@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">WaiUScheduler</string>
+    <string name="title_timer">Timer</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_courses">Courses</string>
+    <string name="title_calendar">Calendar</string>
+</resources>
