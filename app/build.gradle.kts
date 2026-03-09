@@ -46,4 +46,12 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+
+    // Add dependencies for room
+    implementation("androidx.room:room-runtime:2.8.4")
+    annotationProcessor("androidx.room:room-compiler:2.8.4")
+
+    // Add dependencies for lifecycle extensions
+    implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
+    annotationProcessor("androidx.lifecycle:lifecycle-compiler:2.10.0")
 }

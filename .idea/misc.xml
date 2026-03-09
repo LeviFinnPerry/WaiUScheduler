@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="EntryPointsManager">
+    <writeAnnotations>
+      <writeAnnotation name="androidx.room.PrimaryKey" />
+    </writeAnnotations>
+  </component>
   <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="Kotlin2JsCompilerArguments">
     <option name="moduleKind" value="plain" />
