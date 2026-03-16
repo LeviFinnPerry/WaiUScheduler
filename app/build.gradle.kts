@@ -54,4 +54,11 @@ dependencies {
     // Add dependencies for lifecycle extensions
     implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
     annotationProcessor("androidx.lifecycle:lifecycle-compiler:2.10.0")
+
+    // Add dependencies for GSON
+    implementation("com.google.code.gson:gson:2.13.2")
+
+    // Add dependencies for HTTP
+    implementation("com.squareup.retrofit2:retrofit:3.0.0")
+    implementation("com.squareup.retrofit2:converter-gson:3.0.0") // For JSON conversion
 }
