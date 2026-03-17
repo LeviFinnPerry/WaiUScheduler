@@ -1,7 +1,10 @@
 package com.example.waiuscheduler;
 
+import android.content.Context;
+
 import androidx.annotation.NonNull;
 
+import com.example.waiuscheduler.database.PaperTable;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
@@ -25,7 +28,9 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
-// TODO: OPTIMISE THE HANDLING ON PARSING DATA
+// TODO: OPTIMISE THE HANDLING ON PARSING
+// TODO: Need a converted to handle date types
+// TODO: Pre populate semester information
 
 // Collects information from the paper outline on the waikato university website
 public class CourseOutlineScraper {
@@ -98,7 +103,7 @@ public class CourseOutlineScraper {
         tableNames.add("timetable");
         tableNames.add("assessments");
 
-        List<String> itemsData = new ArrayList<>();
+        ArrayList<String> itemsData = new ArrayList<>();
         ArrayList<ArrayList<ArrayList<String>>> tablesData = new ArrayList<>();
 
         // Retrieve main information from paper outline
@@ -113,9 +118,7 @@ public class CourseOutlineScraper {
                     String item = span.text();
                     itemsData.add(item);
                 }
-
             }
-
         }
 
         // Retrieve information fromm each table
@@ -124,7 +127,7 @@ public class CourseOutlineScraper {
         }
 
         // TODO: Store the information in the correct databases
-
+        PaperTable paperTable = toPaperData(itemsData);
 
     }
 
@@ -151,6 +154,24 @@ public class CourseOutlineScraper {
             }
         }
         return tableData;
+    }
+
+    // Store information for paper database
+    public PaperTable toPaperData(ArrayList<String> paperData) {
+        // Retrieve information from array list
+        // For now just for papers that successfully parse all information
+        if (paperData.size() == 6) {
+            String paperName = paperData.get(0);
+            String paperCode = paperData.get(1).split("-")[0];
+            int points = Integer.parseInt(paperData.get(2));
+            String startWeek = paperData.get(4);
+            String endWeek = paperData.get(5);
+            String semesterCode_fk = paperData.get(3);
+
+            // TODO: Set paper data
+            return new PaperTable(paperCode, paperName, points, startWeek, endWeek, semesterCode_fk);
+        }
+        return null;
     }
 
 }

@@ -1,5 +1,7 @@
 package com.example.waiuscheduler.database;
 
+import android.widget.FilterQueryProvider;
+
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
 import androidx.room.Index;
@@ -22,11 +24,11 @@ public class PaperTable {
     private int points;                 // Paper points
     private String startWeek;           // Start week for the paper
     private String endWeek;             // End week for the paper
-    private ForeignKey semesterCode_fk;    // Foreign key referencing semester
+    private String semesterCode_fk;    // Foreign key referencing semester
 
     // Constructor for the paper table
     public PaperTable(String paperCode, String paperName,
-                      int points, String startWeek, String endWeek, ForeignKey semesterCode_fk) {
+                      int points, String startWeek, String endWeek, String semesterCode_fk) {
         this.paperCode = paperCode;
         this.paperName = paperName;
         this.points = points;
@@ -94,11 +96,11 @@ public class PaperTable {
 
     // Semester code
 
-    public ForeignKey getSemesterCode_fk() {
+    public String getSemesterCode_fk() {
         return semesterCode_fk;
     }
 
-    public void setSemesterCode_fk(ForeignKey semesterCode_fk) {
+    public void setSemesterCode_fk(String semesterCode_fk) {
         this.semesterCode_fk = semesterCode_fk;
     }
 }

@@ -1,8 +1,10 @@
 package com.example.waiuscheduler.dao;
 
 import androidx.lifecycle.LiveData;
+
 import androidx.room.Delete;
 import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
@@ -14,7 +16,7 @@ import java.util.List;
 @androidx.room.Dao
 public interface PaperDao {
     // Add data
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE) // Replace Information if duplicate
     void insert(PaperTable paper);
 
     // Remove data
