@@ -1,7 +1,5 @@
 package com.example.waiuscheduler;
 
-import android.content.Context;
-
 import androidx.annotation.NonNull;
 
 import com.example.waiuscheduler.database.PaperTable;
@@ -30,11 +28,17 @@ import okhttp3.ResponseBody;
 
 // TODO: OPTIMISE THE HANDLING ON PARSING
 // TODO: Need a converted to handle date types
-// TODO: Pre populate semester information
 
 // Collects information from the paper outline on the waikato university website
 public class CourseOutlineScraper {
-    public CourseOutlineScraper(HttpUrl url) throws IOException {
+    // Database controller
+    private final DatabaseController dbController;
+
+    public CourseOutlineScraper(DatabaseController dbController) {
+        this.dbController = dbController;   // Connects controller to scraper
+    }
+
+    public void getCourseOutline(HttpUrl url) throws IOException {
         OkHttpClient client = new OkHttpClient();   // Initialise the client
         Request request = new Request.Builder()
                 .url(url)
@@ -79,15 +83,16 @@ public class CourseOutlineScraper {
                     // Store the html as a document
                     Document paperOutline = Jsoup.parse(html);
 
-                    // Extract key information from the paper
-                    RetrieveInformation(paperOutline);
+                    // Extract key information from the paper and save to database
+                    getInformation(paperOutline);
                 }
-
             }
         });
+
     }
+
     // Function to retrieve outline information from the paper outline
-    public void RetrieveInformation(Document paper) {
+    private void getInformation(Document paper) {
         // Labels of each element
         List<String> labelNames = new ArrayList<>();
         labelNames.add("Paper Title");
@@ -123,16 +128,16 @@ public class CourseOutlineScraper {
 
         // Retrieve information fromm each table
         for (String table: tableNames) {
-            tablesData.add(RetrieveTableData(table, paper));
+            tablesData.add(retrieveTableData(table, paper));
         }
 
-        // TODO: Store the information in the correct databases
-        PaperTable paperTable = toPaperData(itemsData);
+        // Store data to the paper table
+        toPaperData(itemsData);
 
     }
 
     // Helping function to retrieve information from tables
-    public ArrayList<ArrayList<String>> RetrieveTableData(String tableName, Document paper) {
+    private ArrayList<ArrayList<String>> retrieveTableData(String tableName, Document paper) {
         ArrayList<String> colData = new ArrayList<>();
         ArrayList<ArrayList<String>> tableData = new ArrayList<>();
         String query = "table:contains(" + tableName + ")";
@@ -157,7 +162,7 @@ public class CourseOutlineScraper {
     }
 
     // Store information for paper database
-    public PaperTable toPaperData(ArrayList<String> paperData) {
+    private void toPaperData(ArrayList<String> paperData) {
         // Retrieve information from array list
         // For now just for papers that successfully parse all information
         if (paperData.size() == 6) {
@@ -168,10 +173,8 @@ public class CourseOutlineScraper {
             String endWeek = paperData.get(5);
             String semesterCode_fk = paperData.get(3);
 
-            // TODO: Set paper data
-            return new PaperTable(paperCode, paperName, points, startWeek, endWeek, semesterCode_fk);
+            dbController.savePaper(new PaperTable(paperCode, paperName, points, startWeek, endWeek, semesterCode_fk));
         }
-        return null;
     }
 
 }

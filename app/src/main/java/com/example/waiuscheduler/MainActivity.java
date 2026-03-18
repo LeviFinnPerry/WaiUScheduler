@@ -12,13 +12,32 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.example.waiuscheduler.databinding.ActivityMainBinding;
 
+import java.io.IOException;
+
+import okhttp3.HttpUrl;
+
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
 
+
+    // Classes for paper outlines
+    private CourseOutlineScraper courseOutlineScraper;
+    private DatabaseController databaseController;
+    private AppDatabase appDatabase;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Initialise the app database
+        appDatabase = AppDatabase.getInstance(getApplicationContext());
+
+        // Get the database controller
+        databaseController = new DatabaseController(appDatabase);
+
+        // Get the course outline scraper
+
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -33,6 +52,19 @@ public class MainActivity extends AppCompatActivity {
                 Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.navView, navController);
+    }
+
+    // Method for getting and adding the paper outline
+    public void storePaperOutline() throws IOException {
+        // Get the course code from the user eg. COMPX576
+        String courseCode = "COMPX576";
+
+        // Form the course code into the URL
+        String urlFormat = "https://uow-func-net-currmngmt-offmngmt-aue-prod.azurewebsites.net/api/outline/view/" + courseCode +"26A%20%28HAM%29";
+        HttpUrl url = HttpUrl.parse(urlFormat);
+
+        // Handle paper outline
+        courseOutlineScraper.getCourseOutline(url);
     }
 
 }
