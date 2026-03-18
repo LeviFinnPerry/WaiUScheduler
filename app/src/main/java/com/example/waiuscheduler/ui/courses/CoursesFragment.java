@@ -76,7 +76,7 @@ public class CoursesFragment extends Fragment {
         String courseCode = "COMPX576";
 
         // Form the course code into the URL
-        String urlFormat = "https://uow-func-net-currmngmt-offmngmt-aue-prod.azurewebsites.net/api/outline/view/" + courseCode +"26A%20%28HAM%29";
+        String urlFormat = "https://uow-func-net-currmngmt-offmngmt-aue-prod.azurewebsites.net/api/outline/view/" + courseCode +"-26A%20%28HAM%29";
         HttpUrl url = HttpUrl.parse(urlFormat);
 
         // Handle paper outline

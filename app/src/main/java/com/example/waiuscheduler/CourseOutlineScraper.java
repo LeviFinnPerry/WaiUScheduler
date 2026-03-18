@@ -42,7 +42,7 @@ public class CourseOutlineScraper {
         OkHttpClient client = new OkHttpClient();   // Initialise the client
         Request request = new Request.Builder()
                 .url(url)
-                .header("Accept", "application/json")
+                .header("Accept", "application/json")   // As written on website for request headers
                 .header("Accept-Language", "en-US,en;q=0.9,es;q=0.8,ru;q=0.7")
                 .header("Origin", "https://paperoutlines.waikato.ac.nz")
                 .header("Referer", "https://paperoutlines.waikato.ac.nz/")
