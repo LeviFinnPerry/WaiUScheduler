@@ -23,8 +23,7 @@ public class DatabaseController {
     private StudySessionDao studyDao;
 
 
-    public DatabaseController(Context context) {
-        AppDatabase db = AppDatabase.getInstance(context);
+    public DatabaseController(AppDatabase db) {
         this.assessmentDao = db.assessmentDao();
         this.eventDao = db.eventDao();
         this.paperDao = db.paperDao();

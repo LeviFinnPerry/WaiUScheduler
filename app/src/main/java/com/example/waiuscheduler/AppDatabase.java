@@ -3,9 +3,11 @@ package com.example.waiuscheduler;
 import android.app.Application;
 import android.content.Context;
 
+import androidx.annotation.NonNull;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
+import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import com.example.waiuscheduler.dao.AssessmentDao;
 import com.example.waiuscheduler.dao.EventDao;
@@ -22,6 +24,8 @@ import com.example.waiuscheduler.database.SemesterTable;
 import com.example.waiuscheduler.database.StaffTable;
 import com.example.waiuscheduler.database.StudySessionTable;
 import com.example.waiuscheduler.database.TimetablePatternTable;
+
+import java.util.concurrent.Executors;
 
 @Database(entities = {
         AssessmentTable.class,
@@ -43,7 +47,6 @@ public abstract class AppDatabase extends RoomDatabase {
 
     // Instance for the database
     private static volatile AppDatabase INSTANCE;
-    private static DatabaseController dbController;
 
     // Get instance of the database
     public static AppDatabase getInstance(Context context) {
@@ -55,24 +58,28 @@ public abstract class AppDatabase extends RoomDatabase {
                             AppDatabase.class, "app_database")
                             .enableMultiInstanceInvalidation()  // Allow for foreign keys
                             .fallbackToDestructiveMigration() // Handle migrations
+                            .addCallback(insertSemesterDates)
                             .build();
-
-                    dbController = new DatabaseController(context);
                 }
             }
         }
         return INSTANCE;
     }
 
-    // Get the database controller
-    public static DatabaseController getDatabaseController() {
-        if (dbController != null) {
-            return dbController;
-        } else {
-            return null;
+    // Add semester dates for the year manually at the beginning
+    private static final RoomDatabase.Callback insertSemesterDates = new RoomDatabase.Callback() {
+        @Override
+        public void onCreate(@NonNull SupportSQLiteDatabase db) {
+            super.onCreate(db);
+
+            Executors.newSingleThreadScheduledExecutor().execute(() -> {
+                SemesterDao semester = INSTANCE.semesterDao();
+
+                // Add the dates
+                // TODO: Update from strings to dates
+                semester.insert(new SemesterTable("26A", "02/03/2026", "26/06/2026", "08/04/2026", "20/04/2026"));
+                semester.insert(new SemesterTable("26B", "13/07/2026", "06/11/2026", "24/08/2026", "07/09/2026"));
+            });
         }
-    }
-
-
-
+    };
 }
