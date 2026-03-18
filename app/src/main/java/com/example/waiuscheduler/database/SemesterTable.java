@@ -1,11 +1,12 @@
 package com.example.waiuscheduler.database;
 
+import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
 @Entity(tableName = "semester")
 public class SemesterTable {
-    @PrimaryKey
+    @PrimaryKey @NonNull
     private String semesterCode;    // Unique occurrence code for each semester eg. 26A
     private String startDate;       // Start Date for the semester
     private String endDate;         // End Date for the semester

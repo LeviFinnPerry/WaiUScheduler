@@ -16,15 +16,14 @@ import androidx.room.PrimaryKey;
 )
 public class StaffTable {
     @PrimaryKey(autoGenerate = true)
-    private String StaffId;     // Unique Id for the staff member
+    private int StaffId;     // Unique Id for the staff member
     private String name;        // Name of staff member
     private String email;       // Email of staff member
     private String position;    // Position of staff member (eg. conveyor, tutor, etc.)
-    private ForeignKey paperId_fk; // Foreign key for paper ID
+    private String paperId_fk; // Foreign key for paper ID
 
     // Constructor for staff table
-    public StaffTable(String staffId, String name, String email, String position, ForeignKey paperId_fk){
-        StaffId = staffId;
+    public StaffTable(String name, String email, String position, String paperId_fk) {
         this.name = name;
         this.email = email;
         this.position = position;
@@ -33,8 +32,12 @@ public class StaffTable {
 
     // Getters and setters for the staff variables
     // Staff ID
-    public String getStaffId() {
+    public int getStaffId() {
         return StaffId;
+    }
+
+    public void setStaffId(int staffId) {
+        StaffId = staffId;
     }
 
     // Name
@@ -68,11 +71,11 @@ public class StaffTable {
 
     // Paper id
 
-    public ForeignKey getPaperId_fk() {
+    public String getPaperId_fk() {
         return paperId_fk;
     }
 
-    public void setPaperId_fk(ForeignKey paperId_fk) {
+    public void setPaperId_fk(String paperId_fk) {
         this.paperId_fk = paperId_fk;
     }
 }

@@ -8,7 +8,7 @@ import androidx.room.PrimaryKey;
 @Entity(tableName = "assessment",
         foreignKeys = @ForeignKey(
                 entity = PaperTable.class,      // Class of foreign key
-                parentColumns = "paperId_fk",      // Foreign key variable
+                parentColumns = "paperId",      // Foreign key variable
                 childColumns = "paperId_fk",    // Foreign key name
                 onDelete = ForeignKey.CASCADE   // Dependency on paper
         ),
@@ -16,17 +16,17 @@ import androidx.room.PrimaryKey;
 )
 public class AssessmentTable {
     @PrimaryKey(autoGenerate = true)
-    private String assessmentId;    // Unique id for assessments
+    private int assessmentId;    // Unique id for assessments
     private String title;           // Title for the assessment
     private String dueDate;         // Due date of the assignment
     private Double weight;          // Weight of marks for the assignment
     private String type;            // Type of assessment (eg. test, assignment, exam)
     private Double grade;           // Grade given on assignment
-    private ForeignKey paperId_fk;     // Foreign key to reference the paper table
+    private String paperId_fk;     // Foreign key to reference the paper table
 
     // Constructor for the paper table
     public AssessmentTable(String title, String dueDate, Double weight,
-                           String type, Double grade, ForeignKey paperId_fk
+                           String type, Double grade, String paperId_fk
     ) {
         this.title = title;
         this.dueDate = dueDate;
@@ -39,7 +39,12 @@ public class AssessmentTable {
     // Getters and setters for each assignment variable
     // Id
 
-    public String getAssessmentId() {
+
+    public void setAssessmentId(int assessmentId) {
+        this.assessmentId = assessmentId;
+    }
+
+    public int getAssessmentId() {
         return assessmentId;
     }
 
@@ -96,11 +101,11 @@ public class AssessmentTable {
     // Paper id
 
 
-    public ForeignKey getPaperId_fk() {
+    public String getPaperId_fk() {
         return paperId_fk;
     }
 
-    public void setPaperId_fk(ForeignKey paperId_fk) {
+    public void setPaperId_fk(String paperId_fk) {
         this.paperId_fk = paperId_fk;
     }
 }

@@ -8,7 +8,7 @@ import androidx.room.PrimaryKey;
 @Entity(tableName = "timetable_pattern",
         foreignKeys = @ForeignKey(
                 entity = PaperTable.class,      // Class of the foreign key
-                parentColumns = "paperId_fk",      // Foreign key variable
+                parentColumns = "paperId",      // Foreign key variable
                 childColumns = "paperId_fk",    // Foreign key name
                 onDelete = ForeignKey.CASCADE   // Dependency on paper
         ),
@@ -16,18 +16,18 @@ import androidx.room.PrimaryKey;
 )
 public class TimetablePatternTable {
     @PrimaryKey(autoGenerate = true)
-    private String timetableId;     // Unique Id for the timetable occurance
+    private int timetableId;     // Unique Id for the timetable occurance
     private String type;            // Type of timetable event (eg. lecture)
     private String dayOfWeek;       // Day of week event occurs on
     private String startTime;       // Start time
     private String endTime;         // End time
     private String location;        // Location for event
     private Double duration;        // Total duration in hours
-    private ForeignKey paperId_fk;     // Foreign key references event table
+    private String paperId_fk;     // Foreign key references event table
 
     // Constructor for the timetable table
     public TimetablePatternTable(String type, String dayOfWeek, String startTime,
-                                 String endTime, String location, Double duration, ForeignKey paperId_fk
+                                 String endTime, String location, Double duration, String paperId_fk
     ) {
         this.type = type;
         this.dayOfWeek = dayOfWeek;
@@ -40,8 +40,12 @@ public class TimetablePatternTable {
 
     // Getters and setters of each timetable pattern variable
     // Timetable id
-    public String getTimetableId() {
+    public int getTimetableId() {
         return timetableId;
+    }
+
+    public void setTimetableId(int timetableId) {
+        this.timetableId = timetableId;
     }
 
     // Type
@@ -102,11 +106,11 @@ public class TimetablePatternTable {
 
     // Event id
 
-    public ForeignKey getPaperId_fk() {
+    public String getPaperId_fk() {
         return paperId_fk;
     }
 
-    public void setPaperId_fk(ForeignKey paperId_fk) {
+    public void setPaperId_fk(String paperId_fk) {
         this.paperId_fk = paperId_fk;
     }
 }

@@ -16,16 +16,16 @@ import androidx.room.PrimaryKey;
 )
 public class EventTable {
     @PrimaryKey(autoGenerate = true)
-    private String eventId;     // Unique identifier for the event
+    private int eventId;     // Unique identifier for the event
     private String eventType;   // Type of event
     private String dateTimeStart;   // Start time
     private String dateTimeEnd;     // End time
     private Boolean attended;       // Monitor attendance of each event
-    private ForeignKey timetableId_fk;     // Foreign key references the timetable table
+    private String timetableId_fk;     // Foreign key references the timetable table
 
     // Constructor for the event table
     public EventTable(String eventType, String dateTimeStart,
-                      String dateTimeEnd, Boolean attended, ForeignKey timetableId_fk
+                      String dateTimeEnd, Boolean attended, String timetableId_fk
     ) {
         this.eventType = eventType;
         this.dateTimeStart = dateTimeStart;
@@ -36,8 +36,11 @@ public class EventTable {
 
     // Getters and setters for each event variable
     // Id
+    public void setEventId(int eventId) {
+        this.eventId = eventId;
+    }
 
-    public String getEventId() {
+    public int getEventId() {
         return eventId;
     }
 
@@ -84,11 +87,11 @@ public class EventTable {
 
     // Paper id
 
-    public ForeignKey getTimetableId_fk() {
+    public String getTimetableId_fk() {
         return timetableId_fk;
     }
 
-    public void setTimetableId_fk(ForeignKey timetableId_fk) {
+    public void setTimetableId_fk(String timetableId_fk) {
         this.timetableId_fk = timetableId_fk;
     }
 }

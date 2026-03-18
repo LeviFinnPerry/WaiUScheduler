@@ -18,7 +18,7 @@ import androidx.room.PrimaryKey;
 )
 public class PaperTable {
     @PrimaryKey(autoGenerate = true)    // Unique Id for the paper
-    private String paperId;
+    private int paperId;
     private String paperCode;           // Paper code eg. COMPX576
     private String paperName;           // Paper name eg. Programming Project
     private int points;                 // Paper points
@@ -39,10 +39,13 @@ public class PaperTable {
 
     // Getters and setters for each paper variable
     // Id
-    public String getPaperId() {
+    public int getPaperId() {
         return paperId;
     }
 
+    public void setPaperId(int paperId) {
+        this.paperId = paperId;
+    }
 
     // Paper code
 

@@ -16,16 +16,16 @@ import androidx.room.PrimaryKey;
 )
 public class StudySessionTable {
     @PrimaryKey(autoGenerate = true)        // Unique Id for the study session
-    private String sessionId;
+    private int sessionId;
     private String dateTimeStart;           // Start time of study session
     private String dateTimeEnd;             // End time of study session
     private Double duration;                // Duration of study session
     private String notes;                   // Notes from session
-    private ForeignKey paperId_fk;          // Foreign key referencing paper
+    private String paperId_fk;          // Foreign key referencing paper
 
     // Constructor for the study session table
     public StudySessionTable(String dateTimeStart, String dateTimeEnd, Double duration,
-                             String notes, ForeignKey paperId_fk) {
+                             String notes, String paperId_fk) {
         this.dateTimeStart = dateTimeStart;
         this.dateTimeEnd = dateTimeEnd;
         this.duration = duration;
@@ -36,8 +36,12 @@ public class StudySessionTable {
     // Getter and setters
     // Id
 
-    public String getSessionId() {
+    public int getSessionId() {
         return sessionId;
+    }
+
+    public void setSessionId(int sessionId) {
+        this.sessionId = sessionId;
     }
 
     // Start
@@ -80,11 +84,11 @@ public class StudySessionTable {
 
     // Paper Id
 
-    public ForeignKey getPaperId_fk() {
+    public String getPaperId_fk() {
         return paperId_fk;
     }
 
-    public void setPaperId_fk(ForeignKey paperId_fk) {
+    public void setPaperId_fk(String paperId_fk) {
         this.paperId_fk = paperId_fk;
     }
 }
