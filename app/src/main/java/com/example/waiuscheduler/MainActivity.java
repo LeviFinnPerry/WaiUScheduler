@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
         databaseController = new DatabaseController(appDatabase);
 
         // Get the course outline scraper
-
+        courseOutlineScraper = new CourseOutlineScraper(databaseController);
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -54,17 +54,9 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupWithNavController(binding.navView, navController);
     }
 
-    // Method for getting and adding the paper outline
-    public void storePaperOutline() throws IOException {
-        // Get the course code from the user eg. COMPX576
-        String courseCode = "COMPX576";
-
-        // Form the course code into the URL
-        String urlFormat = "https://uow-func-net-currmngmt-offmngmt-aue-prod.azurewebsites.net/api/outline/view/" + courseCode +"26A%20%28HAM%29";
-        HttpUrl url = HttpUrl.parse(urlFormat);
-
-        // Handle paper outline
-        courseOutlineScraper.getCourseOutline(url);
+    // To get the database the course outline scraper
+    public CourseOutlineScraper getCourseOutlineScraper() {
+        return courseOutlineScraper;
     }
 
 }
