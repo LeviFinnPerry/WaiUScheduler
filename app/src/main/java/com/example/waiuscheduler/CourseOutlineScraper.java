@@ -42,7 +42,17 @@ public class CourseOutlineScraper {
         OkHttpClient client = new OkHttpClient();   // Initialise the client
         Request request = new Request.Builder()
                 .url(url)
-                .header("Accept", "application/json")   // Request header
+                .header("Accept", "application/json")
+                .header("Accept-Language", "en-US,en;q=0.9,es;q=0.8,ru;q=0.7")
+                .header("Origin", "https://paperoutlines.waikato.ac.nz")
+                .header("Referer", "https://paperoutlines.waikato.ac.nz/")
+                .header("sec-ch-ua", "\"Opera\";v=\"127\", \"Chromium\";v=\"143\", \"Not A(Brand\";v=\"24\"")
+                .header("sec-ch-ua-mobile", "?0")
+                .header("sec-ch-ua-platform", "\"Windows\"")
+                .header("sec-fetch-dest", "empty")
+                .header("sec-fetch-mode", "cors")
+                .header("sec-fetch-site", "cross-site")
+                .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 OPR/127.0.0.0")
                 .build();
 
         client.newCall(request).enqueue(new Callback() {
@@ -58,7 +68,7 @@ public class CourseOutlineScraper {
                     @NonNull Response response
             ) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
-                    if (!response.isSuccessful()) throw new IOException("Unexpected code"); // Error for unsuccessful calls
+                    if (!response.isSuccessful()) throw new IOException("Unexpected code" + response); // Error for unsuccessful calls
                     assert responseBody != null;    // Make sure the document is not empty
                     String result = responseBody.string();  // Get the document string
 
