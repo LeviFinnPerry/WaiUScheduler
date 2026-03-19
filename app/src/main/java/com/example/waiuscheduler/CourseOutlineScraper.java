@@ -150,8 +150,7 @@ public class CourseOutlineScraper {
     private ArrayList<ArrayList<String>> retrieveTableData(String tableName, Document paper) {
         ArrayList<String> colData = new ArrayList<>();
         ArrayList<ArrayList<String>> tableData = new ArrayList<>();
-        String query = "table:contains(" + tableName + ")";
-        // Find the table
+        String query = "table." + tableName;        // Find the table
         Element table = paper.select(query).first();
         // Find the rows in the table
         assert table != null;       // Make sure there is a table
@@ -181,7 +180,7 @@ public class CourseOutlineScraper {
             int points = Integer.parseInt(paperData.get(2));
             String startWeek = paperData.get(4);
             String endWeek = paperData.get(5);
-            String semesterCode_fk = paperData.get(3);
+            String semesterCode_fk = "26" + paperData.get(3);
 
             dbController.savePaper(new PaperTable(paperCode, paperName, points, startWeek, endWeek, semesterCode_fk));
         }
