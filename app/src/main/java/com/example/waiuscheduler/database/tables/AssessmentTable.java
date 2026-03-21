@@ -1,4 +1,4 @@
-package com.example.waiuscheduler.database;
+package com.example.waiuscheduler.database.tables;
 
 import androidx.room.Entity;
 import androidx.room.ForeignKey;

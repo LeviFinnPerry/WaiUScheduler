@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.waiuscheduler.cleaner.ScrapedData;
 import com.example.waiuscheduler.http.CourseOutlineScraper;
 import com.example.waiuscheduler.MainActivity;
 import com.example.waiuscheduler.R;
@@ -31,6 +32,7 @@ public class CoursesFragment extends Fragment {
 
     // outline scraper
     private CourseOutlineScraper courseOutlineScraper;
+    private ScrapedData paperData;
 
     public View onCreateView(
             @NonNull LayoutInflater inflater,
@@ -86,6 +88,8 @@ public class CoursesFragment extends Fragment {
 
         // Handle paper outline
         courseOutlineScraper.getCourseOutline(url);
+
+        //TODO: Store the paper outline to the database
     }
 
 }

@@ -1,4 +1,4 @@
-package com.example.waiuscheduler.database;
+package com.example.waiuscheduler.database.tables;
 
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
@@ -14,8 +14,9 @@ public class SemesterTable {
     private String breakEndDate;    // End date for the mid semester break
 
     // Constructor for the semester table
-    public SemesterTable(String semesterCode, String startDate,
-                         String endDate, String breakStartDate, String breakEndDate) {
+    public SemesterTable(
+            @NonNull String semesterCode, String startDate,
+            String endDate, String breakStartDate, String breakEndDate) {
         this.semesterCode = semesterCode;
         this.startDate = startDate;
         this.endDate = endDate;

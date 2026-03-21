@@ -7,7 +7,7 @@ import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
-import com.example.waiuscheduler.database.TimetablePatternTable;
+import com.example.waiuscheduler.database.tables.TimetablePatternTable;
 
 import java.util.List;
 

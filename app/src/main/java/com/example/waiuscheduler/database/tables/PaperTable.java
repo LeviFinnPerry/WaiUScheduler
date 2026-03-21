@@ -1,6 +1,4 @@
-package com.example.waiuscheduler.database;
-
-import android.widget.FilterQueryProvider;
+package com.example.waiuscheduler.database.tables;
 
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
@@ -18,7 +16,7 @@ import androidx.room.PrimaryKey;
 )
 public class PaperTable {
     @PrimaryKey(autoGenerate = true)    // Unique Id for the paper
-    private int paperId;
+    private long paperId;
     private String paperCode;           // Paper code eg. COMPX576
     private String paperName;           // Paper name eg. Programming Project
     private int points;                 // Paper points
@@ -39,11 +37,11 @@ public class PaperTable {
 
     // Getters and setters for each paper variable
     // Id
-    public int getPaperId() {
+    public long getPaperId() {
         return paperId;
     }
 
-    public void setPaperId(int paperId) {
+    public void setPaperId(long paperId) {
         this.paperId = paperId;
     }
 

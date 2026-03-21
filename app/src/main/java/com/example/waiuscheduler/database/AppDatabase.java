@@ -1,6 +1,5 @@
-package com.example.waiuscheduler;
+package com.example.waiuscheduler.database;
 
-import android.app.Application;
 import android.content.Context;
 
 import androidx.annotation.NonNull;
@@ -17,13 +16,13 @@ import com.example.waiuscheduler.dao.StaffDao;
 import com.example.waiuscheduler.dao.StudySessionDao;
 import com.example.waiuscheduler.dao.TimetablePatternDao;
 
-import com.example.waiuscheduler.database.AssessmentTable;
-import com.example.waiuscheduler.database.EventTable;
-import com.example.waiuscheduler.database.PaperTable;
-import com.example.waiuscheduler.database.SemesterTable;
-import com.example.waiuscheduler.database.StaffTable;
-import com.example.waiuscheduler.database.StudySessionTable;
-import com.example.waiuscheduler.database.TimetablePatternTable;
+import com.example.waiuscheduler.database.tables.AssessmentTable;
+import com.example.waiuscheduler.database.tables.EventTable;
+import com.example.waiuscheduler.database.tables.PaperTable;
+import com.example.waiuscheduler.database.tables.SemesterTable;
+import com.example.waiuscheduler.database.tables.StaffTable;
+import com.example.waiuscheduler.database.tables.StudySessionTable;
+import com.example.waiuscheduler.database.tables.TimetablePatternTable;
 
 import java.util.concurrent.Executors;
 
@@ -35,7 +34,7 @@ import java.util.concurrent.Executors;
         StaffTable.class,
         StudySessionTable.class,
         TimetablePatternTable.class
-}, version = 1)
+}, version = 2)
 public abstract class AppDatabase extends RoomDatabase {
     public abstract AssessmentDao assessmentDao();
     public abstract EventDao eventDao();

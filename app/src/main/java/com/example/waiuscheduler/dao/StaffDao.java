@@ -7,7 +7,7 @@ import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
-import com.example.waiuscheduler.database.StaffTable;
+import com.example.waiuscheduler.database.tables.StaffTable;
 
 import java.util.List;
 

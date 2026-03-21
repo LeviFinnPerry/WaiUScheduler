@@ -1,8 +1,9 @@
 package com.example.waiuscheduler;
 
 import android.os.Bundle;
-import android.util.Log;
 
+import com.example.waiuscheduler.database.AppDatabase;
+import com.example.waiuscheduler.database.DatabaseController;
 import com.example.waiuscheduler.http.CourseOutlineScraper;
 import com.example.waiuscheduler.http.OnDocumentReady;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -14,8 +15,6 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.example.waiuscheduler.databinding.ActivityMainBinding;
-
-import org.jsoup.nodes.Document;
 
 public class MainActivity extends AppCompatActivity {
 

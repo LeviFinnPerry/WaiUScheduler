@@ -8,7 +8,7 @@ import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
-import com.example.waiuscheduler.database.PaperTable;
+import com.example.waiuscheduler.database.tables.PaperTable;
 
 import java.util.List;
 
@@ -16,8 +16,8 @@ import java.util.List;
 @androidx.room.Dao
 public interface PaperDao {
     // Add data
-    @Insert(onConflict = OnConflictStrategy.REPLACE) // Replace Information if duplicate
-    void insert(PaperTable paper);
+    @Insert // Replace Information if duplicate
+    long insert(PaperTable paper);
 
     // Remove data
     @Delete

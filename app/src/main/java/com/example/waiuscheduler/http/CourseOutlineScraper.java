@@ -4,8 +4,8 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.example.waiuscheduler.DatabaseController;
-import com.example.waiuscheduler.database.PaperTable;
+import com.example.waiuscheduler.cleaner.DataCleaner;
+import com.example.waiuscheduler.cleaner.ScrapedData;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
@@ -14,12 +14,8 @@ import com.google.gson.JsonParser;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -37,6 +33,8 @@ public class CourseOutlineScraper {
     // Database controller
     private OnDocumentReady listener;
 
+    private ScrapedData paperData;
+
     public CourseOutlineScraper() {
         startOnDocumentReadyListener();          // Initialise ondocumentready listener
     }
@@ -47,7 +45,9 @@ public class CourseOutlineScraper {
             @Override
             public void onReady(Document document) {
                 // TODO: Pass document to cleaning
-                Log.e("Listener", "Successful parse document");
+                // Possibly needing to rethink threads for foreign key
+                //DataCleaner cleaner = new DataCleaner();
+                //setPaperData(cleaner.clean(document));
             }
 
             @Override
@@ -127,15 +127,24 @@ public class CourseOutlineScraper {
         });
     }
 
-        // Notify listener of the result
-        private void notifyListener(OnDocumentReady listener, Document document) {
-            if (listener != null) {
-                try {
-                    listener.onReady(document);
-                } catch (Exception e) {
-                    listener.onError(e);
-                }
+    // Notify listener of the result
+    private void notifyListener(OnDocumentReady listener, Document document) {
+        if (listener != null) {
+            try {
+                listener.onReady(document);
+            } catch (Exception e) {
+                listener.onError(e);
             }
         }
+    }
 
+    // Get the paperData from the course outline
+    public ScrapedData getPaperData() {
+        return paperData;
+    }
+
+    public void setPaperData(ScrapedData paperData) {
+        this.paperData = paperData;
+    }
 }
+
