@@ -2,6 +2,7 @@ package com.example.waiuscheduler.ui.courses;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,10 +13,13 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.example.waiuscheduler.CourseOutlineScraper;
+import com.example.waiuscheduler.http.CourseOutlineScraper;
 import com.example.waiuscheduler.MainActivity;
 import com.example.waiuscheduler.R;
 import com.example.waiuscheduler.databinding.FragmentCoursesBinding;
+import com.example.waiuscheduler.http.OnDocumentReady;
+
+import org.jsoup.nodes.Document;
 
 import java.io.IOException;
 
@@ -76,10 +80,12 @@ public class CoursesFragment extends Fragment {
         String courseCode = "COMPX576";
 
         // Form the course code into the URL
-        String urlFormat = "https://uow-func-net-currmngmt-offmngmt-aue-prod.azurewebsites.net/api/outline/view/" + courseCode +"-26A%20%28HAM%29";
+        String urlFormat =
+                "https://uow-func-net-currmngmt-offmngmt-aue-prod.azurewebsites.net/api/outline/view/" + courseCode + "-26A%20%28HAM%29";
         HttpUrl url = HttpUrl.parse(urlFormat);
 
         // Handle paper outline
         courseOutlineScraper.getCourseOutline(url);
     }
+
 }

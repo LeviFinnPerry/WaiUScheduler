@@ -1,7 +1,10 @@
 package com.example.waiuscheduler;
 
 import android.os.Bundle;
+import android.util.Log;
 
+import com.example.waiuscheduler.http.CourseOutlineScraper;
+import com.example.waiuscheduler.http.OnDocumentReady;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,9 +15,7 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.example.waiuscheduler.databinding.ActivityMainBinding;
 
-import java.io.IOException;
-
-import okhttp3.HttpUrl;
+import org.jsoup.nodes.Document;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -23,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
 
     // Classes for paper outlines
     private CourseOutlineScraper courseOutlineScraper;
+    private OnDocumentReady documentListener;
     private DatabaseController databaseController;
     private AppDatabase appDatabase;
 
@@ -36,8 +38,8 @@ public class MainActivity extends AppCompatActivity {
         // Get the database controller
         databaseController = new DatabaseController(appDatabase);
 
-        // Get the course outline scraper
-        courseOutlineScraper = new CourseOutlineScraper(databaseController);
+        // Get the course outline scraper and listener
+        courseOutlineScraper = new CourseOutlineScraper();
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -58,5 +60,6 @@ public class MainActivity extends AppCompatActivity {
     public CourseOutlineScraper getCourseOutlineScraper() {
         return courseOutlineScraper;
     }
+
 
 }
