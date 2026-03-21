@@ -1,95 +1,59 @@
 package com.example.waiuscheduler.ui.courses;
 
-import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.example.waiuscheduler.cleaner.ScrapedData;
-import com.example.waiuscheduler.http.CourseOutlineScraper;
-import com.example.waiuscheduler.MainActivity;
-import com.example.waiuscheduler.R;
 import com.example.waiuscheduler.databinding.FragmentCoursesBinding;
-import com.example.waiuscheduler.http.OnDocumentReady;
-
-import org.jsoup.nodes.Document;
-
-import java.io.IOException;
-
-import okhttp3.HttpUrl;
 
 public class CoursesFragment extends Fragment {
 
     private FragmentCoursesBinding binding;
 
-    // outline scraper
-    private CourseOutlineScraper courseOutlineScraper;
-    private ScrapedData paperData;
+    // View Model
+    private CoursesViewModel coursesViewModel;
 
     public View onCreateView(
             @NonNull LayoutInflater inflater,
             ViewGroup container, Bundle savedInstanceState
     ) {
-        CoursesViewModel coursesViewModel =
-                new ViewModelProvider(this).get(CoursesViewModel.class);
+        coursesViewModel = new ViewModelProvider(this).get(CoursesViewModel.class);
 
         binding = FragmentCoursesBinding.inflate(inflater, container, false);
-        View root = binding.getRoot();
 
-        final TextView textView = binding.textCourses;
-        coursesViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
+        return binding.getRoot();
+    }
 
-        // Initialise button for getting paper outline
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
-        Button parseButton = root.findViewById(R.id.button);
-        parseButton.setOnClickListener(v -> {
-            try {
-                storePaperOutline();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+        // Observe text changes
+
+        // Observe the pipeline status
+        coursesViewModel.getStatus().observe(getViewLifecycleOwner(), statusMessage -> {
+            if (statusMessage != null) {
+                Toast.makeText(getContext(), statusMessage, Toast.LENGTH_LONG).show();
             }
         });
 
-        return root;
+        // Trigger the pipeline via the button
+        binding.button.setOnClickListener(v -> {
+            coursesViewModel.processCourseOutline("TESTING");
+        });
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
-    }
-
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        if (context instanceof MainActivity) {
-            courseOutlineScraper = ((MainActivity) context).getCourseOutlineScraper();
-        }
-    }
-
-
-    // Method for getting and adding the paper outline
-    public void storePaperOutline() throws IOException {
-        // Get the course code from the user eg. COMPX576
-        String courseCode = "COMPX576";
-
-        // Form the course code into the URL
-        String urlFormat =
-                "https://uow-func-net-currmngmt-offmngmt-aue-prod.azurewebsites.net/api/outline/view/" + courseCode + "-26A%20%28HAM%29";
-        HttpUrl url = HttpUrl.parse(urlFormat);
-
-        // Handle paper outline
-        courseOutlineScraper.getCourseOutline(url);
-
-        //TODO: Store the paper outline to the database
     }
 
 }

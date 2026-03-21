@@ -48,7 +48,7 @@ public abstract class AppDatabase extends RoomDatabase {
     private static volatile AppDatabase INSTANCE;
 
     // Get instance of the database
-    public static AppDatabase getInstance(Context context) {
+    public static AppDatabase getInstance(final Context context) {
         // If not already an instance
         if (INSTANCE == null) {
             synchronized (AppDatabase.class) {  // Check the class

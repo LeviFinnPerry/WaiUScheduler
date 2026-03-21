@@ -1,4 +1,4 @@
-package com.example.waiuscheduler.cleaner;
+package com.example.waiuscheduler.parsing;
 
 import com.example.waiuscheduler.database.tables.PaperTable;
 import com.example.waiuscheduler.database.tables.StaffTable;

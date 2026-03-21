@@ -2,10 +2,6 @@ package com.example.waiuscheduler;
 
 import android.os.Bundle;
 
-import com.example.waiuscheduler.database.AppDatabase;
-import com.example.waiuscheduler.database.DatabaseController;
-import com.example.waiuscheduler.http.CourseOutlineScraper;
-import com.example.waiuscheduler.http.OnDocumentReady;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,24 +17,9 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
 
 
-    // Classes for paper outlines
-    private CourseOutlineScraper courseOutlineScraper;
-    private OnDocumentReady documentListener;
-    private DatabaseController databaseController;
-    private AppDatabase appDatabase;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // Initialise the app database
-        appDatabase = AppDatabase.getInstance(getApplicationContext());
-
-        // Get the database controller
-        databaseController = new DatabaseController(appDatabase);
-
-        // Get the course outline scraper and listener
-        courseOutlineScraper = new CourseOutlineScraper();
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -54,11 +35,4 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.navView, navController);
     }
-
-    // To get the database the course outline scraper
-    public CourseOutlineScraper getCourseOutlineScraper() {
-        return courseOutlineScraper;
-    }
-
-
 }
