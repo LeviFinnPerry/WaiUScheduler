@@ -13,6 +13,7 @@ import java.util.List;
 public class DataCleaner {
     private ArrayList<String> itemsData;
     private ArrayList<String> staffData;
+    private ArrayList<String> assessmentData;
 
     public ScrapedData clean(Document paper) {
         ScrapedData results = new ScrapedData();
@@ -50,6 +51,8 @@ public class DataCleaner {
 
         this.staffData = retrieveStaffTableData(paper);
 
+        this.assessmentData = retrieveAssessmentData(paper);
+
     }
 
     // Helping function to retrieve information from the span elements
@@ -66,6 +69,58 @@ public class DataCleaner {
         }
         return null;
     }
+
+    // Helping function to retrieve information from staff tables
+    private ArrayList<String> retrieveStaffTableData(Document paper) {
+        ArrayList<String> tableData = new ArrayList<>();
+        String query = "table.staff";        // Find the staff table
+        Element table = paper.select(query).first();
+        // Find the rows in the table
+        assert table != null;       // Make sure there is a table
+        Elements rows = table.select("tr");
+        // Get the columns from the rows
+        for (Element row: rows) {
+            Elements cols = row.select("td");
+            // Process each cell in the row
+            for (Element col: cols) {
+                String cellData = col.text();
+                // Check if there is more than one person listed
+                if (cellData.matches(".*@.*@.*")) {
+                    splitMultipleStaff(cellData, tableData);
+                } else if (cellData.contains("-")) {
+                    // Check if there contains a "-" as it seperates name and email
+                    splitStaffInformation(cellData, tableData);
+                } else {
+                    tableData.add(cellData);
+                }
+            }
+        }
+        return tableData;
+    }
+
+    // Helping function to retrieve information from assessment table
+    private ArrayList<String> retrieveAssessmentData(Document paper) {
+        ArrayList<String> tableData = new ArrayList<>();
+        String query = "table.assessments";
+        Element table = paper.select(query).first();
+        assert table != null;
+        Elements rows = table.select("tr");
+        for (Element row : rows) {
+            Elements cols = row.select("td");
+
+            // Skip rows that don't have 3 columns
+            for (Element col : cols) {
+                    String cellData = col.text();
+                    tableData.add(cellData);
+            }
+        }
+        // TODO: Clean arraylist to match the entity structure
+        // (Remove the empty spaces & only need the name, date, percentage )
+
+        return tableData;
+    }
+
+
 
     private PaperTable getPaperInformation() {
         String paperName = itemsData.get(0);
@@ -96,34 +151,6 @@ public class DataCleaner {
             }
         }
         return staffList;
-    }
-
-    // Helping function to retrieve information from tables
-    private ArrayList<String> retrieveStaffTableData(Document paper) {
-        ArrayList<String> tableData = new ArrayList<>();
-        String query = "table.staff";        // Find the staff table
-        Element table = paper.select(query).first();
-        // Find the rows in the table
-        assert table != null;       // Make sure there is a table
-        Elements rows = table.select("tr");
-        // Get the columns from the rows
-        for (Element row: rows) {
-            Elements cols = row.select("td");
-            // Process each cell in the row
-            for (Element col: cols) {
-                String cellData = col.text();
-                // Check if there is more than one person listed
-                if (cellData.matches(".*@.*@.*")) {
-                    splitMultipleStaff(cellData, tableData);
-                } else if (cellData.contains("-")) {
-                    // Check if there contains a "-" as it seperates name and email
-                    splitStaffInformation(cellData, tableData);
-                } else {
-                    tableData.add(cellData);
-                }
-            }
-        }
-        return tableData;
     }
 
     // Handles multiple staff member information
