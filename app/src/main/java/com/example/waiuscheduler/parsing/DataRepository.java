@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.example.waiuscheduler.database.AppDatabase;
 import com.example.waiuscheduler.database.DatabaseController;
+import com.example.waiuscheduler.database.DateConverter;
 import com.example.waiuscheduler.database.tables.AssessmentTable;
 import com.example.waiuscheduler.database.tables.EventTable;
 import com.example.waiuscheduler.database.tables.PaperTable;
@@ -31,11 +32,20 @@ public class DataRepository {
         this.db = AppDatabase.getInstance(context);
         this.dbController = new DatabaseController(db);
 
+
+
         AppDatabase.databaseWriteExecutor.execute(() -> {
             // Add the dates
-            // TODO: Update from strings to dates
-            dbController.saveSemester(new SemesterTable("26A", "02/03/2026", "26/06/2026", "08/04/2026", "20/04/2026"));
-            dbController.saveSemester(new SemesterTable("26B", "13/07/2026", "06/11/2026", "24/08/2026", "07/09/2026"));
+            dbController.saveSemester(new SemesterTable("26A",
+                    DateConverter.stringToDate("02/03/2026"),
+                    DateConverter.stringToDate("26/06/2026"),
+                    DateConverter.stringToDate("08/04/2026"),
+                    DateConverter.stringToDate("20/04/2026")));
+            dbController.saveSemester(new SemesterTable("26B",
+                    DateConverter.stringToDate("13/07/2026"),
+                    DateConverter.stringToDate("06/11/2026"),
+                    DateConverter.stringToDate("24/08/2026"),
+                    DateConverter.stringToDate("07/09/2026")));
 
         });
     }
@@ -88,4 +98,6 @@ public class DataRepository {
     public interface RepositoryCallback {
         void OnComplete(String result);
     }
+
+
 }

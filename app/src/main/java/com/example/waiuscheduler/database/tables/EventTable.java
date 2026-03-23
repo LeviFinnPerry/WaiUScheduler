@@ -5,6 +5,8 @@ import androidx.room.ForeignKey;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
+import java.util.Date;
+
 @Entity(tableName = "event",
         foreignKeys = @ForeignKey(
                 entity = TimetablePatternTable.class,   // Class of foreign key
@@ -18,14 +20,14 @@ public class EventTable {
     @PrimaryKey(autoGenerate = true)
     private int eventId;     // Unique identifier for the event
     private String eventType;   // Type of event
-    private String dateTimeStart;   // Start time
-    private String dateTimeEnd;     // End time
+    private Date dateTimeStart;   // Start time
+    private Date dateTimeEnd;     // End time
     private Boolean attended;       // Monitor attendance of each event
     private String timetableId_fk;     // Foreign key references the timetable table
 
     // Constructor for the event table
-    public EventTable(String eventType, String dateTimeStart,
-                      String dateTimeEnd, Boolean attended, String timetableId_fk
+    public EventTable(String eventType, Date dateTimeStart,
+                      Date dateTimeEnd, Boolean attended, String timetableId_fk
     ) {
         this.eventType = eventType;
         this.dateTimeStart = dateTimeStart;
@@ -56,21 +58,21 @@ public class EventTable {
 
     // Start
 
-    public String getDateTimeStart() {
+    public Date getDateTimeStart() {
         return dateTimeStart;
     }
 
-    public void setDateTimeStart(String dateTimeStart) {
+    public void setDateTimeStart(Date dateTimeStart) {
         this.dateTimeStart = dateTimeStart;
     }
 
     // End
 
-    public String getDateTimeEnd() {
+    public Date getDateTimeEnd() {
         return dateTimeEnd;
     }
 
-    public void setDateTimeEnd(String dateTimeEnd) {
+    public void setDateTimeEnd(Date dateTimeEnd) {
         this.dateTimeEnd = dateTimeEnd;
     }
 

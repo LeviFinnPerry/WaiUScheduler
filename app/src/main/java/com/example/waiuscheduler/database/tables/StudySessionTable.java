@@ -5,6 +5,8 @@ import androidx.room.ForeignKey;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
+import java.util.Date;
+
 @Entity(tableName = "study_session",
         foreignKeys = @ForeignKey(
                 entity = PaperTable.class,  // Class of foreign key
@@ -17,14 +19,14 @@ import androidx.room.PrimaryKey;
 public class StudySessionTable {
     @PrimaryKey(autoGenerate = true)        // Unique Id for the study session
     private int sessionId;
-    private String dateTimeStart;           // Start time of study session
-    private String dateTimeEnd;             // End time of study session
+    private Date dateTimeStart;           // Start time of study session
+    private Date dateTimeEnd;             // End time of study session
     private Double duration;                // Duration of study session
     private String notes;                   // Notes from session
     private String paperId_fk;          // Foreign key referencing paper
 
     // Constructor for the study session table
-    public StudySessionTable(String dateTimeStart, String dateTimeEnd, Double duration,
+    public StudySessionTable(Date dateTimeStart, Date dateTimeEnd, Double duration,
                              String notes, String paperId_fk) {
         this.dateTimeStart = dateTimeStart;
         this.dateTimeEnd = dateTimeEnd;
@@ -46,20 +48,20 @@ public class StudySessionTable {
 
     // Start
 
-    public String getDateTimeStart() {
+    public Date getDateTimeStart() {
         return dateTimeStart;
     }
 
-    public void setDateTimeStart(String dateTimeStart) {
+    public void setDateTimeStart(Date dateTimeStart) {
         this.dateTimeStart = dateTimeStart;
     }
     // End
 
-    public String getDateTimeEnd() {
+    public Date getDateTimeEnd() {
         return dateTimeEnd;
     }
 
-    public void setDateTimeEnd(String dateTimeEnd) {
+    public void setDateTimeEnd(Date dateTimeEnd) {
         this.dateTimeEnd = dateTimeEnd;
     }
     // Duration

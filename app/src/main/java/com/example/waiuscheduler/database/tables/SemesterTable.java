@@ -4,19 +4,21 @@ import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import java.util.Date;
+
 @Entity(tableName = "semester")
 public class SemesterTable {
     @PrimaryKey @NonNull
     private String semesterCode;    // Unique occurrence code for each semester eg. 26A
-    private String startDate;       // Start Date for the semester
-    private String endDate;         // End Date for the semester
-    private String breakStartDate;  // Start date for the mid semester break
-    private String breakEndDate;    // End date for the mid semester break
+    private Date startDate;       // Start Date for the semester
+    private Date endDate;         // End Date for the semester
+    private Date breakStartDate;  // Start date for the mid semester break
+    private Date breakEndDate;    // End date for the mid semester break
 
     // Constructor for the semester table
     public SemesterTable(
-            @NonNull String semesterCode, String startDate,
-            String endDate, String breakStartDate, String breakEndDate) {
+            @NonNull String semesterCode, Date startDate,
+            Date endDate, Date breakStartDate, Date breakEndDate) {
         this.semesterCode = semesterCode;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -26,47 +28,48 @@ public class SemesterTable {
 
     // Getter and setter for each variable
     // Semester code
+    @NonNull
     public String getSemesterCode() {
         return semesterCode;
     }
 
-    public void setSemesterCode(String semesterCode) {
+    public void setSemesterCode(@NonNull String semesterCode) {
         this.semesterCode = semesterCode;
     }
 
     // Start date
-    public String getStartDate() {
+    public Date getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(String startDate) {
+    public void setStartDate(Date startDate) {
         this.startDate = startDate;
     }
 
     // End date
-    public String getEndDate() {
+    public Date getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(String endDate) {
+    public void setEndDate(Date endDate) {
         this.endDate = endDate;
     }
 
     // Break Start Date
-    public String getBreakStartDate() {
+    public Date getBreakStartDate() {
         return breakStartDate;
     }
 
-    public void setBreakEndDate(String breakEndDate) {
+    public void setBreakEndDate(Date breakEndDate) {
         this.breakEndDate = breakEndDate;
     }
 
     // Break End Date
-    public String getBreakEndDate() {
+    public Date getBreakEndDate() {
         return breakEndDate;
     }
 
-    public void setBreakStartDate(String breakStartDate) {
+    public void setBreakStartDate(Date breakStartDate) {
         this.breakStartDate = breakStartDate;
     }
 }

@@ -1,5 +1,6 @@
 package com.example.waiuscheduler.parsing;
 
+import com.example.waiuscheduler.database.DateConverter;
 import com.example.waiuscheduler.database.tables.AssessmentTable;
 import com.example.waiuscheduler.database.tables.PaperTable;
 import com.example.waiuscheduler.database.tables.StaffTable;
@@ -10,6 +11,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class DataCleaner {
@@ -114,7 +116,7 @@ public class DataCleaner {
     // Helping function to retrieve information from assessment table
     private ArrayList<String> retrieveAssessmentTableData(Document paper) {
         ArrayList<String> tableData = new ArrayList<>();
-        ArrayList<String> colTexts = new ArrayList<>();
+        ArrayList<String> colTexts;
         String query = "table.assessments";
         Element table = paper.select(query).first();
         assert table != null;
@@ -168,8 +170,8 @@ public class DataCleaner {
         String paperName = itemsData.get(0);
         String paperCode = itemsData.get(1).split("-")[0];
         int points = Integer.parseInt(itemsData.get(2));
-        String startWeek = itemsData.get(4);
-        String endWeek = itemsData.get(5);
+        Date startWeek = convertToDate(itemsData.get(4));
+        Date endWeek = convertToDate(itemsData.get(5));
         String semesterCode_fk = "26" + itemsData.get(3);
 
         this.paperId_fk = paperId;
@@ -202,7 +204,7 @@ public class DataCleaner {
 
         for (int i = 0; i < assessmentData.size(); i+=3) {
             String title = assessmentData.get(i);
-            String dueDate = assessmentData.get(i + 1);
+            Date dueDate = convertToDate(assessmentData.get(i + 1));
             Double weight = Double.valueOf(assessmentData.get(i + 2));
             String assessmentType = findAssessmentType(title);
 
@@ -242,10 +244,13 @@ public class DataCleaner {
         for (int i = 0; i < timetablePatternData.size(); i+=5) {
             String type = timetablePatternData.get(i);
             String dayOfWeek = timetablePatternData.get(i + 1);
-            String startTime = timetablePatternData.get(i + 2);
-            String endTime = timetablePatternData.get(i + 3);
+            String startTimeString = timetablePatternData.get(i + 2);
+            String endTimeString = timetablePatternData.get(i + 3);
             String location = timetablePatternData.get(i + 4);
-            Double duration = getDuration(startTime, endTime);
+            Double duration = getDuration(startTimeString, endTimeString);
+
+            Date startTime = convertToTime(startTimeString);
+            Date endTime = convertToTime(endTimeString);
 
             // Add to the timetable pattern table
             timetablePatternList.add(new TimetablePatternTable(type, dayOfWeek, startTime, endTime, location, duration, paperId_fk));
@@ -280,4 +285,11 @@ public class DataCleaner {
         tableData.add(splitCell[1].trim());
     }
 
+    private Date convertToDate(String dateString) {
+        return DateConverter.stringToDate(dateString);
+    }
+
+    private Date convertToTime(String timeString) {
+        return DateConverter.stringToTime(timeString);
+    }
 }

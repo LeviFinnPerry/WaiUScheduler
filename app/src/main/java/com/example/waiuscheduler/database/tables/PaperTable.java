@@ -6,6 +6,8 @@ import androidx.room.ForeignKey;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
+import java.util.Date;
+
 @Entity(tableName = "paper",
         foreignKeys = @ForeignKey(
                 entity = SemesterTable.class,   // Class of foreign key
@@ -21,13 +23,13 @@ public class PaperTable {
     private String paperCode;           // Paper code eg. COMPX576
     private String paperName;           // Paper name eg. Programming Project
     private int points;                 // Paper points
-    private String startWeek;           // Start week for the paper
-    private String endWeek;             // End week for the paper
+    private Date startWeek;           // Start week for the paper
+    private Date endWeek;             // End week for the paper
     private String semesterCode_fk;    // Foreign key referencing semester
 
     // Constructor for the paper table
     public PaperTable(@NonNull String paperId, String paperCode, String paperName,
-                      int points, String startWeek, String endWeek, String semesterCode_fk) {
+                      int points, Date startWeek, Date endWeek, String semesterCode_fk) {
         this.paperId = paperId;
         this.paperCode = paperCode;
         this.paperName = paperName;
@@ -80,21 +82,21 @@ public class PaperTable {
 
     // Start Week
 
-    public String getStartWeek() {
+    public Date getStartWeek() {
         return startWeek;
     }
 
-    public void setStartWeek(String startWeek) {
+    public void setStartWeek(Date startWeek) {
         this.startWeek = startWeek;
     }
 
     // End Week
 
-    public String getEndWeek() {
+    public Date getEndWeek() {
         return endWeek;
     }
 
-    public void setEndWeek(String endWeek) {
+    public void setEndWeek(Date endWeek) {
         this.endWeek = endWeek;
     }
 

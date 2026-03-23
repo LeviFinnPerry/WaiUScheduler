@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
+import androidx.room.TypeConverters;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import com.example.waiuscheduler.dao.AssessmentDao;
@@ -35,7 +36,8 @@ import java.util.concurrent.Executors;
         StaffTable.class,
         StudySessionTable.class,
         TimetablePatternTable.class
-}, version = 4)
+}, version = 5)
+@TypeConverters({DateConverter.class})
 public abstract class AppDatabase extends RoomDatabase {
     public abstract AssessmentDao assessmentDao();
     public abstract EventDao eventDao();
@@ -61,7 +63,7 @@ public abstract class AppDatabase extends RoomDatabase {
                             AppDatabase.class, "app_database")
                             .enableMultiInstanceInvalidation()  // Allow for foreign keys
                             .fallbackToDestructiveMigration() // Handle migrations
-                            .addCallback(insertSemesterDates)
+                            .addCallback(initialiseDB)
                             .build();
                 }
             }
@@ -70,7 +72,7 @@ public abstract class AppDatabase extends RoomDatabase {
     }
 
     // Add semester dates for the year manually at the beginning
-    private static final RoomDatabase.Callback insertSemesterDates = new RoomDatabase.Callback() {
+    private static final RoomDatabase.Callback initialiseDB = new RoomDatabase.Callback() {
         @Override
         public void onCreate(@NonNull SupportSQLiteDatabase db) {
             super.onCreate(db);

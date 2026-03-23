@@ -5,6 +5,8 @@ import androidx.room.ForeignKey;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
+import java.util.Date;
+
 @Entity(tableName = "assessment",
         foreignKeys = @ForeignKey(
                 entity = PaperTable.class,      // Class of foreign key
@@ -18,14 +20,14 @@ public class AssessmentTable {
     @PrimaryKey(autoGenerate = true)
     private int assessmentId;    // Unique id for assessments
     private String title;           // Title for the assessment
-    private String dueDate;         // Due date of the assignment
+    private Date dueDate;         // Due date of the assignment
     private Double weight;          // Weight of marks for the assignment
     private String type;            // Type of assessment (eg. test, assignment, exam)
     private Double grade;           // Grade given on assignment
     private String paperId_fk;     // Foreign key to reference the paper table
 
     // Constructor for the paper table
-    public AssessmentTable(String title, String dueDate, Double weight,
+    public AssessmentTable(String title, Date dueDate, Double weight,
                            String type, Double grade, String paperId_fk
     ) {
         this.title = title;
@@ -60,11 +62,11 @@ public class AssessmentTable {
 
     // Due Date
 
-    public String getDueDate() {
+    public Date getDueDate() {
         return dueDate;
     }
 
-    public void setDueDate(String dueDate) {
+    public void setDueDate(Date dueDate) {
         this.dueDate = dueDate;
     }
 

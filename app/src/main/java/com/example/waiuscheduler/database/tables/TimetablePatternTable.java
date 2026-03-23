@@ -5,6 +5,8 @@ import androidx.room.ForeignKey;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
+import java.util.Date;
+
 @Entity(tableName = "timetable_pattern",
         foreignKeys = @ForeignKey(
                 entity = PaperTable.class,      // Class of the foreign key
@@ -19,15 +21,15 @@ public class TimetablePatternTable {
     private int timetableId;     // Unique Id for the timetable occurance
     private String type;            // Type of timetable event (eg. lecture)
     private String dayOfWeek;       // Day of week event occurs on
-    private String startTime;       // Start time
-    private String endTime;         // End time
+    private Date startTime;       // Start time
+    private Date endTime;         // End time
     private String location;        // Location for event
     private Double duration;        // Total duration in hours
     private String paperId_fk;     // Foreign key references event table
 
     // Constructor for the timetable table
-    public TimetablePatternTable(String type, String dayOfWeek, String startTime,
-                                 String endTime, String location, Double duration, String paperId_fk
+    public TimetablePatternTable(String type, String dayOfWeek, Date startTime,
+                                 Date endTime, String location, Double duration, String paperId_fk
     ) {
         this.type = type;
         this.dayOfWeek = dayOfWeek;
@@ -68,20 +70,20 @@ public class TimetablePatternTable {
     }
     // Start time
 
-    public String getStartTime() {
+    public Date getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(String startTime) {
+    public void setStartTime(Date startTime) {
         this.startTime = startTime;
     }
     // End time
 
-    public String getEndTime() {
+    public Date getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(String endTime) {
+    public void setEndTime(Date endTime) {
         this.endTime = endTime;
     }
     // Location
