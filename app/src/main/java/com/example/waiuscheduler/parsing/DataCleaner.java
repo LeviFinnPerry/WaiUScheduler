@@ -1,5 +1,6 @@
 package com.example.waiuscheduler.parsing;
 
+import com.example.waiuscheduler.database.tables.AssessmentTable;
 import com.example.waiuscheduler.database.tables.PaperTable;
 import com.example.waiuscheduler.database.tables.StaffTable;
 
@@ -29,6 +30,8 @@ public class DataCleaner {
         // Get the staff table object for the results
         results.setStaff(getStaffInformation());
 
+        results.setAssessment(getAssessmentInformation());
+
         return results;
     }
 
@@ -54,6 +57,7 @@ public class DataCleaner {
         this.staffData = retrieveStaffTableData(paper);
 
         this.assessmentData = retrieveAssessmentData(paper);
+
 
     }
 
@@ -103,17 +107,15 @@ public class DataCleaner {
     // Helping function to retrieve information from assessment table
     private ArrayList<String> retrieveAssessmentData(Document paper) {
         ArrayList<String> tableData = new ArrayList<>();
+        ArrayList<String> colTexts = new ArrayList<>();
         String query = "table.assessments";
         Element table = paper.select(query).first();
         assert table != null;
         Elements rows = table.select("tr");
         for (Element row : rows) {
-            Elements cols = row.select("td");
-
-            // Skip rows that don't have 3 columns
-            for (Element col : cols) {
-                    String cellData = col.text();
-                    tableData.add(cellData);
+            colTexts = checkAssignment(row);
+            if (colTexts != null) {
+                tableData.addAll(colTexts);
             }
         }
         // TODO: Clean arraylist to match the entity structure
@@ -122,6 +124,24 @@ public class DataCleaner {
         return tableData;
     }
 
+    private ArrayList<String> checkAssignment(Element row) {
+        ArrayList<String> rowElements = new ArrayList<>();
+        ArrayList<String> finalRow = new ArrayList<>();
+        Elements cols = row.select("td");
+        for (Element col: cols) {
+            String colText = col.text();
+            if (!colText.isEmpty()) {
+                rowElements.add(colText);
+            }
+        }
+        if (rowElements.size() > 3) {
+            for (int i = 0; i < 3; i++) {
+                finalRow.add(rowElements.get(i));
+            }
+            return finalRow;
+        } else { return null; }
+
+    }
 
 
     private PaperTable getPaperInformation() {
@@ -156,6 +176,21 @@ public class DataCleaner {
             }
         }
         return staffList;
+    }
+
+    private ArrayList<AssessmentTable> getAssessmentInformation() {
+        ArrayList<AssessmentTable> assessmentList = new ArrayList<>();
+
+        for (int i = 0; i < assessmentData.size(); i+=3) {
+            String title = assessmentData.get(i);
+            String dueDate = assessmentData.get(i + 1);
+            Double weight = Double.valueOf(assessmentData.get(i + 2));
+            // TODO: Determine the type of assessment
+            // Add the assessment table
+            assessmentList.add(new AssessmentTable(title, dueDate, weight, "Assessments", 0.0, paperId_fk));
+        }
+
+        return assessmentList;
     }
 
     // Handles multiple staff member information

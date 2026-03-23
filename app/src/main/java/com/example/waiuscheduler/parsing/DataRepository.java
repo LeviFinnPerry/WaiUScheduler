@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.example.waiuscheduler.database.AppDatabase;
 import com.example.waiuscheduler.database.DatabaseController;
+import com.example.waiuscheduler.database.tables.AssessmentTable;
 import com.example.waiuscheduler.database.tables.PaperTable;
 import com.example.waiuscheduler.database.tables.SemesterTable;
 import com.example.waiuscheduler.database.tables.StaffTable;
@@ -59,6 +60,12 @@ public class DataRepository {
                    for (StaffTable staff: staffMembers) {
 
                        dbController.saveStaff(staff);
+                   }
+
+                   // Add the assessments to the database
+                   ArrayList<AssessmentTable> assessments = cleanOutline.getAssessment();
+                   for (AssessmentTable assessment: assessments) {
+                       dbController.saveAssessment(assessment);
                    }
 
                 // Callback for successful pipeline

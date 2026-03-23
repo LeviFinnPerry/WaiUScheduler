@@ -7,6 +7,7 @@ import com.example.waiuscheduler.dao.SemesterDao;
 import com.example.waiuscheduler.dao.StaffDao;
 import com.example.waiuscheduler.dao.StudySessionDao;
 import com.example.waiuscheduler.dao.TimetablePatternDao;
+import com.example.waiuscheduler.database.tables.AssessmentTable;
 import com.example.waiuscheduler.database.tables.EventTable;
 import com.example.waiuscheduler.database.tables.PaperTable;
 import com.example.waiuscheduler.database.tables.SemesterTable;
@@ -41,7 +42,9 @@ public class DatabaseController {
     }
 
     // Function to save semester
-    public void saveSemester(SemesterTable semesterTable) {semesterDao.insert(semesterTable);}
+    public void saveSemester(SemesterTable semesterTable) {
+        semesterDao.insert(semesterTable);
+    }
 
     // Function to save to event table
     public void saveEvent(EventTable eventTable) {
@@ -51,5 +54,10 @@ public class DatabaseController {
     // Function to save to staff table
     public void saveStaff(StaffTable staffTable) {
         staffDao.insert(staffTable);
+    }
+
+    // Function to save the assessment table
+    public void saveAssessment(AssessmentTable assessmentTable) {
+        assessmentDao.insert(assessmentTable);
     }
 }
