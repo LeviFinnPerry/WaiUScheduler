@@ -164,7 +164,7 @@ public class DataCleaner {
 
 
     private PaperTable getPaperInformation() {
-        String paperId = itemsData.get(1).split(" ")[0];
+        String paperId = itemsData.get(1);
         String paperName = itemsData.get(0);
         String paperCode = itemsData.get(1).split("-")[0];
         int points = Integer.parseInt(itemsData.get(2));
@@ -204,12 +204,36 @@ public class DataCleaner {
             String title = assessmentData.get(i);
             String dueDate = assessmentData.get(i + 1);
             Double weight = Double.valueOf(assessmentData.get(i + 2));
-            // TODO: Determine the type of assessment
+            String assessmentType = findAssessmentType(title);
+
             // Add the assessment table
-            assessmentList.add(new AssessmentTable(title, dueDate, weight, "Assessments", 0.0, paperId_fk));
+            assessmentList.add(new AssessmentTable(title, dueDate, weight, assessmentType, 0.0, paperId_fk));
         }
 
         return assessmentList;
+    }
+
+    private String findAssessmentType(String title) {
+        ArrayList<String> assessmentTypes = setAssessmentTypes();
+
+        for (String assessmentType: assessmentTypes) {
+            if (title.contains(assessmentType)) {
+                return assessmentType;
+            }
+        }
+        return "Assessment";
+    }
+
+    private ArrayList<String> setAssessmentTypes() {
+        ArrayList<String> assessmentTypes = new ArrayList<>();
+        assessmentTypes.add("Assessment");
+        assessmentTypes.add("Quiz");
+        assessmentTypes.add("Test");
+        assessmentTypes.add("Report");
+        assessmentTypes.add("Presentation");
+        assessmentTypes.add("Exam");
+
+        return assessmentTypes;
     }
 
     private ArrayList<TimetablePatternTable> getTimetablePatternInformation() {
