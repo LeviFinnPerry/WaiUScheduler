@@ -5,9 +5,11 @@ import android.content.Context;
 import com.example.waiuscheduler.database.AppDatabase;
 import com.example.waiuscheduler.database.DatabaseController;
 import com.example.waiuscheduler.database.tables.AssessmentTable;
+import com.example.waiuscheduler.database.tables.EventTable;
 import com.example.waiuscheduler.database.tables.PaperTable;
 import com.example.waiuscheduler.database.tables.SemesterTable;
 import com.example.waiuscheduler.database.tables.StaffTable;
+import com.example.waiuscheduler.database.tables.TimetablePatternTable;
 
 import org.jsoup.nodes.Document;
 
@@ -41,32 +43,37 @@ public class DataRepository {
     /// Full pipeline to scrape course outlines and save it into tables
     public void startCourseOutlinePipeline(HttpUrl url, RepositoryCallback callback) {
         new Thread(() -> {
-           try {
-               // Get the document with course outline scraper
-               Document paperOutline = scraper.getCourseOutline(url);
+            try {
+                // Get the document with course outline scraper
+                Document paperOutline = scraper.getCourseOutline(url);
 
-               // Clean the data
-               ScrapedData cleanOutline = cleaner.clean(paperOutline);
+                // Clean the data
+                ScrapedData cleanOutline = cleaner.clean(paperOutline);
 
-               // Write the data to the database
+                // Write the data to the database
 
-                   // Add the paper information to database
-                   PaperTable paper = cleanOutline.getPaper();
-                   dbController.savePaper(paper);
+                // Add the paper information to database
+                PaperTable paper = cleanOutline.getPaper();
+                dbController.savePaper(paper);
 
-                   // Add the staff members to the database
-                   ArrayList<StaffTable> staffMembers = cleanOutline.getStaff();
-                   // Set the paperId as foreign key
-                   for (StaffTable staff: staffMembers) {
+                // Add the staff members to the database
+                ArrayList<StaffTable> staffMembers = cleanOutline.getStaff();
+                // Set the paperId as foreign key
+                for (StaffTable staff: staffMembers) {
+                   dbController.saveStaff(staff);
+                }
 
-                       dbController.saveStaff(staff);
-                   }
+                // Add the assessments to the database
+                ArrayList<AssessmentTable> assessments = cleanOutline.getAssessment();
+                for (AssessmentTable assessment: assessments) {
+                    dbController.saveAssessment(assessment);
+                }
 
-                   // Add the assessments to the database
-                   ArrayList<AssessmentTable> assessments = cleanOutline.getAssessment();
-                   for (AssessmentTable assessment: assessments) {
-                       dbController.saveAssessment(assessment);
-                   }
+                // Add the events to the database
+                ArrayList<TimetablePatternTable> timetablePatterns = cleanOutline.getTimetablePattern();
+                for (TimetablePatternTable timetablePattern: timetablePatterns) {
+                    dbController.saveTimetablePattern(timetablePattern);
+                }
 
                 // Callback for successful pipeline
                 callback.OnComplete("Success");

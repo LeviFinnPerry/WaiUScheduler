@@ -3,6 +3,7 @@ package com.example.waiuscheduler.parsing;
 import com.example.waiuscheduler.database.tables.AssessmentTable;
 import com.example.waiuscheduler.database.tables.PaperTable;
 import com.example.waiuscheduler.database.tables.StaffTable;
+import com.example.waiuscheduler.database.tables.TimetablePatternTable;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -15,6 +16,7 @@ public class DataCleaner {
     private ArrayList<String> itemsData;
     private ArrayList<String> staffData;
     private ArrayList<String> assessmentData;
+    private ArrayList<String> timetablePatternData;
 
     private String paperId_fk;
 
@@ -30,7 +32,11 @@ public class DataCleaner {
         // Get the staff table object for the results
         results.setStaff(getStaffInformation());
 
+        // Get the assessment table object for the results
         results.setAssessment(getAssessmentInformation());
+
+        // Get the timetable pattern table object for the results
+        results.setTimetablePattern(getTimetablePatternInformation());
 
         return results;
     }
@@ -56,8 +62,9 @@ public class DataCleaner {
 
         this.staffData = retrieveStaffTableData(paper);
 
-        this.assessmentData = retrieveAssessmentData(paper);
+        this.assessmentData = retrieveAssessmentTableData(paper);
 
+        this.timetablePatternData = retrieveTimeTablePatternData(paper);
 
     }
 
@@ -105,7 +112,7 @@ public class DataCleaner {
     }
 
     // Helping function to retrieve information from assessment table
-    private ArrayList<String> retrieveAssessmentData(Document paper) {
+    private ArrayList<String> retrieveAssessmentTableData(Document paper) {
         ArrayList<String> tableData = new ArrayList<>();
         ArrayList<String> colTexts = new ArrayList<>();
         String query = "table.assessments";
@@ -118,9 +125,21 @@ public class DataCleaner {
                 tableData.addAll(colTexts);
             }
         }
-        // TODO: Clean arraylist to match the entity structure
-        // (Remove the empty spaces & only need the name, date, percentage )
+        return tableData;
+    }
 
+    private ArrayList<String> retrieveTimeTablePatternData(Document paper) {
+        ArrayList<String> tableData = new ArrayList<>();
+        String query = "table.timetable";
+        Element table = paper.select(query).first();
+        assert table != null;
+        Elements rows = table.select("tr");
+        for (Element row: rows) {
+            Elements cols = row.select("td");
+            for (Element col: cols) {
+                tableData.add(col.text());
+            }
+        }
         return tableData;
     }
 
@@ -191,6 +210,31 @@ public class DataCleaner {
         }
 
         return assessmentList;
+    }
+
+    private ArrayList<TimetablePatternTable> getTimetablePatternInformation() {
+        ArrayList<TimetablePatternTable> timetablePatternList = new ArrayList<>();
+
+        for (int i = 0; i < timetablePatternData.size(); i+=5) {
+            String type = timetablePatternData.get(i);
+            String dayOfWeek = timetablePatternData.get(i + 1);
+            String startTime = timetablePatternData.get(i + 2);
+            String endTime = timetablePatternData.get(i + 3);
+            String location = timetablePatternData.get(i + 4);
+            Double duration = getDuration(startTime, endTime);
+
+            // Add to the timetable pattern table
+            timetablePatternList.add(new TimetablePatternTable(type, dayOfWeek, startTime, endTime, location, duration, paperId_fk));
+        }
+        return timetablePatternList;
+    }
+
+    // To get the duration
+    private Double getDuration(String startTime, String endTime) {
+        Double start = Double.valueOf(startTime.split(":")[0]);
+        Double end = Double.valueOf(endTime.split(":")[0]);
+
+        return end - start;
     }
 
     // Handles multiple staff member information

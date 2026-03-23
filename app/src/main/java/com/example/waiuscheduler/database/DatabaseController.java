@@ -12,6 +12,7 @@ import com.example.waiuscheduler.database.tables.EventTable;
 import com.example.waiuscheduler.database.tables.PaperTable;
 import com.example.waiuscheduler.database.tables.SemesterTable;
 import com.example.waiuscheduler.database.tables.StaffTable;
+import com.example.waiuscheduler.database.tables.TimetablePatternTable;
 
 public class DatabaseController {
     // Each dao for the corresponding table
@@ -59,5 +60,10 @@ public class DatabaseController {
     // Function to save the assessment table
     public void saveAssessment(AssessmentTable assessmentTable) {
         assessmentDao.insert(assessmentTable);
+    }
+
+    // Function to save the timetable pattern table
+    public void saveTimetablePattern(TimetablePatternTable timetablePatternTable) {
+        timetableDao.insert(timetablePatternTable);
     }
 }
