@@ -24,6 +24,7 @@ import com.example.waiuscheduler.database.tables.StaffTable;
 import com.example.waiuscheduler.database.tables.StudySessionTable;
 import com.example.waiuscheduler.database.tables.TimetablePatternTable;
 
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 @Database(entities = {
@@ -34,7 +35,7 @@ import java.util.concurrent.Executors;
         StaffTable.class,
         StudySessionTable.class,
         TimetablePatternTable.class
-}, version = 2)
+}, version = 4)
 public abstract class AppDatabase extends RoomDatabase {
     public abstract AssessmentDao assessmentDao();
     public abstract EventDao eventDao();
@@ -44,8 +45,11 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract StudySessionDao studySessionDao();
     public abstract TimetablePatternDao timetablePatternDao();
 
+
     // Instance for the database
     private static volatile AppDatabase INSTANCE;
+
+    public static final ExecutorService databaseWriteExecutor = Executors.newFixedThreadPool(4);
 
     // Get instance of the database
     public static AppDatabase getInstance(final Context context) {
@@ -70,15 +74,7 @@ public abstract class AppDatabase extends RoomDatabase {
         @Override
         public void onCreate(@NonNull SupportSQLiteDatabase db) {
             super.onCreate(db);
-
-            Executors.newSingleThreadScheduledExecutor().execute(() -> {
-                SemesterDao semester = INSTANCE.semesterDao();
-
-                // Add the dates
-                // TODO: Update from strings to dates
-                semester.insert(new SemesterTable("26A", "02/03/2026", "26/06/2026", "08/04/2026", "20/04/2026"));
-                semester.insert(new SemesterTable("26B", "13/07/2026", "06/11/2026", "24/08/2026", "07/09/2026"));
-            });
+            db.execSQL("PRAGMA foreign_keys=ON");   // Enforce foreign keys
         }
     };
 }

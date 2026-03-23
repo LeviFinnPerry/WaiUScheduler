@@ -20,10 +20,10 @@ public class StaffTable {
     private String name;        // Name of staff member
     private String email;       // Email of staff member
     private String position;    // Position of staff member (eg. conveyor, tutor, etc.)
-    private long paperId_fk; // Foreign key for paper ID
+    private String paperId_fk; // Foreign key for paper ID
 
     // Constructor for staff table
-    public StaffTable(String name, String email, String position, long paperId_fk) {
+    public StaffTable(String name, String email, String position, String paperId_fk) {
         this.name = name;
         this.email = email;
         this.position = position;
@@ -71,11 +71,11 @@ public class StaffTable {
 
     // Paper id
 
-    public long getPaperId_fk() {
+    public String getPaperId_fk() {
         return paperId_fk;
     }
 
-    public void setPaperId_fk(long paperId_fk) {
+    public void setPaperId_fk(String paperId_fk) {
         this.paperId_fk = paperId_fk;
     }
 }

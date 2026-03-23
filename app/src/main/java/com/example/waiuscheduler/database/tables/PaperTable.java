@@ -1,5 +1,6 @@
 package com.example.waiuscheduler.database.tables;
 
+import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
 import androidx.room.Index;
@@ -15,8 +16,8 @@ import androidx.room.PrimaryKey;
         indices = {@Index("semesterCode_fk")}        // Index of the foreign key
 )
 public class PaperTable {
-    @PrimaryKey(autoGenerate = true)    // Unique Id for the paper
-    private long paperId;
+    @PrimaryKey @NonNull                       // Unique Id for the paper
+    private String paperId;
     private String paperCode;           // Paper code eg. COMPX576
     private String paperName;           // Paper name eg. Programming Project
     private int points;                 // Paper points
@@ -25,8 +26,9 @@ public class PaperTable {
     private String semesterCode_fk;    // Foreign key referencing semester
 
     // Constructor for the paper table
-    public PaperTable(String paperCode, String paperName,
+    public PaperTable(@NonNull String paperId, String paperCode, String paperName,
                       int points, String startWeek, String endWeek, String semesterCode_fk) {
+        this.paperId = paperId;
         this.paperCode = paperCode;
         this.paperName = paperName;
         this.points = points;
@@ -37,11 +39,12 @@ public class PaperTable {
 
     // Getters and setters for each paper variable
     // Id
-    public long getPaperId() {
+    @NonNull
+    public String getPaperId() {
         return paperId;
     }
 
-    public void setPaperId(long paperId) {
+    public void setPaperId(@NonNull String paperId) {
         this.paperId = paperId;
     }
 

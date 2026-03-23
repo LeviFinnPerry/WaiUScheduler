@@ -15,6 +15,8 @@ public class DataCleaner {
     private ArrayList<String> staffData;
     private ArrayList<String> assessmentData;
 
+    private String paperId_fk;
+
     public ScrapedData clean(Document paper) {
         ScrapedData results = new ScrapedData();
 
@@ -123,6 +125,7 @@ public class DataCleaner {
 
 
     private PaperTable getPaperInformation() {
+        String paperId = itemsData.get(1).split(" ")[0];
         String paperName = itemsData.get(0);
         String paperCode = itemsData.get(1).split("-")[0];
         int points = Integer.parseInt(itemsData.get(2));
@@ -130,7 +133,9 @@ public class DataCleaner {
         String endWeek = itemsData.get(5);
         String semesterCode_fk = "26" + itemsData.get(3);
 
-        return new PaperTable(paperName, paperCode, points, startWeek, endWeek, semesterCode_fk);
+        this.paperId_fk = paperId;
+
+        return new PaperTable(paperId, paperName, paperCode, points, startWeek, endWeek, semesterCode_fk);
     }
 
     private ArrayList<StaffTable> getStaffInformation() {
@@ -143,7 +148,7 @@ public class DataCleaner {
             if (item.contains("@")) {
                 String name = (i > 0) ? staffData.get(i - 1) : "Unknown";
                 // Use the paperId we generated above as the foreign key
-                //staffList.add(new StaffTable(name, item, position, results.paperId));
+                staffList.add(new StaffTable(name, item, position, paperId_fk));
             }
             // If it's a role/position header
             else if (i + 1 < staffData.size() && !staffData.get(i + 1).contains("@")) {

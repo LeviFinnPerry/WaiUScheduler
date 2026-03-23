@@ -9,6 +9,7 @@ import com.example.waiuscheduler.dao.StudySessionDao;
 import com.example.waiuscheduler.dao.TimetablePatternDao;
 import com.example.waiuscheduler.database.tables.EventTable;
 import com.example.waiuscheduler.database.tables.PaperTable;
+import com.example.waiuscheduler.database.tables.SemesterTable;
 import com.example.waiuscheduler.database.tables.StaffTable;
 
 public class DatabaseController {
@@ -35,9 +36,12 @@ public class DatabaseController {
 
     // One method to save all data from a single paper
     // Function to save to paper table
-    public long savePaper(PaperTable paperOutline) {
-        return paperDao.insert(paperOutline);
+    public void savePaper(PaperTable paperOutline) {
+        paperDao.insert(paperOutline);
     }
+
+    // Function to save semester
+    public void saveSemester(SemesterTable semesterTable) {semesterDao.insert(semesterTable);}
 
     // Function to save to event table
     public void saveEvent(EventTable eventTable) {

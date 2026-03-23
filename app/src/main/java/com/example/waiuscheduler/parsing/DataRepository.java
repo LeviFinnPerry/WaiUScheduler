@@ -5,11 +5,13 @@ import android.content.Context;
 import com.example.waiuscheduler.database.AppDatabase;
 import com.example.waiuscheduler.database.DatabaseController;
 import com.example.waiuscheduler.database.tables.PaperTable;
+import com.example.waiuscheduler.database.tables.SemesterTable;
 import com.example.waiuscheduler.database.tables.StaffTable;
 
 import org.jsoup.nodes.Document;
 
 import java.util.ArrayList;
+import java.util.concurrent.Executors;
 
 import okhttp3.HttpUrl;
 
@@ -25,6 +27,14 @@ public class DataRepository {
         this.cleaner = new DataCleaner();
         this.db = AppDatabase.getInstance(context);
         this.dbController = new DatabaseController(db);
+
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            // Add the dates
+            // TODO: Update from strings to dates
+            dbController.saveSemester(new SemesterTable("26A", "02/03/2026", "26/06/2026", "08/04/2026", "20/04/2026"));
+            dbController.saveSemester(new SemesterTable("26B", "13/07/2026", "06/11/2026", "24/08/2026", "07/09/2026"));
+
+        });
     }
 
     /// Full pipeline to scrape course outlines and save it into tables
@@ -38,19 +48,19 @@ public class DataRepository {
                ScrapedData cleanOutline = cleaner.clean(paperOutline);
 
                // Write the data to the database
-               db.runInTransaction(() -> {
+
                    // Add the paper information to database
                    PaperTable paper = cleanOutline.getPaper();
-                   long paperId = dbController.savePaper(paper);
+                   dbController.savePaper(paper);
 
                    // Add the staff members to the database
                    ArrayList<StaffTable> staffMembers = cleanOutline.getStaff();
                    // Set the paperId as foreign key
                    for (StaffTable staff: staffMembers) {
-                       staff.setPaperId_fk(paperId);
+
                        dbController.saveStaff(staff);
                    }
-               });
+
                 // Callback for successful pipeline
                 callback.OnComplete("Success");
            } catch (Exception e) {
