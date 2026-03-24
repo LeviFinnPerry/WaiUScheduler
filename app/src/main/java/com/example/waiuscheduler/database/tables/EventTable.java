@@ -23,11 +23,11 @@ public class EventTable {
     private Date dateTimeStart;   // Start time
     private Date dateTimeEnd;     // End time
     private Boolean attended;       // Monitor attendance of each event
-    private String timetableId_fk;     // Foreign key references the timetable table
+    private int timetableId_fk;     // Foreign key references the timetable table
 
     // Constructor for the event table
     public EventTable(String eventType, Date dateTimeStart,
-                      Date dateTimeEnd, Boolean attended, String timetableId_fk
+                      Date dateTimeEnd, Boolean attended, int timetableId_fk
     ) {
         this.eventType = eventType;
         this.dateTimeStart = dateTimeStart;
@@ -89,11 +89,11 @@ public class EventTable {
 
     // Paper id
 
-    public String getTimetableId_fk() {
+    public int getTimetableId_fk() {
         return timetableId_fk;
     }
 
-    public void setTimetableId_fk(String timetableId_fk) {
+    public void setTimetableId_fk(int timetableId_fk) {
         this.timetableId_fk = timetableId_fk;
     }
 }

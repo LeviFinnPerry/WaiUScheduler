@@ -2,6 +2,8 @@ package com.example.waiuscheduler.parsing;
 
 import android.content.Context;
 
+import androidx.room.Transaction;
+
 import com.example.waiuscheduler.database.AppDatabase;
 import com.example.waiuscheduler.database.DatabaseController;
 import com.example.waiuscheduler.database.DateConverter;
@@ -14,8 +16,8 @@ import com.example.waiuscheduler.database.tables.TimetablePatternTable;
 
 import org.jsoup.nodes.Document;
 
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.concurrent.Executors;
 
 import okhttp3.HttpUrl;
 
@@ -25,6 +27,8 @@ public class DataRepository {
     private final AppDatabase db;
 
     private final DatabaseController dbController;
+    private ScrapedData currentOutline = new ScrapedData();
+
 
     public DataRepository(Context context) {
         this.scraper = new CourseOutlineScraper();
@@ -51,53 +55,66 @@ public class DataRepository {
     }
 
     /// Full pipeline to scrape course outlines and save it into tables
+    @Transaction
     public void startCourseOutlinePipeline(HttpUrl url, RepositoryCallback callback) {
-        new Thread(() -> {
-            try {
+        try {
+            new Thread(() -> {
                 // Get the document with course outline scraper
-                Document paperOutline = scraper.getCourseOutline(url);
+                Document paperOutline = null;
+                try {
+                    paperOutline = scraper.getCourseOutline(url);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
 
                 // Clean the data
-                ScrapedData cleanOutline = cleaner.clean(paperOutline);
+                currentOutline = cleaner.clean(paperOutline);
+
 
                 // Write the data to the database
 
                 // Add the paper information to database
-                PaperTable paper = cleanOutline.getPaper();
+                PaperTable paper = currentOutline.getPaper();
                 dbController.savePaper(paper);
 
                 // Add the staff members to the database
-                ArrayList<StaffTable> staffMembers = cleanOutline.getStaff();
+                ArrayList<StaffTable> staffMembers = currentOutline.getStaffs();
                 // Set the paperId as foreign key
-                for (StaffTable staff: staffMembers) {
-                   dbController.saveStaff(staff);
+                for (StaffTable staff : staffMembers) {
+                    dbController.saveStaff(staff);
                 }
 
                 // Add the assessments to the database
-                ArrayList<AssessmentTable> assessments = cleanOutline.getAssessment();
-                for (AssessmentTable assessment: assessments) {
+                ArrayList<AssessmentTable> assessments = currentOutline.getAssessments();
+                for (AssessmentTable assessment : assessments) {
                     dbController.saveAssessment(assessment);
                 }
 
                 // Add the events to the database
-                ArrayList<TimetablePatternTable> timetablePatterns = cleanOutline.getTimetablePattern();
-                for (TimetablePatternTable timetablePattern: timetablePatterns) {
+                ArrayList<TimetablePatternTable> timetablePatterns =
+                        currentOutline.getTimetablePatterns();
+                for (TimetablePatternTable timetablePattern : timetablePatterns) {
                     dbController.saveTimetablePattern(timetablePattern);
                 }
-
-                // Callback for successful pipeline
-                callback.OnComplete("Success");
-           } catch (Exception e) {
-               callback.OnComplete("Error: " + e.getMessage());
-           }
-        }).start();
+                // TODO: Handle error of same thread
+                currentOutline.setEvents(cleaner.createEventData(cleaner.semester_fk));
+                ArrayList<EventTable> events = currentOutline.getEvents();
+                for (EventTable event : events) {
+                    dbController.saveEvent(event);
+                }
+            }).start();
+            // Callback for successful pipeline
+           callback.OnComplete("Initial Success");
+        } catch (Exception e) {
+           callback.OnComplete("Error: " + e.getMessage());
+        }
 
     }
+
 
     // Callback for pipeline
     public interface RepositoryCallback {
         void OnComplete(String result);
     }
-
 
 }

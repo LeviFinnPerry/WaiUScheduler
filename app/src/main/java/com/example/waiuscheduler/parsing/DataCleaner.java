@@ -2,7 +2,9 @@ package com.example.waiuscheduler.parsing;
 
 import com.example.waiuscheduler.database.DateConverter;
 import com.example.waiuscheduler.database.tables.AssessmentTable;
+import com.example.waiuscheduler.database.tables.EventTable;
 import com.example.waiuscheduler.database.tables.PaperTable;
+import com.example.waiuscheduler.database.tables.SemesterTable;
 import com.example.waiuscheduler.database.tables.StaffTable;
 import com.example.waiuscheduler.database.tables.TimetablePatternTable;
 
@@ -11,6 +13,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -19,11 +22,13 @@ public class DataCleaner {
     private ArrayList<String> staffData;
     private ArrayList<String> assessmentData;
     private ArrayList<String> timetablePatternData;
+    public String semester_fk;
+    private ScrapedData results;
 
     private String paperId_fk;
 
     public ScrapedData clean(Document paper) {
-        ScrapedData results = new ScrapedData();
+        results = new ScrapedData();
 
         // Process paper data into arraylists
         getInformation(paper);
@@ -32,13 +37,13 @@ public class DataCleaner {
         results.setPaper(getPaperInformation());
 
         // Get the staff table object for the results
-        results.setStaff(getStaffInformation());
+        results.setStaffs(getStaffInformation());
 
         // Get the assessment table object for the results
-        results.setAssessment(getAssessmentInformation());
+        results.setAssessments(getAssessmentInformation());
 
         // Get the timetable pattern table object for the results
-        results.setTimetablePattern(getTimetablePatternInformation());
+        results.setTimetablePatterns(getTimetablePatternInformation());
 
         return results;
     }
@@ -145,6 +150,53 @@ public class DataCleaner {
         return tableData;
     }
 
+    public ArrayList<EventTable> createEventData(String semesterCode) {
+        SemesterTable semester = results.getSemester(semesterCode);
+        ArrayList<TimetablePatternTable> timetablePattern = results.getTimetablePatterns();
+        ArrayList<EventTable> eventTables = new ArrayList<>();
+
+        Date startDate = semester.getStartDate();
+        Date endDate = semester.getEndDate();
+        Date breakStartDate = semester.getBreakStartDate();
+        Date breakEndDate = semester.getBreakEndDate();
+
+        for (TimetablePatternTable timetable: timetablePattern) {
+            int timeTableId = timetable.getTimetableId();
+            String type = timetable.getType();
+            int dow = timetable.getDayOfWeek();
+            Date startTime = timetable.getStartTime();
+            Date endTime = timetable.getEndTime();
+
+            // Method to create events
+            eventTables.addAll(createEvents(startDate,  endDate, breakStartDate, breakEndDate,
+                    type, dow, startTime, endTime, timeTableId));
+        }
+        return eventTables;
+    }
+
+    private ArrayList<EventTable> createEvents(Date semStart, Date semEnd, Date breakSemStart, Date breakSemEnd,
+                              String type, int dow, Date startTime, Date endTime, int event_fk) {
+        ArrayList<EventTable> events = new ArrayList<>();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(semStart);
+
+        while (cal.getTime().before(semEnd)  || cal.getTime().equals(semEnd)) {
+            Date current = cal.getTime();
+
+            // Check if it is the right day of the week
+            if (cal.get(Calendar.DAY_OF_WEEK) == dow) {
+                // Check if it not during the break
+                if (current.before(breakSemStart) || current.after(breakSemEnd)) {
+                    Date startDateTime = convertToDateTime(current, startTime);
+                    Date endDateTime = convertToDateTime(current, endTime);
+
+                    events.add(new EventTable(type, startDateTime, endDateTime, false, event_fk));
+                }
+            }
+        }
+        return events;
+
+    }
     private ArrayList<String> checkAssignment(Element row) {
         ArrayList<String> rowElements = new ArrayList<>();
         ArrayList<String> finalRow = new ArrayList<>();
@@ -175,6 +227,7 @@ public class DataCleaner {
         String semesterCode_fk = "26" + itemsData.get(3);
 
         this.paperId_fk = paperId;
+        this.semester_fk = semesterCode_fk;
 
         return new PaperTable(paperId, paperName, paperCode, points, startWeek, endWeek, semesterCode_fk);
     }
@@ -243,7 +296,7 @@ public class DataCleaner {
 
         for (int i = 0; i < timetablePatternData.size(); i+=5) {
             String type = timetablePatternData.get(i);
-            String dayOfWeek = timetablePatternData.get(i + 1);
+            int dayOfWeek = convertDOW(timetablePatternData.get(i + 1));
             String startTimeString = timetablePatternData.get(i + 2);
             String endTimeString = timetablePatternData.get(i + 3);
             String location = timetablePatternData.get(i + 4);
@@ -256,6 +309,27 @@ public class DataCleaner {
             timetablePatternList.add(new TimetablePatternTable(type, dayOfWeek, startTime, endTime, location, duration, paperId_fk));
         }
         return timetablePatternList;
+    }
+
+    // Convert the day of week into a number
+    private int convertDOW(String dayOfWeek) {
+        ArrayList<String> days = setDays();
+        for (String day: days) {
+            if (day.matches(dayOfWeek)) {
+                return days.indexOf(day) + 1;
+            }
+        }
+        return 0;
+    }
+
+    private ArrayList<String> setDays() {
+        ArrayList<String> days = new ArrayList<>();
+        days.add("Mon");
+        days.add("Tue");
+        days.add("Wed");
+        days.add("Thu");
+        days.add("Fri");
+        return days;
     }
 
     // To get the duration
@@ -291,5 +365,9 @@ public class DataCleaner {
 
     private Date convertToTime(String timeString) {
         return DateConverter.stringToTime(timeString);
+    }
+
+    private Date convertToDateTime(Date date, Date time) {
+        return DateConverter.ToDateTime(date, time);
     }
 }

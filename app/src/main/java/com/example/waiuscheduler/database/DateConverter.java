@@ -33,7 +33,9 @@ public class DateConverter {
         return parse(timeString, TIME_PATTERN);
     }
 
-    public static Date stringToDateTime(String dateString, String timeString) {
+    public static Date ToDateTime(Date date, Date time) {
+        String dateString = format(date, DATE_PATTERN);
+        String timeString = format(time, TIME_PATTERN);
         String dateTimeString = dateString + " " + timeString;
         return parse(dateTimeString, DATETIME_PATTERN);
     }
@@ -46,4 +48,15 @@ public class DateConverter {
             return null;
         }
     }
+
+    private static String format(Date date, String pattern) {
+        if (date == null) return "";
+        try {
+            return new SimpleDateFormat(pattern, LOCALE).format(date);
+        } catch (Exception e) {
+            Log.e("DateConverter", "Formatting error for date");
+            return "";
+        }
+    }
+
 }

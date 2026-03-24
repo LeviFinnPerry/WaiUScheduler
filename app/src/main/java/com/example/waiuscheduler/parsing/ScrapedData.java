@@ -3,6 +3,7 @@ package com.example.waiuscheduler.parsing;
 import com.example.waiuscheduler.database.tables.AssessmentTable;
 import com.example.waiuscheduler.database.tables.EventTable;
 import com.example.waiuscheduler.database.tables.PaperTable;
+import com.example.waiuscheduler.database.tables.SemesterTable;
 import com.example.waiuscheduler.database.tables.StaffTable;
 import com.example.waiuscheduler.database.tables.TimetablePatternTable;
 
@@ -13,6 +14,7 @@ public class ScrapedData {
     private ArrayList<StaffTable> staff;
     private ArrayList<AssessmentTable> assessment;
     private ArrayList<EventTable> event;
+    private ArrayList<SemesterTable> semester;
 
     private ArrayList<TimetablePatternTable> timetablePattern;
 
@@ -29,35 +31,54 @@ public class ScrapedData {
         this.paper = paper;
     }
 
-    public ArrayList<StaffTable> getStaff() {
+    public ArrayList<StaffTable> getStaffs() {
         return staff;
     }
 
-    public void setStaff(ArrayList<StaffTable> staff) {
+    public void setStaffs(ArrayList<StaffTable> staff) {
         this.staff = staff;
     }
 
-    public ArrayList<AssessmentTable> getAssessment() {
+    public ArrayList<AssessmentTable> getAssessments() {
         return assessment;
     }
 
-    public void setAssessment(ArrayList<AssessmentTable> assessment) {
+    public void setAssessments(ArrayList<AssessmentTable> assessment) {
         this.assessment = assessment;
     }
 
-    public ArrayList<TimetablePatternTable> getTimetablePattern() {
+    public ArrayList<TimetablePatternTable> getTimetablePatterns() {
         return timetablePattern;
     }
 
-    public void setTimetablePattern(ArrayList<TimetablePatternTable> timetablePattern) {
+    public void setTimetablePatterns(ArrayList<TimetablePatternTable> timetablePattern) {
         this.timetablePattern = timetablePattern;
     }
 
-    public ArrayList<EventTable> getEvent() {
+    public ArrayList<EventTable> getEvents() {
         return event;
     }
 
-    public void setEvent(ArrayList<EventTable> event) {
+    public void setEvents(ArrayList<EventTable> event) {
         this.event = event;
+    }
+
+    public void setSemesters(ArrayList<SemesterTable> semester) {
+        this.semester = semester;
+    }
+
+    public ArrayList<SemesterTable> getSemesters() {
+        return semester;
+    }
+
+    public SemesterTable getSemester(String semesterCode) {
+        if (semester != null) {
+            for (SemesterTable s: semester) {
+                if (semesterCode.matches(s.getSemesterCode())) {
+                    return s;
+                }
+            }
+        }
+        return null;
     }
 }

@@ -38,5 +38,7 @@ public class CoursesViewModel extends AndroidViewModel {
         HttpUrl url = HttpUrl.parse(urlFormat);
 
         repository.startCourseOutlinePipeline(url, status::postValue);
+
     }
+
 }

@@ -48,6 +48,8 @@ public class CoursesFragment extends Fragment {
         binding.button.setOnClickListener(v -> {
             coursesViewModel.processCourseOutline("TESTING");
         });
+
+
     }
 
     @Override

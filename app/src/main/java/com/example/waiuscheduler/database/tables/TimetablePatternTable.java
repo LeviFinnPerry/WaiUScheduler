@@ -20,7 +20,7 @@ public class TimetablePatternTable {
     @PrimaryKey(autoGenerate = true)
     private int timetableId;     // Unique Id for the timetable occurance
     private String type;            // Type of timetable event (eg. lecture)
-    private String dayOfWeek;       // Day of week event occurs on
+    private int dayOfWeek;       // Day of week event occurs on
     private Date startTime;       // Start time
     private Date endTime;         // End time
     private String location;        // Location for event
@@ -28,7 +28,7 @@ public class TimetablePatternTable {
     private String paperId_fk;     // Foreign key references event table
 
     // Constructor for the timetable table
-    public TimetablePatternTable(String type, String dayOfWeek, Date startTime,
+    public TimetablePatternTable(String type, int dayOfWeek, Date startTime,
                                  Date endTime, String location, Double duration, String paperId_fk
     ) {
         this.type = type;
@@ -61,11 +61,11 @@ public class TimetablePatternTable {
     }
     // Day of week
 
-    public String getDayOfWeek() {
+    public int getDayOfWeek() {
         return dayOfWeek;
     }
 
-    public void setDayOfWeek(String dayOfWeek) {
+    public void setDayOfWeek(int dayOfWeek) {
         this.dayOfWeek = dayOfWeek;
     }
     // Start time
