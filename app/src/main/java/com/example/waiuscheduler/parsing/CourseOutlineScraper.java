@@ -16,16 +16,18 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-// Collects information from the paper outline on the waikato university website
+/// Collects information from the paper outline on the waikato university website
 public class CourseOutlineScraper {
 
     private final OkHttpClient client = new OkHttpClient();     // Initialise http client
 
-
+    /// Retrieves course outline based on the url.
+    /// Throws IOException
     public Document getCourseOutline(HttpUrl url) throws IOException {
+        // As written on website for request headers
         Request request = new Request.Builder()
                 .url(url)
-                .header("Accept", "application/json")   // As written on website for request headers
+                .header("Accept", "application/json")
                 .header("Accept-Language", "en-US,en;q=0.9,es;q=0.8,ru;q=0.7")
                 .header("Origin", "https://paperoutlines.waikato.ac.nz")
                 .header("Referer", "https://paperoutlines.waikato.ac.nz/")
@@ -44,6 +46,7 @@ public class CourseOutlineScraper {
                 )
                 .build();
 
+        // Try clean the json returned from the request
         try (Response response = client.newCall(request).execute()) {
             if (!response.isSuccessful())
                 throw new IOException("Unexpected code" + response); // Error for unsuccessful calls

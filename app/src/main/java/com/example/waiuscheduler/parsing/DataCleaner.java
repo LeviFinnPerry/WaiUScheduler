@@ -17,6 +17,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+/// Cleans HTML information from the paper outline
 public class DataCleaner {
     private ArrayList<String> itemsData;
     private ArrayList<String> staffData;
@@ -27,6 +28,8 @@ public class DataCleaner {
 
     private String paperId_fk;
 
+    /// Main method to clean HTML document.
+    /// Returns ScrapedData object
     public ScrapedData clean(Document paper) {
         results = new ScrapedData();
 
@@ -48,16 +51,10 @@ public class DataCleaner {
         return results;
     }
 
-    // Function to retrieve outline information from the paper outline
+    /// Function to retrieve outline information from the paper outline
+    /// for the paper header and each of the tables in the html
     private void getInformation(Document paper) {
-        // Labels of each element
-        List<String> labelNames = new ArrayList<>();
-        labelNames.add("Paper Title");
-        labelNames.add("Paper Occurrence Code");
-        labelNames.add("Points");
-        labelNames.add("When taught");
-        labelNames.add("Start Week");
-        labelNames.add("End Week");
+        ArrayList<String> labelNames = getLabelNames();
 
         itemsData = new ArrayList<>();
         staffData = new ArrayList<>();
@@ -67,30 +64,47 @@ public class DataCleaner {
             itemsData.add(retrieveItemData(name, paper));
         }
 
+        // Retrieves information about the staff
         this.staffData = retrieveStaffTableData(paper);
 
+        // Retrieves information about the assessments
         this.assessmentData = retrieveAssessmentTableData(paper);
 
+        // Retrieves information about the timetable pattern
         this.timetablePatternData = retrieveTimeTablePatternData(paper);
 
     }
 
-    // Helping function to retrieve information from the span elements
-    private String retrieveItemData(String itemName, Document paper) {
-        String query = "label:contains(" + itemName + ")";
-        // Find the label
-        Element label = paper.select(query).first();
-        // Get the information of the element
-        if (label != null) {
-            Element span = label.nextElementSibling();
-            if (span != null) {
-                return span.text();
-            }
-        }
-        return null;
+    /// Function to generate the label names for the core paper information.
+    /// Returns a string arraylist of names.
+    private ArrayList<String> getLabelNames() {
+        // Labels of each element
+        ArrayList<String> labelNames = new ArrayList<>();
+        labelNames.add("Paper Title");
+        labelNames.add("Paper Occurrence Code");
+        labelNames.add("Points");
+        labelNames.add("When taught");
+        labelNames.add("Start Week");
+        labelNames.add("End Week");
+
+        return labelNames;
     }
 
-    // Helping function to retrieve information from staff tables
+    /// Helping function to retrieve information from the span elements
+    private String retrieveItemData(String itemName, Document paper) {
+        String query = "label:contains(" + itemName + ")";
+        Element label = paper.select(query).first();    // Find the label
+        if (label != null) {
+            Element span = label.nextElementSibling();  // Find the span
+            if (span != null) {
+                return span.text();                     // Return the item
+            }
+        }
+        return null;    // Else return null
+    }
+
+    /// Helping function to retrieve information from staff tables
+    /// Returns an arraylist of staff information
     private ArrayList<String> retrieveStaffTableData(Document paper) {
         ArrayList<String> tableData = new ArrayList<>();
         String query = "table.staff";        // Find the staff table
@@ -118,7 +132,8 @@ public class DataCleaner {
         return tableData;
     }
 
-    // Helping function to retrieve information from assessment table
+    /// Helping function to retrieve information from assessment table
+    /// Returns an arraylist of assessment information
     private ArrayList<String> retrieveAssessmentTableData(Document paper) {
         ArrayList<String> tableData = new ArrayList<>();
         ArrayList<String> colTexts;
@@ -135,6 +150,8 @@ public class DataCleaner {
         return tableData;
     }
 
+    /// Helping function to retrieve information from timetable pattern
+    /// Returns an arraylist of timetable pattern information.
     private ArrayList<String> retrieveTimeTablePatternData(Document paper) {
         ArrayList<String> tableData = new ArrayList<>();
         String query = "table.timetable";
@@ -150,6 +167,8 @@ public class DataCleaner {
         return tableData;
     }
 
+    /// Function that creates event data for the event table
+    /// Returns an arraylist of events created based on the semester and timetable table
     public ArrayList<EventTable> createEventData(String semesterCode) {
         SemesterTable semester = results.getSemester(semesterCode);
         ArrayList<TimetablePatternTable> timetablePattern = results.getTimetablePatterns();
@@ -174,6 +193,8 @@ public class DataCleaner {
         return eventTables;
     }
 
+    /// Function that creates events based on a timetable pattern occurrence
+    /// Returns an arraylist of EventTable Objects
     private ArrayList<EventTable> createEvents(Date semStart, Date semEnd, Date breakSemStart, Date breakSemEnd,
                               String type, int dow, Date startTime, Date endTime, int event_fk) {
         ArrayList<EventTable> events = new ArrayList<>();
@@ -197,6 +218,10 @@ public class DataCleaner {
         return events;
 
     }
+
+    /// Helping function to determine whether a row in the assignment table
+    /// is an actual assignment.
+    /// Returns an arraylist of assignment information for the row
     private ArrayList<String> checkAssignment(Element row) {
         ArrayList<String> rowElements = new ArrayList<>();
         ArrayList<String> finalRow = new ArrayList<>();
@@ -216,7 +241,8 @@ public class DataCleaner {
 
     }
 
-
+    /// Function to retrieve the information from the paper arraylist
+    /// Returns a new Paper Table object
     private PaperTable getPaperInformation() {
         String paperId = itemsData.get(1);
         String paperName = itemsData.get(0);
@@ -232,13 +258,15 @@ public class DataCleaner {
         return new PaperTable(paperId, paperName, paperCode, points, startWeek, endWeek, semesterCode_fk);
     }
 
+    /// Function to retrieve the information from the staff arraylist
+    /// Returns a new Staff Table object
     private ArrayList<StaffTable> getStaffInformation() {
         ArrayList<StaffTable> staffList = new ArrayList<>();
         String position = "";
 
         for (int i = 0; i < staffData.size(); i++) {
             String item = staffData.get(i);
-
+            // If the item contains an email
             if (item.contains("@")) {
                 String name = (i > 0) ? staffData.get(i - 1) : "Unknown";
                 // Use the paperId we generated above as the foreign key
@@ -252,6 +280,8 @@ public class DataCleaner {
         return staffList;
     }
 
+    /// Function to retrieve the information from the assessment arraylist
+    /// Returns a new Assessment Table object
     private ArrayList<AssessmentTable> getAssessmentInformation() {
         ArrayList<AssessmentTable> assessmentList = new ArrayList<>();
 
@@ -268,17 +298,22 @@ public class DataCleaner {
         return assessmentList;
     }
 
+
+    /// Helping function to determine the type of assessment based on the title
+    /// Returns the type of assessment as a string
     private String findAssessmentType(String title) {
         ArrayList<String> assessmentTypes = setAssessmentTypes();
-
+        // Compare the title to the assessment types
         for (String assessmentType: assessmentTypes) {
             if (title.contains(assessmentType)) {
                 return assessmentType;
             }
         }
-        return "Assessment";
+        return "Assessment";    // Default assessment type
     }
 
+    /// Sets arraylist of assessment types to check
+    /// Returns an arraylist of all the assessment types
     private ArrayList<String> setAssessmentTypes() {
         ArrayList<String> assessmentTypes = new ArrayList<>();
         assessmentTypes.add("Assessment");
@@ -291,9 +326,12 @@ public class DataCleaner {
         return assessmentTypes;
     }
 
+    /// Function to retrieve the timetable pattern information based on the timetable
+    /// arraylist.
+    /// Returns an arraylist of timetable patterns
     private ArrayList<TimetablePatternTable> getTimetablePatternInformation() {
         ArrayList<TimetablePatternTable> timetablePatternList = new ArrayList<>();
-
+        // Iterate through arraylist in groups of 5
         for (int i = 0; i < timetablePatternData.size(); i+=5) {
             String type = timetablePatternData.get(i);
             int dayOfWeek = convertDOW(timetablePatternData.get(i + 1));
@@ -302,6 +340,7 @@ public class DataCleaner {
             String location = timetablePatternData.get(i + 4);
             Double duration = getDuration(startTimeString, endTimeString);
 
+            // Convert the times to date objects
             Date startTime = convertToTime(startTimeString);
             Date endTime = convertToTime(endTimeString);
 
@@ -311,7 +350,7 @@ public class DataCleaner {
         return timetablePatternList;
     }
 
-    // Convert the day of week into a number
+    /// Convert the day of week into int representation
     private int convertDOW(String dayOfWeek) {
         ArrayList<String> days = setDays();
         for (String day: days) {
@@ -322,6 +361,8 @@ public class DataCleaner {
         return 0;
     }
 
+    /// Helping function to add days of week
+    /// Returns arraylist of the days of the week
     private ArrayList<String> setDays() {
         ArrayList<String> days = new ArrayList<>();
         days.add("Mon");
@@ -332,7 +373,8 @@ public class DataCleaner {
         return days;
     }
 
-    // To get the duration
+    /// Calculates duration based on the start and end time
+    /// Returns the duration as a double
     private Double getDuration(String startTime, String endTime) {
         Double start = Double.valueOf(startTime.split(":")[0]);
         Double end = Double.valueOf(endTime.split(":")[0]);
@@ -340,33 +382,38 @@ public class DataCleaner {
         return end - start;
     }
 
-    // Handles multiple staff member information
+    /// Handles multiple staff member information by separating name and email for each staff member
     private void splitMultipleStaff(String cellData, ArrayList<String> tableData) {
         String[] multipleStaff = cellData.split(" ");
         for (int i = 0; i < multipleStaff.length; i+=4) {
             String staffName = multipleStaff[i] + " " + multipleStaff[i+1];
             String staffEmail = multipleStaff[i + 3];
 
+            // Add to arraylist
             tableData.add(staffName);
             tableData.add(staffEmail);
         }
     }
 
-    // Splits the name and email of a staff member
+    /// Splits the name and email of a staff member from a single string
     private void splitStaffInformation(String cellData, ArrayList<String> tableData) {
         String[] splitCell = cellData.split("-");
+        // Add to arraylist
         tableData.add(splitCell[0].trim());
         tableData.add(splitCell[1].trim());
     }
 
+    /// Converts a dateString into a date Date object
     private Date convertToDate(String dateString) {
         return DateConverter.stringToDate(dateString);
     }
 
+    /// Converts a timeString into a time Date object
     private Date convertToTime(String timeString) {
         return DateConverter.stringToTime(timeString);
     }
 
+    /// Combines date and time into a datetime Date object
     private Date convertToDateTime(Date date, Date time) {
         return DateConverter.ToDateTime(date, time);
     }
