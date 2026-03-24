@@ -2,8 +2,6 @@ package com.example.waiuscheduler.parsing;
 
 import android.content.Context;
 
-import androidx.room.Transaction;
-
 import com.example.waiuscheduler.database.AppDatabase;
 import com.example.waiuscheduler.database.DatabaseController;
 import com.example.waiuscheduler.database.DateConverter;
@@ -18,6 +16,8 @@ import org.jsoup.nodes.Document;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicReference;
 
 import okhttp3.HttpUrl;
 
@@ -29,7 +29,7 @@ public class DataRepository {
     private final DatabaseController dbController;
     private ScrapedData currentOutline = new ScrapedData();
 
-
+    /// Constructor to connect all initialisations
     public DataRepository(Context context) {
         this.scraper = new CourseOutlineScraper();
         this.cleaner = new DataCleaner();
@@ -37,14 +37,15 @@ public class DataRepository {
         this.dbController = new DatabaseController(db);
 
 
-
+        // Pre initialising the semester table to this years dates
         AppDatabase.databaseWriteExecutor.execute(() -> {
-            // Add the dates
+            // A Semester
             dbController.saveSemester(new SemesterTable("26A",
                     DateConverter.stringToDate("02/03/2026"),
                     DateConverter.stringToDate("26/06/2026"),
                     DateConverter.stringToDate("08/04/2026"),
                     DateConverter.stringToDate("20/04/2026")));
+            // B Semester
             dbController.saveSemester(new SemesterTable("26B",
                     DateConverter.stringToDate("13/07/2026"),
                     DateConverter.stringToDate("06/11/2026"),
@@ -55,64 +56,85 @@ public class DataRepository {
     }
 
     /// Full pipeline to scrape course outlines and save it into tables
-    @Transaction
     public void startCourseOutlinePipeline(HttpUrl url, RepositoryCallback callback) {
+        AtomicReference<Document> paperOutline = new AtomicReference<>();
+        CountDownLatch latch = new CountDownLatch(3); // 3 Tasks
         try {
-            new Thread(() -> {
+            AppDatabase.databaseWriteExecutor.execute(() -> {
                 // Get the document with course outline scraper
-                Document paperOutline = null;
+
                 try {
-                    paperOutline = scraper.getCourseOutline(url);
+                    paperOutline.set(scraper.getCourseOutline(url));
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    callback.OnComplete("Connection Error: " + e.getMessage());    // Handling for failure in the connection
+                } finally {
+                    latch.countDown();  // Countdown task
                 }
+            });
 
-                // Clean the data
-                currentOutline = cleaner.clean(paperOutline);
+            AppDatabase.databaseWriteExecutor.execute(() -> {
+                try {
 
+                    // Clean the data
+                    currentOutline = cleaner.clean(paperOutline.get());
 
-                // Write the data to the database
+                    // Write the data to the database
 
-                // Add the paper information to database
-                PaperTable paper = currentOutline.getPaper();
-                dbController.savePaper(paper);
+                    // Add the paper information to database
+                    PaperTable paper = currentOutline.getPaper();
+                    dbController.savePaper(paper);
 
-                // Add the staff members to the database
-                ArrayList<StaffTable> staffMembers = currentOutline.getStaffs();
-                // Set the paperId as foreign key
-                for (StaffTable staff : staffMembers) {
-                    dbController.saveStaff(staff);
+                    // Add the staff members to the database
+                    ArrayList<StaffTable> staffMembers = currentOutline.getStaffs();
+                    // Set the paperId as foreign key
+                    for (StaffTable staff : staffMembers) {
+                        dbController.saveStaff(staff);      // Save each staff member to database
+                    }
+
+                    // Add the assessments to the database
+                    ArrayList<AssessmentTable> assessments = currentOutline.getAssessments();
+                    for (AssessmentTable assessment : assessments) {
+                        dbController.saveAssessment(assessment);    // Save each assessment to database
+                    }
+
+                    // Add the events to the database
+                    ArrayList<TimetablePatternTable> timetablePatterns =
+                            currentOutline.getTimetablePatterns();
+                    for (TimetablePatternTable timetablePattern : timetablePatterns) {
+                        dbController.saveTimetablePattern(timetablePattern);    // Save timetable to database
+                    }
+                } catch (Exception e) {
+                    callback.OnComplete("Error: " + e.getMessage());
+                }  finally {
+                    latch.countDown();  // Countdown task
                 }
+            });
+            // TODO: Handle error of parsing error for date
+            AppDatabase.databaseWriteExecutor.execute(() -> {
+                try {
+                    latch.await();
 
-                // Add the assessments to the database
-                ArrayList<AssessmentTable> assessments = currentOutline.getAssessments();
-                for (AssessmentTable assessment : assessments) {
-                    dbController.saveAssessment(assessment);
+                    currentOutline.setEvents(cleaner.createEventData(cleaner.semester_fk));
+                    ArrayList<EventTable> events = currentOutline.getEvents();
+                    for (EventTable event : events) {
+                        dbController.saveEvent(event); // Save event to database
+                    }
+                } catch (Exception e) {
+                    callback.OnComplete("Error: " + e.getMessage());
+                }  finally {
+                    latch.countDown();  // Countdown task
                 }
+            });
 
-                // Add the events to the database
-                ArrayList<TimetablePatternTable> timetablePatterns =
-                        currentOutline.getTimetablePatterns();
-                for (TimetablePatternTable timetablePattern : timetablePatterns) {
-                    dbController.saveTimetablePattern(timetablePattern);
-                }
-                // TODO: Handle error of same thread
-                currentOutline.setEvents(cleaner.createEventData(cleaner.semester_fk));
-                ArrayList<EventTable> events = currentOutline.getEvents();
-                for (EventTable event : events) {
-                    dbController.saveEvent(event);
-                }
-            }).start();
             // Callback for successful pipeline
-           callback.OnComplete("Initial Success");
+            callback.OnComplete("Success");
         } catch (Exception e) {
            callback.OnComplete("Error: " + e.getMessage());
         }
 
     }
 
-
-    // Callback for pipeline
+    /// Callback for pipeline
     public interface RepositoryCallback {
         void OnComplete(String result);
     }
