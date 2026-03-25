@@ -36,7 +36,7 @@ import java.util.concurrent.Executors;
         StaffTable.class,
         StudySessionTable.class,
         TimetablePatternTable.class
-}, version = 7)
+}, version = 8)
 @TypeConverters({DateConverter.class})
 public abstract class AppDatabase extends RoomDatabase {
     public abstract AssessmentDao assessmentDao();

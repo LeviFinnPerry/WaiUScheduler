@@ -1,5 +1,6 @@
 package com.example.waiuscheduler.database.tables;
 
+import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
 import androidx.room.Index;
@@ -17,8 +18,7 @@ import java.util.Date;
         indices = {@Index("paperId_fk")}
 )
 public class TimetablePatternTable {
-    @PrimaryKey(autoGenerate = true)
-    private int timetableId;     // Unique Id for the timetable occurance
+    @PrimaryKey @NonNull
     private String type;            // Type of timetable event (eg. lecture)
     private int dayOfWeek;       // Day of week event occurs on
     private Date startTime;       // Start time
@@ -28,8 +28,9 @@ public class TimetablePatternTable {
     private String paperId_fk;     // Foreign key references event table
 
     // Constructor for the timetable table
-    public TimetablePatternTable(String type, int dayOfWeek, Date startTime,
-                                 Date endTime, String location, Double duration, String paperId_fk
+    public TimetablePatternTable(
+            @NonNull String type, int dayOfWeek, Date startTime,
+            Date endTime, String location, Double duration, String paperId_fk
     ) {
         this.type = type;
         this.dayOfWeek = dayOfWeek;
@@ -41,22 +42,16 @@ public class TimetablePatternTable {
     }
 
     // Getters and setters of each timetable pattern variable
-    // Timetable id
-    public int getTimetableId() {
-        return timetableId;
-    }
 
-    public void setTimetableId(int timetableId) {
-        this.timetableId = timetableId;
-    }
 
     // Type
 
+    @NonNull
     public String getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(@NonNull String type) {
         this.type = type;
     }
     // Day of week

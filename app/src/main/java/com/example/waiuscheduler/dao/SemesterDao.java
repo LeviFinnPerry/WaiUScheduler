@@ -1,6 +1,5 @@
 package com.example.waiuscheduler.dao;
 
-import androidx.lifecycle.LiveData;
 import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
@@ -9,6 +8,7 @@ import androidx.room.Update;
 
 import com.example.waiuscheduler.database.tables.SemesterTable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @androidx.room.Dao
@@ -31,5 +31,5 @@ public interface SemesterDao {
 
     // Select all semesters
     @Query("SELECT * FROM semester")
-    LiveData<List<SemesterTable>> getAllSemesters();
+    List<SemesterTable> getAllSemesters();
 }

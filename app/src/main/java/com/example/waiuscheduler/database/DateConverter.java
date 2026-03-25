@@ -11,6 +11,7 @@ import java.util.Locale;
 
 public class DateConverter {
     private static final String DATE_PATTERN = "dd/MM/yyyy";
+    private static final String ABV_DATE_PATTERN = "dd MMM yyyy";
     private static final String TIME_PATTERN = "HH:mm";
     private static final String DATETIME_PATTERN = "dd/MM/yyyy HH:mm";
     private static final Locale LOCALE = new Locale("en", "NZ");
@@ -32,6 +33,11 @@ public class DateConverter {
         return parse(dateString, DATE_PATTERN);
     }
 
+    /// Converts abbreviated string to date (date object)
+    public static Date stringAbvToDate(String dateString) {
+        return parse(dateString, ABV_DATE_PATTERN);
+    }
+
     /// Converts string to time (date object)
     public static Date stringToTime(String timeString) {
         return parse(timeString, TIME_PATTERN);
@@ -48,7 +54,8 @@ public class DateConverter {
     /// Primary function to parse a string into a simple date format based on the pattern
     private static Date parse(String str, String pattern) {
         try {
-            return new SimpleDateFormat(pattern, LOCALE).parse(str); // Returns new date format
+            // Returns new date format
+            return new SimpleDateFormat(pattern, LOCALE).parse(str);
         } catch (ParseException e) {
             Log.e("DateConverter", "Parsing error for date");   // Returns error
             return null;

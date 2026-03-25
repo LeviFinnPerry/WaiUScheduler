@@ -1,5 +1,7 @@
 package com.example.waiuscheduler.database;
 
+import androidx.lifecycle.LiveData;
+
 import com.example.waiuscheduler.dao.AssessmentDao;
 import com.example.waiuscheduler.dao.EventDao;
 import com.example.waiuscheduler.dao.PaperDao;
@@ -13,6 +15,9 @@ import com.example.waiuscheduler.database.tables.PaperTable;
 import com.example.waiuscheduler.database.tables.SemesterTable;
 import com.example.waiuscheduler.database.tables.StaffTable;
 import com.example.waiuscheduler.database.tables.TimetablePatternTable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class DatabaseController {
     // Each dao for the corresponding table
@@ -65,5 +70,18 @@ public class DatabaseController {
     // Function to save the timetable pattern table
     public void saveTimetablePattern(TimetablePatternTable timetablePatternTable) {
         timetableDao.insert(timetablePatternTable);
+    }
+
+    // Get semesters
+    public SemesterTable getSemesterTable(String semesterCode) {
+        ArrayList<SemesterTable> semesters =
+                (ArrayList<SemesterTable>) semesterDao.getAllSemesters();
+
+        for (SemesterTable semester: semesters) {
+            if (semester.getSemesterCode().equals(semesterCode)) {
+                return semester;
+            }
+        }
+        return null;
     }
 }

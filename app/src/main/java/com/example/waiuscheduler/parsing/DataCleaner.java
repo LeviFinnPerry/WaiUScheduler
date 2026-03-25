@@ -169,8 +169,7 @@ public class DataCleaner {
 
     /// Function that creates event data for the event table
     /// Returns an arraylist of events created based on the semester and timetable table
-    public ArrayList<EventTable> createEventData(String semesterCode) {
-        SemesterTable semester = results.getSemester(semesterCode);
+    public ArrayList<EventTable> createEventData(SemesterTable semester) {
         ArrayList<TimetablePatternTable> timetablePattern = results.getTimetablePatterns();
         ArrayList<EventTable> eventTables = new ArrayList<>();
 
@@ -180,7 +179,6 @@ public class DataCleaner {
         Date breakEndDate = semester.getBreakEndDate();
 
         for (TimetablePatternTable timetable: timetablePattern) {
-            int timeTableId = timetable.getTimetableId();
             String type = timetable.getType();
             int dow = timetable.getDayOfWeek();
             Date startTime = timetable.getStartTime();
@@ -188,7 +186,7 @@ public class DataCleaner {
 
             // Method to create events
             eventTables.addAll(createEvents(startDate,  endDate, breakStartDate, breakEndDate,
-                    type, dow, startTime, endTime, timeTableId));
+                    type, dow, startTime, endTime));
         }
         return eventTables;
     }
@@ -196,7 +194,7 @@ public class DataCleaner {
     /// Function that creates events based on a timetable pattern occurrence
     /// Returns an arraylist of EventTable Objects
     private ArrayList<EventTable> createEvents(Date semStart, Date semEnd, Date breakSemStart, Date breakSemEnd,
-                              String type, int dow, Date startTime, Date endTime, int event_fk) {
+                              String type, int dow, Date startTime, Date endTime) {
         ArrayList<EventTable> events = new ArrayList<>();
         Calendar cal = Calendar.getInstance();
         cal.setTime(semStart);
@@ -205,15 +203,18 @@ public class DataCleaner {
             Date current = cal.getTime();
 
             // Check if it is the right day of the week
-            if (cal.get(Calendar.DAY_OF_WEEK) == dow) {
+            int calDay = cal.get(Calendar.DAY_OF_WEEK);
+            if (calDay == dow) {
                 // Check if it not during the break
                 if (current.before(breakSemStart) || current.after(breakSemEnd)) {
                     Date startDateTime = convertToDateTime(current, startTime);
                     Date endDateTime = convertToDateTime(current, endTime);
 
-                    events.add(new EventTable(type, startDateTime, endDateTime, false, event_fk));
+                    events.add(new EventTable(startDateTime, endDateTime, false, type));
                 }
             }
+            // Move to the next day
+            cal.add(Calendar.DATE, 1);
         }
         return events;
 
@@ -355,7 +356,7 @@ public class DataCleaner {
         ArrayList<String> days = setDays();
         for (String day: days) {
             if (day.matches(dayOfWeek)) {
-                return days.indexOf(day) + 1;
+                return days.indexOf(day) + 2;
             }
         }
         return 0;
@@ -405,7 +406,7 @@ public class DataCleaner {
 
     /// Converts a dateString into a date Date object
     private Date convertToDate(String dateString) {
-        return DateConverter.stringToDate(dateString);
+        return DateConverter.stringAbvToDate(dateString);
     }
 
     /// Converts a timeString into a time Date object
