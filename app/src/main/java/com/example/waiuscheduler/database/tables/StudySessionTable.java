@@ -7,6 +7,7 @@ import androidx.room.PrimaryKey;
 
 import java.util.Date;
 
+/// Entity for study session table
 @Entity(tableName = "study_session",
         foreignKeys = @ForeignKey(
                 entity = PaperTable.class,  // Class of foreign key
@@ -25,7 +26,7 @@ public class StudySessionTable {
     private String notes;                   // Notes from session
     private String paperId_fk;          // Foreign key referencing paper
 
-    // Constructor for the study session table
+    /// Constructor for the study session table
     public StudySessionTable(Date dateTimeStart, Date dateTimeEnd, Double duration,
                              String notes, String paperId_fk) {
         this.dateTimeStart = dateTimeStart;
@@ -35,61 +36,51 @@ public class StudySessionTable {
         this.paperId_fk = paperId_fk;
     }
 
-    // Getter and setters
+    /// Getter and setters
     // Id
-
     public int getSessionId() {
         return sessionId;
     }
-
     public void setSessionId(int sessionId) {
         this.sessionId = sessionId;
     }
 
     // Start
-
     public Date getDateTimeStart() {
         return dateTimeStart;
     }
-
     public void setDateTimeStart(Date dateTimeStart) {
         this.dateTimeStart = dateTimeStart;
     }
-    // End
 
+    // End
     public Date getDateTimeEnd() {
         return dateTimeEnd;
     }
-
     public void setDateTimeEnd(Date dateTimeEnd) {
         this.dateTimeEnd = dateTimeEnd;
     }
-    // Duration
 
+    // Duration
     public Double getDuration() {
         return duration;
     }
-
     public void setDuration(Double duration) {
         this.duration = duration;
     }
 
     // Notes
-
     public String getNotes() {
         return notes;
     }
-
     public void setNotes(String notes) {
         this.notes = notes;
     }
 
     // Paper Id
-
     public String getPaperId_fk() {
         return paperId_fk;
     }
-
     public void setPaperId_fk(String paperId_fk) {
         this.paperId_fk = paperId_fk;
     }

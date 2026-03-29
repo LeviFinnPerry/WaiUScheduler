@@ -7,6 +7,7 @@ import androidx.room.PrimaryKey;
 
 import java.util.Date;
 
+/// Entity for assessment table
 @Entity(tableName = "assessment",
         foreignKeys = @ForeignKey(
                 entity = PaperTable.class,      // Class of foreign key
@@ -26,7 +27,7 @@ public class AssessmentTable {
     private Double grade;           // Grade given on assignment
     private String paperId_fk;     // Foreign key to reference the paper table
 
-    // Constructor for the paper table
+    /// Constructor for the paper table
     public AssessmentTable(String title, Date dueDate, Double weight,
                            String type, Double grade, String paperId_fk
     ) {
@@ -38,75 +39,59 @@ public class AssessmentTable {
         this.paperId_fk = paperId_fk;
     }
 
-    // Getters and setters for each assignment variable
+    /// Getters and setters for each assignment variable
     // Id
-
-
     public void setAssessmentId(int assessmentId) {
         this.assessmentId = assessmentId;
     }
-
     public int getAssessmentId() {
         return assessmentId;
     }
 
     // Title
-
     public String getTitle() {
         return title;
     }
-
     public void setTitle(String title) {
         this.title = title;
     }
 
     // Due Date
-
     public Date getDueDate() {
         return dueDate;
     }
-
     public void setDueDate(Date dueDate) {
         this.dueDate = dueDate;
     }
 
     // Weight
-
     public Double getWeight() {
         return weight;
     }
-
     public void setWeight(Double weight) {
         this.weight = weight;
     }
 
     // Type
-
     public String getType() {
         return type;
     }
-
     public void setType(String type) {
         this.type = type;
     }
 
     // Grade
-
     public Double getGrade() {
         return grade;
     }
-
     public void setGrade(Double grade) {
         this.grade = grade;
     }
 
     // Paper id
-
-
     public String getPaperId_fk() {
         return paperId_fk;
     }
-
     public void setPaperId_fk(String paperId_fk) {
         this.paperId_fk = paperId_fk;
     }

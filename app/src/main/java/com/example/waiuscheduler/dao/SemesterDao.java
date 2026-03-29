@@ -11,25 +11,26 @@ import com.example.waiuscheduler.database.tables.SemesterTable;
 import java.util.ArrayList;
 import java.util.List;
 
+/// Database object for semester table
 @androidx.room.Dao
 public interface SemesterDao {
-    // Add data
+    /// Add data
     @Insert(onConflict = OnConflictStrategy.REPLACE) // Replace Information if duplicate
     void insert(SemesterTable semester);
 
-    // Remove data
+    /// Remove data
     @Delete
     void delete(SemesterTable semester);
 
-    // Update data
+    /// Update data
     @Update
     void update(SemesterTable semester);
 
-    // Delete all semesters
+    /// Delete all semesters
     @Query("DELETE FROM semester")
     void deleteAllSemesters();
 
-    // Select all semesters
+    /// Select all semesters
     @Query("SELECT * FROM semester")
     List<SemesterTable> getAllSemesters();
 }

@@ -11,26 +11,26 @@ import com.example.waiuscheduler.database.tables.PaperTable;
 
 import java.util.List;
 
-// Database object for paper table
+/// Database object for paper table
 @androidx.room.Dao
 public interface PaperDao {
-    // Add data
+    /// Add data
     @Insert // Replace Information if duplicate
     void insert(PaperTable paper);
 
-    // Remove data
+    /// Remove data
     @Delete
     void delete(PaperTable paper);
 
-    // Update data
+    /// Update data
     @Update
     void update(PaperTable paper);
 
-    // Delete all papers
+    /// Delete all papers
     @Query("DELETE FROM paper")
     void deleteAllPapers();
 
-    // Select all papers
+    /// Select all papers
     @Query("SELECT * FROM paper")
     LiveData<List<PaperTable>> getAllPapers();
 }

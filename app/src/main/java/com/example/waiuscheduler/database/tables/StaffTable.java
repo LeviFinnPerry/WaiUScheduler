@@ -5,6 +5,7 @@ import androidx.room.ForeignKey;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
+/// Entity for staff table
 @Entity(tableName = "staff",
         foreignKeys = @ForeignKey(
                 entity = PaperTable.class,      // Class of foreign key
@@ -22,7 +23,7 @@ public class StaffTable {
     private String position;    // Position of staff member (eg. conveyor, tutor, etc.)
     private String paperId_fk; // Foreign key for paper ID
 
-    // Constructor for staff table
+    /// Constructor for staff table
     public StaffTable(String name, String email, String position, String paperId_fk) {
         this.name = name;
         this.email = email;
@@ -30,51 +31,43 @@ public class StaffTable {
         this.paperId_fk = paperId_fk;
     }
 
-    // Getters and setters for the staff variables
+    /// Getters and setters for the staff variables
     // Staff ID
     public int getStaffId() {
         return StaffId;
     }
-
     public void setStaffId(int staffId) {
         StaffId = staffId;
     }
 
     // Name
-
     public String getName() {
         return name;
     }
-
     public void setName(String name) {
         this.name = name;
     }
-    // Email
 
+    // Email
     public String getEmail() {
         return email;
     }
-
     public void setEmail(String email) {
         this.email = email;
     }
 
     // Position
-
     public String getPosition() {
         return position;
     }
-
     public void setPosition(String position) {
         this.position = position;
     }
 
     // Paper id
-
     public String getPaperId_fk() {
         return paperId_fk;
     }
-
     public void setPaperId_fk(String paperId_fk) {
         this.paperId_fk = paperId_fk;
     }

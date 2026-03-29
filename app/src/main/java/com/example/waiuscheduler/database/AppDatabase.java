@@ -28,6 +28,7 @@ import com.example.waiuscheduler.database.tables.TimetablePatternTable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/// Database for each table
 @Database(entities = {
         AssessmentTable.class,
         EventTable.class,
@@ -37,23 +38,24 @@ import java.util.concurrent.Executors;
         StudySessionTable.class,
         TimetablePatternTable.class
 }, version = 8)
-@TypeConverters({DateConverter.class})
+@TypeConverters({DateConverter.class})  // Type converter for dates
 public abstract class AppDatabase extends RoomDatabase {
-    public abstract AssessmentDao assessmentDao();
-    public abstract EventDao eventDao();
-    public abstract PaperDao paperDao();
-    public abstract SemesterDao semesterDao();
-    public abstract StaffDao staffDao();
-    public abstract StudySessionDao studySessionDao();
-    public abstract TimetablePatternDao timetablePatternDao();
+    public abstract AssessmentDao assessmentDao();  // Assessment database object
+    public abstract EventDao eventDao();    // Event database object
+    public abstract PaperDao paperDao();    // Paper database object
+    public abstract SemesterDao semesterDao();  // Semester database object
+    public abstract StaffDao staffDao();    // Staff database object
+    public abstract StudySessionDao studySessionDao();  // Study session database object
+    public abstract TimetablePatternDao timetablePatternDao();  // Timetable pattern database object
 
 
     // Instance for the database
     private static volatile AppDatabase INSTANCE;
 
+    // Fixed thread executor
     public static final ExecutorService databaseWriteExecutor = Executors.newFixedThreadPool(4);
 
-    // Get instance of the database
+    /// Initialise instance of the database
     public static AppDatabase getInstance(final Context context) {
         // If not already an instance
         if (INSTANCE == null) {
@@ -71,7 +73,7 @@ public abstract class AppDatabase extends RoomDatabase {
         return INSTANCE;
     }
 
-    // Add semester dates for the year manually at the beginning
+    /// Add semester dates for the year manually at the beginning
     private static final RoomDatabase.Callback initialiseDB = new RoomDatabase.Callback() {
         @Override
         public void onCreate(@NonNull SupportSQLiteDatabase db) {

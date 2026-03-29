@@ -6,6 +6,7 @@ import androidx.room.PrimaryKey;
 
 import java.util.Date;
 
+/// Entity for semester table
 @Entity(tableName = "semester")
 public class SemesterTable {
     @PrimaryKey @NonNull
@@ -15,7 +16,7 @@ public class SemesterTable {
     private Date breakStartDate;  // Start date for the mid semester break
     private Date breakEndDate;    // End date for the mid semester break
 
-    // Constructor for the semester table
+    /// Constructor for the semester table
     public SemesterTable(
             @NonNull String semesterCode, Date startDate,
             Date endDate, Date breakStartDate, Date breakEndDate) {
@@ -26,13 +27,12 @@ public class SemesterTable {
         this.breakEndDate = breakEndDate;
     }
 
-    // Getter and setter for each variable
+    /// Getter and setter for each variable
     // Semester code
     @NonNull
     public String getSemesterCode() {
         return semesterCode;
     }
-
     public void setSemesterCode(@NonNull String semesterCode) {
         this.semesterCode = semesterCode;
     }
@@ -41,7 +41,6 @@ public class SemesterTable {
     public Date getStartDate() {
         return startDate;
     }
-
     public void setStartDate(Date startDate) {
         this.startDate = startDate;
     }
@@ -50,7 +49,6 @@ public class SemesterTable {
     public Date getEndDate() {
         return endDate;
     }
-
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
     }
@@ -59,7 +57,6 @@ public class SemesterTable {
     public Date getBreakStartDate() {
         return breakStartDate;
     }
-
     public void setBreakEndDate(Date breakEndDate) {
         this.breakEndDate = breakEndDate;
     }
@@ -68,7 +65,6 @@ public class SemesterTable {
     public Date getBreakEndDate() {
         return breakEndDate;
     }
-
     public void setBreakStartDate(Date breakStartDate) {
         this.breakStartDate = breakStartDate;
     }

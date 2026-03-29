@@ -11,25 +11,26 @@ import com.example.waiuscheduler.database.tables.TimetablePatternTable;
 
 import java.util.List;
 
+/// Database object for timetable pattern table
 @androidx.room.Dao
 public interface TimetablePatternDao {
-    // Add data
+    /// Add data
     @Insert(onConflict = OnConflictStrategy.REPLACE) // Replace Information if duplicate
     void insert(TimetablePatternTable timetable);
 
-    // Remove data
+    /// Remove data
     @Delete
     void delete(TimetablePatternTable timetable);
 
-    // Update data
+    /// Update data
     @Update
     void update(TimetablePatternTable timetable);
 
-    // Delete all timetables
+    /// Delete all timetables
     @Query("DELETE FROM timetable_pattern")
     void deleteAllTimetables();
 
-    // Select all timetables
+    /// Select all timetables
     @Query("SELECT * FROM timetable_pattern")
     LiveData<List<TimetablePatternTable>> getAllTimetables();
 }

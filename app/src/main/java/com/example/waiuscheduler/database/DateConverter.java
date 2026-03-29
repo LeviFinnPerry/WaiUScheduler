@@ -9,6 +9,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+/// Type Converter to handle Date Objects in the app
 public class DateConverter {
     private static final String DATE_PATTERN = "dd/MM/yyyy";
     private static final String ABV_DATE_PATTERN = "dd MMM yyyy";

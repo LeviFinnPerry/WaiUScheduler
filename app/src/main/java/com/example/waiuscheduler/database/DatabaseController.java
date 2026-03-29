@@ -19,17 +19,19 @@ import com.example.waiuscheduler.database.tables.TimetablePatternTable;
 import java.util.ArrayList;
 import java.util.List;
 
+/// Database controller to manage all DAOs
 public class DatabaseController {
     // Each dao for the corresponding table
     private final AssessmentDao assessmentDao;
-    private TimetablePatternDao timetableDao;
-    private EventDao eventDao;
-    private PaperDao paperDao;
-    private SemesterDao semesterDao;
-    private StaffDao staffDao;
-    private StudySessionDao studyDao;
+    private final TimetablePatternDao timetableDao;
+    private final EventDao eventDao;
+    private final PaperDao paperDao;
+    private final SemesterDao semesterDao;
+    private final StaffDao staffDao;
+    private final StudySessionDao studyDao;
 
 
+    ///  Database controller constructor from database
     public DatabaseController(AppDatabase db) {
         this.assessmentDao = db.assessmentDao();
         this.eventDao = db.eventDao();
@@ -41,38 +43,38 @@ public class DatabaseController {
 
     }
 
-    // One method to save all data from a single paper
-    // Function to save to paper table
+
+    /// Function to save to paper table
     public void savePaper(PaperTable paperOutline) {
         paperDao.insert(paperOutline);
     }
 
-    // Function to save semester
+    /// Function to save semester
     public void saveSemester(SemesterTable semesterTable) {
         semesterDao.insert(semesterTable);
     }
 
-    // Function to save to event table
+    /// Function to save to event table
     public void saveEvent(EventTable eventTable) {
         eventDao.insert(eventTable);
     }
 
-    // Function to save to staff table
+    /// Function to save to staff table
     public void saveStaff(StaffTable staffTable) {
         staffDao.insert(staffTable);
     }
 
-    // Function to save the assessment table
+    /// Function to save the assessment table
     public void saveAssessment(AssessmentTable assessmentTable) {
         assessmentDao.insert(assessmentTable);
     }
 
-    // Function to save the timetable pattern table
+    /// Function to save the timetable pattern table
     public void saveTimetablePattern(TimetablePatternTable timetablePatternTable) {
         timetableDao.insert(timetablePatternTable);
     }
 
-    // Get semesters
+    /// Function to return the semester based on the semester code
     public SemesterTable getSemesterTable(String semesterCode) {
         ArrayList<SemesterTable> semesters =
                 (ArrayList<SemesterTable>) semesterDao.getAllSemesters();

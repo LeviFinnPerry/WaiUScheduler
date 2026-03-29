@@ -28,6 +28,7 @@ public class CoursesViewModel extends AndroidViewModel {
         return status;
     }
 
+    /// Function to retrieve text from user and start course outline pipeline
     public void processCourseOutline(String courseCode) {
         // Get the course code from the user eg. COMPX576
         courseCode = "COMPX576";

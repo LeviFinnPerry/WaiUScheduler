@@ -11,25 +11,26 @@ import com.example.waiuscheduler.database.tables.StudySessionTable;
 
 import java.util.List;
 
+/// Database object for study session table
 @androidx.room.Dao
 public interface StudySessionDao {
-    // Add data
+    /// Add data
     @Insert(onConflict = OnConflictStrategy.REPLACE) // Replace Information if duplicate
     void insert(StudySessionTable session);
 
-    // Remove data
+    /// Remove data
     @Delete
     void delete(StudySessionTable session);
 
-    // Update data
+    /// Update data
     @Update
     void update(StudySessionTable session);
 
-    // Delete all sessions
+    /// Delete all sessions
     @Query("DELETE FROM study_session")
     void deleteAllSessions();
 
-    // Select all sessions
+    /// Select all sessions
     @Query("SELECT * FROM study_session")
     LiveData<List<StudySessionTable>> getAllSessions();
 }

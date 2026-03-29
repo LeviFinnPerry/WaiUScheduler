@@ -11,25 +11,26 @@ import com.example.waiuscheduler.database.tables.StaffTable;
 
 import java.util.List;
 
+/// Database object for staff table
 @androidx.room.Dao
 public interface StaffDao {
-    // Add data
+    /// Add data
     @Insert(onConflict = OnConflictStrategy.REPLACE) // Replace Information if duplicate
     void insert(StaffTable staff);
 
-    // Remove data
+    /// Remove data
     @Delete
     void delete(StaffTable staff);
 
-    // Update data
+    /// Update data
     @Update
     void update(StaffTable staff);
 
-    // Delete all staff
+    /// Delete all staff
     @Query("DELETE FROM staff")
     void deleteAllStaff();
 
-    // Select all staff
+    /// Select all staff
     @Query("SELECT * FROM staff")
     LiveData<List<StaffTable>> getAllStaff();
 }

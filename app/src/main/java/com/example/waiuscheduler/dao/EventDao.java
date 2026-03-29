@@ -11,26 +11,26 @@ import com.example.waiuscheduler.database.tables.EventTable;
 
 import java.util.List;
 
-// Database object for the event table
+/// Database object for the event table
 @androidx.room.Dao
 public interface EventDao {
-    // Add data
+    /// Add data
     @Insert(onConflict = OnConflictStrategy.REPLACE) // Replace Information if duplicate
     void insert(EventTable event);
 
-    // Remove data
+    /// Remove data
     @Delete
     void delete(EventTable event);
 
-    // Update data
+    /// Update data
     @Update
     void update(EventTable event);
 
-    // Delete all events
+    /// Delete all events
     @Query("DELETE FROM event")
     void deleteAllEvents();
 
-    // Select all events
+    /// Select all events
     @Query("SELECT * FROM event")
     LiveData<List<EventTable>> getAllEvents();
 }
