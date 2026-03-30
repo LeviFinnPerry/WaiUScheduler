@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_margin="15dp"
     tools:context=".ui.courses.CoursesFragment">
 
     <TextView
@@ -13,25 +14,126 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
+        android:text="@string/title_courses"
         android:textAlignment="center"
         android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/button"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/addCourse"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="113dp"
-        android:layout_marginTop="276dp"
-        android:layout_marginEnd="113dp"
-        android:layout_marginBottom="32dp"
-        android:onClick="pap"
-        android:text="TestPaperOutline"
-        app:layout_constraintBottom_toTopOf="@+id/text_courses"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@id/currentCourses"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/text_courses">
+
+        <TextView
+            android:id="@+id/text_add_paper"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/add_paper"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/text_paper_code"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/paper_code" />
+
+        <EditText
+            android:id="@+id/editText_paper_code"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="text"
+            android:text="@string/paper_code_hint"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/text_occ_code"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/occurrence_code"
+            android:textSize="14sp" />
+
+        <EditText
+            android:id="@+id/editText_occ_code"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="text"
+            android:text="@string/occurrence_code_hint"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/text_location"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/location"
+            android:textSize="14sp" />
+
+        <RadioGroup
+            android:id="@+id/radioGroup_location"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <RadioButton
+                android:id="@+id/radio_location_ham"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/radio_button_ham"
+                android:textSize="14sp" />
+
+            <RadioButton
+                android:id="@+id/radio_location_tga"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/radio_button_tga"
+                android:textSize="14sp" />
+
+            <RadioButton
+                android:id="@+id/radio_location_onl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/radio_button_onl" />
+        </RadioGroup>
+
+        <Button
+            android:id="@+id/button_search_paper"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="processCourseOutline"
+            android:text="@string/search_button"
+            android:textAlignment="center"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/currentCourses"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@id/staffList"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/addCourse">
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/staffList"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/currentCourses"></LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

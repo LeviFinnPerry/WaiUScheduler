@@ -45,7 +45,7 @@ public class CoursesFragment extends Fragment {
         });
 
         // Trigger the pipeline via the button
-        binding.button.setOnClickListener(v -> {
+        binding.buttonSearchPaper.setOnClickListener(v -> {
             coursesViewModel.processCourseOutline("TESTING");
         });
 

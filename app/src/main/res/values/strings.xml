@@ -4,4 +4,17 @@
     <string name="title_dashboard">Dashboard</string>
     <string name="title_courses">Courses</string>
     <string name="title_calendar">Calendar</string>
+
+    # Courses strings
+    <string name="add_paper">Add New Paper</string>
+    <string name="paper_code">Paper Code</string>
+    <string name="paper_code_hint">Eg. COMPX576</string>
+    <string name="occurrence_code">Occurrence Code</string>
+    <string name="occurrence_code_hint">Eg. 26A</string>
+    <string name="location">Location</string>
+    <string name="radio_button_ham">HAM</string>
+    <string name="radio_button_tga">TGA</string>
+    <string name="radio_button_onl">ONL</string>
+    <string name="search_button">Search Paper Outline</string>
+
 </resources>
