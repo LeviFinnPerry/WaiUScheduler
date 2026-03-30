@@ -1,6 +1,7 @@
 package com.example.waiuscheduler.ui.courses;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,8 +36,6 @@ public class CoursesFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Observe text changes
-
         // Observe the pipeline status
         coursesViewModel.getStatus().observe(getViewLifecycleOwner(), statusMessage -> {
             if (statusMessage != null) {
@@ -46,7 +45,21 @@ public class CoursesFragment extends Fragment {
 
         // Trigger the pipeline via the button
         binding.buttonSearchPaper.setOnClickListener(v -> {
-            coursesViewModel.processCourseOutline("TESTING");
+            try {
+
+
+                // Get the information for the course outline
+                String paperCode = String.valueOf(binding.editTextPaperCode.getText()).trim();
+                String occCode = String.valueOf(binding.editTextOccCode.getText()).trim();
+
+                // Find the selected location
+                int locationId = binding.radioGroupLocation.getCheckedRadioButtonId();
+                String location = getLocation(locationId);
+
+                coursesViewModel.processCourseOutline(paperCode, occCode, location);
+            } catch (Exception e) {
+                Log.e("User Add Paper", "Error in getting paper information");
+            }
         });
 
 
@@ -56,6 +69,18 @@ public class CoursesFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    /// Function to determine which radiobutton is selected
+    private String getLocation(int locationId) {
+        if (locationId == binding.radioLocationHam.getId()) {
+            return "HAM";
+        } else if (locationId == binding.radioLocationTga.getId()) {
+            return "TGA";
+        } else if (locationId == binding.radioLocationOnl.getId()) {
+            return "ONL";
+        }
+        return null;
     }
 
 }

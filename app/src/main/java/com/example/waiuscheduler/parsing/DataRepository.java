@@ -1,8 +1,7 @@
 package com.example.waiuscheduler.parsing;
 
 import android.content.Context;
-
-import androidx.lifecycle.LiveData;
+import android.util.Log;
 
 import com.example.waiuscheduler.database.AppDatabase;
 import com.example.waiuscheduler.database.DatabaseController;
@@ -16,18 +15,14 @@ import com.example.waiuscheduler.database.tables.TimetablePatternTable;
 
 import org.jsoup.nodes.Document;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.Objects;
 
 import okhttp3.HttpUrl;
 
 public class DataRepository {
     private final CourseOutlineScraper scraper;
     private final DataCleaner cleaner;
-    private final AppDatabase db;
 
     private final DatabaseController dbController;
     private ScrapedData currentOutline = new ScrapedData();
@@ -36,7 +31,7 @@ public class DataRepository {
     public DataRepository(Context context) {
         this.scraper = new CourseOutlineScraper();
         this.cleaner = new DataCleaner();
-        this.db = AppDatabase.getInstance(context);
+        AppDatabase db = AppDatabase.getInstance(context);
         this.dbController = new DatabaseController(db);
 
 
@@ -65,52 +60,57 @@ public class DataRepository {
                 // Get the document with course outline scraper
                 Document paperOutline = scraper.getCourseOutline(url);
 
-                // Clean the data
-                currentOutline = cleaner.clean(paperOutline);
+                if (paperOutline.childNodeSize() > 2) {
+                    // Clean the data
+                    currentOutline = cleaner.clean(paperOutline);
 
-                // Write the data to the database
+                    // Write the data to the database
 
-                // Add the paper information to database
-                PaperTable paper = currentOutline.getPaper();
-                dbController.savePaper(paper);
+                    // Add the paper information to database
+                    PaperTable paper = currentOutline.getPaper();
+                    dbController.savePaper(paper);
 
-                // Add the staff members to the database
-                ArrayList<StaffTable> staffMembers = currentOutline.getStaffs();
-                // Set the paperId as foreign key
-                for (StaffTable staff : staffMembers) {
-                    dbController.saveStaff(staff);      // Save each staff member to database
+                    // Add the staff members to the database
+                    ArrayList<StaffTable> staffMembers = currentOutline.getStaffs();
+                    // Set the paperId as foreign key
+                    for (StaffTable staff : staffMembers) {
+                        dbController.saveStaff(staff);      // Save each staff member to database
+                    }
+
+                    // Add the assessments to the database
+                    ArrayList<AssessmentTable> assessments = currentOutline.getAssessments();
+                    for (AssessmentTable assessment : assessments) {
+                        dbController.saveAssessment(assessment);    // Save each assessment to database
+                    }
+
+                    // Add the events to the database
+                    ArrayList<TimetablePatternTable> timetablePatterns =
+                            currentOutline.getTimetablePatterns();
+                    for (TimetablePatternTable timetablePattern : timetablePatterns) {
+                        dbController.saveTimetablePattern(timetablePattern);    // Save timetable to database
+                    }
+
+                    // Get the current semester for the paper
+                    SemesterTable semesterTable =
+                            dbController.getSemesterTable(cleaner.semester_fk);
+
+                    currentOutline.setEvents(cleaner.createEventData(semesterTable));
+                    ArrayList<EventTable> events = currentOutline.getEvents();
+                    for (EventTable event : events) {
+                        dbController.saveEvent(event); // Save event to database
+                    }
+                    // Callback for successful pipeline
+                    callback.OnComplete("Success");
+                } else {
+                    callback.OnComplete("There is no paper outline for this paper");
                 }
-
-                // Add the assessments to the database
-                ArrayList<AssessmentTable> assessments = currentOutline.getAssessments();
-                for (AssessmentTable assessment : assessments) {
-                    dbController.saveAssessment(assessment);    // Save each assessment to database
-                }
-
-                // Add the events to the database
-                ArrayList<TimetablePatternTable> timetablePatterns =
-                        currentOutline.getTimetablePatterns();
-                for (TimetablePatternTable timetablePattern : timetablePatterns) {
-                    dbController.saveTimetablePattern(timetablePattern);    // Save timetable to database
-                }
-
-                // Get the current semester for the paper
-                SemesterTable semesterTable = dbController.getSemesterTable(cleaner.semester_fk);
-
-                currentOutline.setEvents(cleaner.createEventData(semesterTable));
-                ArrayList<EventTable> events = currentOutline.getEvents();
-                for (EventTable event : events) {
-                    dbController.saveEvent(event); // Save event to database
-                }
-
-
-                // Callback for successful pipeline
-                callback.OnComplete("Success");
             } catch (Exception e) {
-                callback.OnComplete("Error: " + e.getMessage());
+                Log.e("Pipeline failure:", Objects.requireNonNull(e.getMessage()));
+                if (e.getMessage().contains("code=400")) {
+                    callback.OnComplete("Paper Outline does not exist, make sure the information is correct");
+                }
             }
         });
-
     }
 
     /// Callback for pipeline
