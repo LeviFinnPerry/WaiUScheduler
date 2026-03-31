@@ -49,19 +49,19 @@ dependencies {
     androidTestImplementation(libs.espresso.core)
 
     // Add dependencies for room
-    implementation("androidx.room:room-runtime:2.8.4")
-    annotationProcessor("androidx.room:room-compiler:2.8.4")
+    implementation(libs.room.runtime)
+    annotationProcessor(libs.room.compiler)
 
     // Add dependencies for lifecycle extensions
-    implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
+    implementation(libs.lifecycle.extensions)
     annotationProcessor(libs.lifecycle.compiler)
 
     // Add dependencies for GSON
-    implementation("com.google.code.gson:gson:2.13.2")
+    implementation(libs.gson)
 
     // Add dependencies for HTTP
-    implementation("com.squareup.retrofit2:retrofit:3.0.0")
-    implementation("com.squareup.retrofit2:converter-gson:3.0.0") // For JSON conversion
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.gson) // For JSON conversion
 
     // Add dependencies for JSOUP
     implementation(libs.jsoup)
