@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.waiuscheduler.R;
 import com.example.waiuscheduler.database.tables.PaperTable;
+import com.example.waiuscheduler.database.tables.StaffTable;
 import com.example.waiuscheduler.databinding.FragmentCoursesBinding;
 
 import java.util.ArrayList;
@@ -27,8 +28,11 @@ public class CoursesFragment extends Fragment {
     // View Model
     private CoursesViewModel coursesViewModel;
 
-    // Paper adapter
-    private PaperAdapter adapter;
+    // Paper Adapter
+    private PaperAdapter paperAdapter;
+
+    // Staff Adapter
+    private StaffAdapter staffAdapter;
 
     public View onCreateView(
             @NonNull LayoutInflater inflater,
@@ -70,24 +74,40 @@ public class CoursesFragment extends Fragment {
             }
 
 
-            // RecyclerView
-            RecyclerView recyclerView = view.findViewById(R.id.paperRecycler);
-            recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+            // RecyclerView for paper information
+            RecyclerView paperRecycler = view.findViewById(R.id.paper_recycler);
+            paperRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
 
-            adapter = new PaperAdapter(paper -> {
-                coursesViewModel.deletePaper(paper);
-            });
+            paperAdapter = new PaperAdapter(paper -> coursesViewModel.deletePaper(paper));
 
-            recyclerView.setAdapter(adapter);
+            paperRecycler.setAdapter(paperAdapter);
 
             // Observe the data from the view model
             coursesViewModel.getAllPapers().observe(
                     getViewLifecycleOwner(), papers -> {
                         if (papers != null) {
-                            adapter.submitPapers((ArrayList<PaperTable>) papers);
+                            paperAdapter.submitPapers((ArrayList<PaperTable>) papers);
                         }
                     }
             );
+
+            // RecyclerView for staff information
+            RecyclerView staffRecycler = view.findViewById(R.id.staff_recycler);
+            staffRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
+
+            staffAdapter = new StaffAdapter();
+
+            staffRecycler.setAdapter(staffAdapter);
+
+            // Observe the data from the view model
+            coursesViewModel.getAllStaff().observe(
+                    getViewLifecycleOwner(), staffMembers -> {
+                        if (staffMembers != null) {
+                            staffAdapter.submitStaff((ArrayList<StaffTable>) staffMembers);
+                        }
+                    }
+            );
+
         });
     }
 

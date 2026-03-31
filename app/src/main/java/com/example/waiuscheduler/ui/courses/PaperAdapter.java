@@ -1,5 +1,6 @@
 package com.example.waiuscheduler.ui.courses;
 
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,30 +30,35 @@ public class PaperAdapter extends RecyclerView.Adapter<PaperAdapter.PaperViewHol
     }
 
     /// Submits papers to the recycler view
+    @SuppressLint("NotifyDataSetChanged")
     public void submitPapers(ArrayList<PaperTable> newPapers) {
         papers = newPapers;
         notifyDataSetChanged();
     }
 
+    /// View Holder class to manage items in the recycler view
     public static class PaperViewHolder extends RecyclerView.ViewHolder {
         TextView title, occurrence, code;
         ImageButton deleteBtn;
 
+        /// Constructor for xml items
         public PaperViewHolder(@NonNull View itemView) {
             super(itemView);
-            code = itemView.findViewById(R.id.paperCode);
-            title = itemView.findViewById(R.id.paperTitle);
-            occurrence = itemView.findViewById(R.id.paperOccurrence);
+            code = itemView.findViewById(R.id.staff_paper_code);
+            title = itemView.findViewById(R.id.staff_name);
+            occurrence = itemView.findViewById(R.id.staff_email);
             deleteBtn = itemView.findViewById(R.id.paper_delete);
         }
     }
 
+    /// Returns new paper view holder when initialised
     @NonNull @Override
     public PaperViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_paper, parent, false);
         return new PaperViewHolder(view);
     }
 
+    /// Sets data to xml items
     @Override
     public void onBindViewHolder(@NonNull PaperViewHolder holder, int position) {
         PaperTable paper = papers.get(position);
@@ -71,6 +77,7 @@ public class PaperAdapter extends RecyclerView.Adapter<PaperAdapter.PaperViewHol
         });
     }
 
+    /// Returns count of papers
     @Override
     public int getItemCount() {
         return papers == null ? 0 : papers.size();

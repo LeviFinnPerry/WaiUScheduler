@@ -72,6 +72,11 @@ public class DatabaseController {
         staffDao.insert(staffTable);
     }
 
+    /// Function to retrieve all staff in table
+    public LiveData<List<StaffTable>> getAllStaff() {
+        return staffDao.getAllStaff();
+    }
+
     /// Function to save the assessment table
     public void saveAssessment(AssessmentTable assessmentTable) {
         assessmentDao.insert(assessmentTable);

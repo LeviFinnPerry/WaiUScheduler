@@ -9,11 +9,11 @@
     tools:context=".ui.courses.CoursesFragment">
 
     <LinearLayout
-        android:id="@+id/addCourse"
+        android:id="@+id/add_course"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintBottom_toTopOf="@id/currentCourses"
+        app:layout_constraintBottom_toTopOf="@id/current_courses"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -24,43 +24,58 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/add_paper"
+            android:textAlignment="center"
             android:textSize="16sp" />
 
-        <TextView
-            android:id="@+id/text_paper_code"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/paper_code" />
-
-        <EditText
-            android:id="@+id/editText_paper_code"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:autofillHints=""
-            android:ems="10"
-            android:inputType="text"
-            android:minHeight="48dp"
-            android:text="@string/paper_code_hint"
-            android:textSize="16sp" />
-
-        <TextView
-            android:id="@+id/text_occ_code"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:autofillHints=""
-            android:text="@string/occurrence_code"
-            android:textSize="14sp" />
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
 
-        <EditText
-            android:id="@+id/editText_occ_code"
+            <TextView
+                android:id="@+id/text_paper_code"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/paper_code" />
+
+            <TextView
+                android:id="@+id/text_occ_code"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:autofillHints=""
+                android:text="@string/occurrence_code"
+                android:textAlignment="textEnd"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/paper_information"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:autofillHints="@string/occurrence_code_hint"
-            android:ems="10"
-            android:inputType="text"
-            android:minHeight="48dp"
-            android:text="@string/occurrence_code_hint"
-            android:textSize="16sp" />
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/editText_paper_code"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:autofillHints=""
+                android:ems="10"
+                android:inputType="text"
+                android:minHeight="48dp"
+                android:text="@string/paper_code_hint"
+                android:textSize="16sp" />
+
+            <EditText
+                android:id="@+id/editText_occ_code"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:autofillHints="@string/occurrence_code_hint"
+                android:ems="10"
+                android:inputType="text"
+                android:minHeight="48dp"
+                android:text="@string/occurrence_code_hint"
+                android:textSize="16sp" />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/text_location"
@@ -111,36 +126,52 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/currentCourses"
+        android:id="@+id/current_courses"
         android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintBottom_toTopOf="@id/staffList"
+        app:layout_constraintBottom_toTopOf="@id/staff_list"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/addCourse">
+        app:layout_constraintTop_toBottomOf="@id/add_course">
 
         <TextView
             android:id="@+id/text_current_papers"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/current_paper" />
+            android:text="@string/current_paper"
+            android:textAlignment="center"
+            android:textSize="16sp" />
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/paperRecycler"
+            android:id="@+id/paper_recycler"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/staffList"
+        android:id="@+id/staff_list"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/currentCourses"></LinearLayout>
+        app:layout_constraintTop_toBottomOf="@id/current_courses">
+
+        <TextView
+            android:id="@+id/text_staff"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/staff_info"
+            android:textAlignment="center"
+            android:textSize="16sp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/staff_recycler"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

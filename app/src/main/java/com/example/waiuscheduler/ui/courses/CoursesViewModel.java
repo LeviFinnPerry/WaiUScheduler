@@ -9,6 +9,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.example.waiuscheduler.database.DatabaseController;
 import com.example.waiuscheduler.database.tables.PaperTable;
+import com.example.waiuscheduler.database.tables.StaffTable;
 import com.example.waiuscheduler.parsing.DataRepository;
 
 import java.util.List;
@@ -43,12 +44,19 @@ public class CoursesViewModel extends AndroidViewModel {
 
     }
 
+    /// Method to return all papers
     public LiveData<List<PaperTable>> getAllPapers() {
         return dbController.getAllPapers();
     }
 
+    /// Deletes paper given
     public void deletePaper(PaperTable paper) {
         dbController.deletePaper(paper);
+    }
+
+    /// Returns all staff members
+    public LiveData<List<StaffTable>> getAllStaff() {
+        return dbController.getAllStaff();
     }
 
 }

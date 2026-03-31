@@ -22,4 +22,10 @@
     <string name="delete_paper">Delete Paper</string>
     <string name="paper_title">Paper Title</string>
 
+    # Staff information
+    <string name="staff_info">Staff Information</string>
+    <string name="staff_name">Staff Name</string>
+    <string name="staff_email">Staff Email</string>
+    <string name="staff_position">Role</string>
+
 </resources>
