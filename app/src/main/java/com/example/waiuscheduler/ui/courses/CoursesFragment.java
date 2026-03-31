@@ -11,8 +11,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.waiuscheduler.R;
+import com.example.waiuscheduler.database.tables.PaperTable;
 import com.example.waiuscheduler.databinding.FragmentCoursesBinding;
+
+import java.util.ArrayList;
 
 public class CoursesFragment extends Fragment {
 
@@ -20,6 +26,9 @@ public class CoursesFragment extends Fragment {
 
     // View Model
     private CoursesViewModel coursesViewModel;
+
+    // Paper adapter
+    private PaperAdapter adapter;
 
     public View onCreateView(
             @NonNull LayoutInflater inflater,
@@ -47,7 +56,6 @@ public class CoursesFragment extends Fragment {
         binding.buttonSearchPaper.setOnClickListener(v -> {
             try {
 
-
                 // Get the information for the course outline
                 String paperCode = String.valueOf(binding.editTextPaperCode.getText()).trim();
                 String occCode = String.valueOf(binding.editTextOccCode.getText()).trim();
@@ -60,9 +68,27 @@ public class CoursesFragment extends Fragment {
             } catch (Exception e) {
                 Log.e("User Add Paper", "Error in getting paper information");
             }
+
+
+            // RecyclerView
+            RecyclerView recyclerView = view.findViewById(R.id.paperRecycler);
+            recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+            adapter = new PaperAdapter(paper -> {
+                coursesViewModel.deletePaper(paper);
+            });
+
+            recyclerView.setAdapter(adapter);
+
+            // Observe the data from the view model
+            coursesViewModel.getAllPapers().observe(
+                    getViewLifecycleOwner(), papers -> {
+                        if (papers != null) {
+                            adapter.submitPapers((ArrayList<PaperTable>) papers);
+                        }
+                    }
+            );
         });
-
-
     }
 
     @Override
@@ -77,8 +103,8 @@ public class CoursesFragment extends Fragment {
             return "HAM";
         } else if (locationId == binding.radioLocationTga.getId()) {
             return "TGA";
-        } else if (locationId == binding.radioLocationOnl.getId()) {
-            return "ONL";
+        } else if (locationId == binding.radioLocationNet.getId()) {
+            return "NET";
         }
         return null;
     }

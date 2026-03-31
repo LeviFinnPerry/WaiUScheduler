@@ -7,7 +7,11 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.waiuscheduler.database.DatabaseController;
+import com.example.waiuscheduler.database.tables.PaperTable;
 import com.example.waiuscheduler.parsing.DataRepository;
+
+import java.util.List;
 
 import okhttp3.HttpUrl;
 
@@ -15,11 +19,13 @@ public class CoursesViewModel extends AndroidViewModel {
 
     private final DataRepository repository;
     private final MutableLiveData<String> status;
+    private final DatabaseController dbController;
 
     public CoursesViewModel(@NonNull Application application) {
         super(application);
         this.repository = new DataRepository(application);
         this.status = new MutableLiveData<>();
+        this.dbController = repository.getDbController();
     }
 
     public LiveData<String> getStatus() {
@@ -35,6 +41,14 @@ public class CoursesViewModel extends AndroidViewModel {
 
         repository.startCourseOutlinePipeline(url, status::postValue);
 
+    }
+
+    public LiveData<List<PaperTable>> getAllPapers() {
+        return dbController.getAllPapers();
+    }
+
+    public void deletePaper(PaperTable paper) {
+        dbController.deletePaper(paper);
     }
 
 }

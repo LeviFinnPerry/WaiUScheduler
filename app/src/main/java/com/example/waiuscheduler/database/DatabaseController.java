@@ -49,6 +49,14 @@ public class DatabaseController {
         paperDao.insert(paperOutline);
     }
 
+    /// Function to retrieve all papers in table
+    public LiveData<List<PaperTable>> getAllPapers() {
+        return paperDao.getAllPapers();
+    }
+
+    /// Function to delete specific paper
+    public void deletePaper(PaperTable paper) { paperDao.delete(paper); }
+
     /// Function to save semester
     public void saveSemester(SemesterTable semesterTable) {
         semesterDao.insert(semesterTable);

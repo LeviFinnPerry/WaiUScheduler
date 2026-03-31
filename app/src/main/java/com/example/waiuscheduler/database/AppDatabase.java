@@ -37,7 +37,7 @@ import java.util.concurrent.Executors;
         StaffTable.class,
         StudySessionTable.class,
         TimetablePatternTable.class
-}, version = 8)
+}, version = 9)
 @TypeConverters({DateConverter.class})  // Type converter for dates
 public abstract class AppDatabase extends RoomDatabase {
     public abstract AssessmentDao assessmentDao();  // Assessment database object
@@ -53,7 +53,7 @@ public abstract class AppDatabase extends RoomDatabase {
     private static volatile AppDatabase INSTANCE;
 
     // Fixed thread executor
-    public static final ExecutorService databaseWriteExecutor = Executors.newFixedThreadPool(4);
+    public static final ExecutorService databaseWriteExecutor = Executors.newFixedThreadPool(8);
 
     /// Initialise instance of the database
     public static AppDatabase getInstance(final Context context) {

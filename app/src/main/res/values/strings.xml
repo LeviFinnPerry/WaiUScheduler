@@ -14,7 +14,12 @@
     <string name="location">Location</string>
     <string name="radio_button_ham">HAM</string>
     <string name="radio_button_tga">TGA</string>
-    <string name="radio_button_onl">ONL</string>
+    <string name="radio_button_net">NET</string>
     <string name="search_button">Search Paper Outline</string>
+
+    # Current paper strings
+    <string name="current_paper">Current Papers</string>
+    <string name="delete_paper">Delete Paper</string>
+    <string name="paper_title">Paper Title</string>
 
 </resources>

@@ -118,4 +118,9 @@ public class DataRepository {
         void OnComplete(String result);
     }
 
+    /// Get the database controller
+    public DatabaseController getDbController() {
+        return dbController;
+    }
+
 }
