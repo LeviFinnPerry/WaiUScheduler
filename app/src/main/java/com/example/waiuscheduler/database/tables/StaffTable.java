@@ -17,7 +17,7 @@ import androidx.room.PrimaryKey;
 )
 public class StaffTable {
     @PrimaryKey(autoGenerate = true)
-    private int StaffId;     // Unique Id for the staff member
+    private int staffId;     // Unique Id for the staff member
     private String name;        // Name of staff member
     private String email;       // Email of staff member
     private String position;    // Position of staff member (eg. conveyor, tutor, etc.)
@@ -34,10 +34,10 @@ public class StaffTable {
     /// Getters and setters for the staff variables
     // Staff ID
     public int getStaffId() {
-        return StaffId;
+        return staffId;
     }
     public void setStaffId(int staffId) {
-        StaffId = staffId;
+        this.staffId = staffId;
     }
 
     // Name
