@@ -7,30 +7,34 @@ import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
-import com.example.waiuscheduler.database.tables.AssessmentTable;
+import com.example.waiuscheduler.database.tables.AssessmentEntity;
 
 import java.util.List;
 
 /// Database object for Assessment Table
 @androidx.room.Dao
 public interface AssessmentDao {
-    /// Add data
+    /// Insert assessment details
+    /// @param assessment An assessment occurance
     @Insert(onConflict = OnConflictStrategy.REPLACE) // Replace Information if duplicate
-    void insert(AssessmentTable assessment);
+    void insert(AssessmentEntity assessment);
 
-    /// Remove data
+    /// Delete assessment details
+    /// @param assessment An assessment occurance
     @Delete
-    void delete(AssessmentTable assessment);
+    void delete(AssessmentEntity assessment);
 
-    /// Update data
+    /// Update assessment details
+    /// @param assessment An assessment occurance
     @Update
-    void update(AssessmentTable assessment);
+    void update(AssessmentEntity assessment);
 
     /// Delete all assessments
     @Query("DELETE FROM assessment")
     void deleteAllAssessments();
 
     /// Select all assessments
+    /// @return All assessments in the table
     @Query("SELECT * FROM assessment")
-    LiveData<List<AssessmentTable>> getAllAssessments();
+    LiveData<List<AssessmentEntity>> getAllAssessments();
 }

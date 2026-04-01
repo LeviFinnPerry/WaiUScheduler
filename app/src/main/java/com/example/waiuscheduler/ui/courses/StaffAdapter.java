@@ -10,14 +10,12 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.waiuscheduler.R;
-import com.example.waiuscheduler.database.tables.StaffTable;
+import com.example.waiuscheduler.database.tables.StaffEntity;
 
 import java.util.ArrayList;
 
 public class StaffAdapter extends RecyclerView.Adapter<StaffAdapter.StaffViewHolder> {
-
-    // TODO: enable the removal of staff members when papers are removed
-    private ArrayList<StaffTable> staffMembers;
+    private final ArrayList<StaffEntity> staffMembers;
 
     /// Constructor for staff adapter
     public StaffAdapter() {
@@ -25,10 +23,11 @@ public class StaffAdapter extends RecyclerView.Adapter<StaffAdapter.StaffViewHol
     }
 
     /// Submits staff members to the recycler view
+    /// @param newStaff Arraylist of staff entities
     @SuppressLint("NotifyDataSetChanged")
-    public void submitStaff(ArrayList<StaffTable> newStaff) {
+    public void submitStaff(ArrayList<StaffEntity> newStaff) {
         staffMembers.clear();
-        for (StaffTable staff : newStaff) {
+        for (StaffEntity staff : newStaff) {
             if (staff.getPosition().matches("Convenor")) {
                 staffMembers.add(staff);
             }
@@ -41,6 +40,7 @@ public class StaffAdapter extends RecyclerView.Adapter<StaffAdapter.StaffViewHol
         TextView paperCode, staffName, staffEmail, staffRole;
 
         /// Constructor for xml items
+        /// @param staffView Recycler view for staff information
         public StaffViewHolder(@NonNull View staffView) {
             super(staffView);
             paperCode = staffView.findViewById(R.id.staff_paper_code);
@@ -50,7 +50,10 @@ public class StaffAdapter extends RecyclerView.Adapter<StaffAdapter.StaffViewHol
         }
     }
 
-    /// Returns new staff view holder when initialised
+    /// Initialises staff information view
+    /// @param parent View Group
+    /// @param viewType Required in override
+    /// @return Staff View holder
     @NonNull @Override
     public StaffViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_staff, parent, false);
@@ -59,9 +62,11 @@ public class StaffAdapter extends RecyclerView.Adapter<StaffAdapter.StaffViewHol
 
 
     /// Sets data to xml items
+    /// @param holder Staff view holder
+    /// @param position Position of the staff member in the view
     @Override
     public void onBindViewHolder(@NonNull StaffViewHolder holder, int position) {
-        StaffTable staff = staffMembers.get(position);
+        StaffEntity staff = staffMembers.get(position);
         String code_fk = staff.getPaperId_fk();
         String code = code_fk.split("-")[0];
 
@@ -71,9 +76,10 @@ public class StaffAdapter extends RecyclerView.Adapter<StaffAdapter.StaffViewHol
         holder.staffRole.setText(staff.getPosition());
     }
 
-    /// Returns count of staff members
+    /// Item count
+    /// @return Size of the staff members table
     @Override
     public int getItemCount() {
-        return staffMembers == null ? 0 : staffMembers.size();
+        return staffMembers.size();
     }
 }

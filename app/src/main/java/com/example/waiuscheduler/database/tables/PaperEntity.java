@@ -6,94 +6,96 @@ import androidx.room.ForeignKey;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
-import java.util.Date;
-
 /// Entity for paper table
 @Entity(tableName = "paper",
         foreignKeys = @ForeignKey(
-                entity = SemesterTable.class,   // Class of foreign key
+                entity = SemesterEntity.class,   // Class of foreign key
                 parentColumns = "semesterCode",   // Foreign key variable
                 childColumns = "semesterCode_fk",    // Foreign key name
                 onDelete = ForeignKey.CASCADE   // Dependency on semester
         ),
         indices = {@Index("semesterCode_fk")}        // Index of the foreign key
 )
-public class PaperTable {
-    @PrimaryKey @NonNull                       // Unique Id for the paper
+public class PaperEntity {
+    @PrimaryKey @NonNull                 // Unique Id for the paper
     private String paperId;
     private String paperCode;           // Paper code eg. COMPX576
     private String paperName;           // Paper name eg. Programming Project
     private int points;                 // Paper points
-    private Date startWeek;           // Start week for the paper
-    private Date endWeek;             // End week for the paper
     private String semesterCode_fk;    // Foreign key referencing semester
 
     /// Constructor for the paper table
-    public PaperTable(@NonNull String paperId, String paperCode, String paperName,
-                      int points, Date startWeek, Date endWeek, String semesterCode_fk) {
+    /// @param paperId Id of the paper
+    /// @param paperCode Code of the paper
+    /// @param paperName Name of the paper
+    /// @param points Amount of points the paper is worth
+    /// @param semesterCode_fk The semester occurrence of the paper
+    public PaperEntity(@NonNull String paperId, String paperCode, String paperName,
+                       int points, String semesterCode_fk) {
         this.paperId = paperId;
         this.paperCode = paperCode;
         this.paperName = paperName;
         this.points = points;
-        this.startWeek = startWeek;
-        this.endWeek = endWeek;
         this.semesterCode_fk = semesterCode_fk;
     }
 
-    /// Getters and setters for each paper variable
-    // Id
+    /// Get paper Id
+    /// @return The paper id
     @NonNull
     public String getPaperId() {
         return paperId;
     }
+
+    /// Set paper Id
+    /// @param paperId The id for the paper
     public void setPaperId(@NonNull String paperId) {
         this.paperId = paperId;
     }
 
-    // Paper code
+    /// Get the paper code
+    /// @return The paper code
     public String getPaperCode() {
         return paperCode;
     }
+
+    /// Set the paper code
+    /// @param paperCode The code for the paper
     public void setPaperCode(String paperCode) {
         this.paperCode = paperCode;
     }
 
-    // Paper name
+    /// Get the paper name
+    /// @return The paper name
     public String getPaperName() {
         return paperName;
     }
+
+    /// Set the paper name
+    /// @param paperName The name for the paper
     public void setPaperName(String paperName) {
         this.paperName = paperName;
     }
 
-    // Points
+    /// Get the paper points
+    /// @return The amount of points the paper is worth
     public int getPoints() {
         return points;
     }
+
+    /// Set the paper points
+    /// @param points The points for the paper
     public void setPoints(int points) {
         this.points = points;
     }
 
-    // Start Week
-    public Date getStartWeek() {
-        return startWeek;
-    }
-    public void setStartWeek(Date startWeek) {
-        this.startWeek = startWeek;
-    }
-
-    // End Week
-    public Date getEndWeek() {
-        return endWeek;
-    }
-    public void setEndWeek(Date endWeek) {
-        this.endWeek = endWeek;
-    }
-
-    // Semester code
+    /// Get the semester code foreign key
+    /// @return Foreign key of the semester occurrence code
     public String getSemesterCode_fk() {
         return semesterCode_fk;
     }
+
+    /// Set the semester code foreign key
+    /// @param semesterCode_fk The semester occurrence code
     public void setSemesterCode_fk(String semesterCode_fk) {
         this.semesterCode_fk = semesterCode_fk;
     }

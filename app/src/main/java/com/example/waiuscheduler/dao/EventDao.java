@@ -7,30 +7,34 @@ import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
-import com.example.waiuscheduler.database.tables.EventTable;
+import com.example.waiuscheduler.database.tables.EventEntity;
 
 import java.util.List;
 
 /// Database object for the event table
 @androidx.room.Dao
 public interface EventDao {
-    /// Add data
+    /// Insert event details
+    /// @param event An event occurance
     @Insert(onConflict = OnConflictStrategy.REPLACE) // Replace Information if duplicate
-    void insert(EventTable event);
+    void insert(EventEntity event);
 
-    /// Remove data
+    /// Delete event details
+    /// @param event An event occurance
     @Delete
-    void delete(EventTable event);
+    void delete(EventEntity event);
 
-    /// Update data
+    /// Update event details
+    /// @param event An event occurance
     @Update
-    void update(EventTable event);
+    void update(EventEntity event);
 
     /// Delete all events
     @Query("DELETE FROM event")
     void deleteAllEvents();
 
     /// Select all events
+    /// @return All events in the table
     @Query("SELECT * FROM event")
-    LiveData<List<EventTable>> getAllEvents();
+    LiveData<List<EventEntity>> getAllEvents();
 }

@@ -7,30 +7,34 @@ import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
-import com.example.waiuscheduler.database.tables.StudySessionTable;
+import com.example.waiuscheduler.database.tables.StudySessionEntity;
 
 import java.util.List;
 
 /// Database object for study session table
 @androidx.room.Dao
 public interface StudySessionDao {
-    /// Add data
+    /// Insert study session details
+    /// @param session A study session occurrence
     @Insert(onConflict = OnConflictStrategy.REPLACE) // Replace Information if duplicate
-    void insert(StudySessionTable session);
+    void insert(StudySessionEntity session);
 
-    /// Remove data
+    /// Delete study session details
+    /// @param session A study session occurrence
     @Delete
-    void delete(StudySessionTable session);
+    void delete(StudySessionEntity session);
 
-    /// Update data
+    /// Update study session details
+    /// @param session A study session occurrence
     @Update
-    void update(StudySessionTable session);
+    void update(StudySessionEntity session);
 
-    /// Delete all sessions
+    /// Delete all study sessions
     @Query("DELETE FROM study_session")
     void deleteAllSessions();
 
-    /// Select all sessions
+    /// Select all study sessions
+    /// @return All study sessions in table
     @Query("SELECT * FROM study_session")
-    LiveData<List<StudySessionTable>> getAllSessions();
+    LiveData<List<StudySessionEntity>> getAllSessions();
 }

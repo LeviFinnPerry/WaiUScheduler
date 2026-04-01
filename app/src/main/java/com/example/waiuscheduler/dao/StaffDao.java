@@ -7,30 +7,34 @@ import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
-import com.example.waiuscheduler.database.tables.StaffTable;
+import com.example.waiuscheduler.database.tables.StaffEntity;
 
 import java.util.List;
 
 /// Database object for staff table
 @androidx.room.Dao
 public interface StaffDao {
-    /// Add data
+    /// Insert staff details
+    /// @param staff A staff members details
     @Insert(onConflict = OnConflictStrategy.REPLACE) // Replace Information if duplicate
-    void insert(StaffTable staff);
+    void insert(StaffEntity staff);
 
-    /// Remove data
+    /// Delete staff details
+    /// @param staff A staff members details
     @Delete
-    void delete(StaffTable staff);
+    void delete(StaffEntity staff);
 
-    /// Update data
+    /// Update staff details
+    /// @param staff A staff members details
     @Update
-    void update(StaffTable staff);
+    void update(StaffEntity staff);
 
     /// Delete all staff
     @Query("DELETE FROM staff")
     void deleteAllStaff();
 
     /// Select all staff
+    /// @return All staff members in the table
     @Query("SELECT * FROM staff")
-    LiveData<List<StaffTable>> getAllStaff();
+    LiveData<List<StaffEntity>> getAllStaff();
 }

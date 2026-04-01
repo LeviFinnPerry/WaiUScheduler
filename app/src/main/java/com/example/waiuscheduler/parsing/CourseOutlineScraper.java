@@ -16,13 +16,15 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-/// Collects information from the paper outline on the waikato university website
+/// Collects information from the paper outline on the Waikato University website
 public class CourseOutlineScraper {
 
     private final OkHttpClient client = new OkHttpClient();     // Initialise http client
 
     /// Retrieves course outline based on the url.
-    /// Throws IOException
+    /// @param url URL object to the paper outline
+    /// @return Paper outline as a document
+    /// @throws IOException When cannot reach the University Website
     public Document getCourseOutline(HttpUrl url) throws IOException {
         // As written on website for request headers
         Request request = new Request.Builder()

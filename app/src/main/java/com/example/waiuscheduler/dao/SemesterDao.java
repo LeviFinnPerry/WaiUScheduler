@@ -6,31 +6,34 @@ import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
-import com.example.waiuscheduler.database.tables.SemesterTable;
+import com.example.waiuscheduler.database.tables.SemesterEntity;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /// Database object for semester table
 @androidx.room.Dao
 public interface SemesterDao {
-    /// Add data
+    /// Insert semester details
+    /// @param semester A semester occurrence
     @Insert(onConflict = OnConflictStrategy.REPLACE) // Replace Information if duplicate
-    void insert(SemesterTable semester);
+    void insert(SemesterEntity semester);
 
-    /// Remove data
+    /// Delete semester details
+    /// @param semester A semester occurrence
     @Delete
-    void delete(SemesterTable semester);
+    void delete(SemesterEntity semester);
 
-    /// Update data
+    /// Update semester details
+    /// @param semester A semester occurrence
     @Update
-    void update(SemesterTable semester);
+    void update(SemesterEntity semester);
 
     /// Delete all semesters
     @Query("DELETE FROM semester")
     void deleteAllSemesters();
 
     /// Select all semesters
+    /// @return All semesters in table
     @Query("SELECT * FROM semester")
-    List<SemesterTable> getAllSemesters();
+    List<SemesterEntity> getAllSemesters();
 }

@@ -1,89 +1,86 @@
 package com.example.waiuscheduler.parsing;
 
-import com.example.waiuscheduler.database.tables.AssessmentTable;
-import com.example.waiuscheduler.database.tables.EventTable;
-import com.example.waiuscheduler.database.tables.PaperTable;
-import com.example.waiuscheduler.database.tables.SemesterTable;
-import com.example.waiuscheduler.database.tables.StaffTable;
-import com.example.waiuscheduler.database.tables.TimetablePatternTable;
+import com.example.waiuscheduler.database.tables.AssessmentEntity;
+import com.example.waiuscheduler.database.tables.EventEntity;
+import com.example.waiuscheduler.database.tables.PaperEntity;
+import com.example.waiuscheduler.database.tables.StaffEntity;
+import com.example.waiuscheduler.database.tables.TimetablePatternEntity;
 
 import java.util.ArrayList;
 /// Scraped data object to temporarily store information from the paper outline
 public class ScrapedData {
-    private PaperTable paper;
+    private PaperEntity paper;
     // Arraylists to save multiple of each table type
-    private ArrayList<StaffTable> staff;
-    private ArrayList<AssessmentTable> assessment;
-    private ArrayList<EventTable> event;
-    private ArrayList<SemesterTable> semester;
-    private ArrayList<TimetablePatternTable> timetablePattern;
+    private ArrayList<StaffEntity> staff;
+    private ArrayList<AssessmentEntity> assessment;
+    private ArrayList<EventEntity> event;
+    private ArrayList<TimetablePatternEntity> timetablePattern;
 
     /// Constructor to initialise arraylists
     public ScrapedData() {
         this.staff = new ArrayList<>();
         this.assessment = new ArrayList<>();
         this.event = new ArrayList<>();
-        this.semester = new ArrayList<>();
         this.timetablePattern = new ArrayList<>();
     }
 
-    /// Public getters and setters for each tables information
-    // Paper
-    public PaperTable getPaper() {
+    /// Get paper
+    /// @return paper entity
+    public PaperEntity getPaper() {
         return paper;
     }
-    public void setPaper(PaperTable paper) {
+
+    /// Set paper
+    /// @param paper paper entity
+    public void setPaper(PaperEntity paper) {
         this.paper = paper;
     }
 
-    // Staff
-    public ArrayList<StaffTable> getStaffs() {
+    /// Get all staff
+    /// @return All staff in the table
+    public ArrayList<StaffEntity> getStaffs() {
         return staff;
     }
-    public void setStaffs(ArrayList<StaffTable> staff) {
+
+    /// Set all staff
+    /// @param staff Arraylist of staff entities
+    public void setStaffs(ArrayList<StaffEntity> staff) {
         this.staff = staff;
     }
 
-    // Assessment
-    public ArrayList<AssessmentTable> getAssessments() {
+    /// Get all assessments
+    /// @return All assessments in the table
+    public ArrayList<AssessmentEntity> getAssessments() {
         return assessment;
     }
-    public void setAssessments(ArrayList<AssessmentTable> assessment) {
+
+    /// Set all assessments
+    /// @param assessment Arraylist of assessment entities
+    public void setAssessments(ArrayList<AssessmentEntity> assessment) {
         this.assessment = assessment;
     }
 
-    // Timetable Pattern
-    public ArrayList<TimetablePatternTable> getTimetablePatterns() {
+    /// Get all timetable occurrences
+    /// @return All timetable patterns in the table
+    public ArrayList<TimetablePatternEntity> getTimetablePatterns() {
         return timetablePattern;
     }
-    public void setTimetablePatterns(ArrayList<TimetablePatternTable> timetablePattern) {
+
+    /// Set all timetable occurrences
+    /// @param timetablePattern Arraylist of timetable entities
+    public void setTimetablePatterns(ArrayList<TimetablePatternEntity> timetablePattern) {
         this.timetablePattern = timetablePattern;
     }
 
-    // Event
-    public ArrayList<EventTable> getEvents() {
+    /// Get all events
+    /// @return All events in the table
+    public ArrayList<EventEntity> getEvents() {
         return event;
     }
-    public void setEvents(ArrayList<EventTable> event) {
-        this.event = event;
-    }
 
-    // Semester
-    public void setSemesters(ArrayList<SemesterTable> semester) {
-        this.semester = semester;
-    }
-    public ArrayList<SemesterTable> getSemesters() {
-        return semester;
-    }
-    // Method to get specific semester
-    public SemesterTable getSemester(String semesterCode) {
-        if (semester != null) {
-            for (SemesterTable s: semester) {
-                if (semesterCode.matches(s.getSemesterCode())) {
-                    return s;
-                }
-            }
-        }
-        return null;
+    /// Set all events
+    /// @param event Arraylist of event entities
+    public void setEvents(ArrayList<EventEntity> event) {
+        this.event = event;
     }
 }

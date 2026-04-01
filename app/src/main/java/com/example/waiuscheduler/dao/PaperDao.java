@@ -7,30 +7,34 @@ import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Update;
 
-import com.example.waiuscheduler.database.tables.PaperTable;
+import com.example.waiuscheduler.database.tables.PaperEntity;
 
 import java.util.List;
 
 /// Database object for paper table
 @androidx.room.Dao
 public interface PaperDao {
-    /// Add data
+    /// Insert paper details
+    /// @param paper A paper occurrence
     @Insert // Replace Information if duplicate
-    void insert(PaperTable paper);
+    void insert(PaperEntity paper);
 
-    /// Remove data
+    /// Delete paper details
+    /// @param paper A paper occurrence
     @Delete
-    void delete(PaperTable paper);
+    void delete(PaperEntity paper);
 
-    /// Update data
+    /// Update paper details
+    /// @param paper A paper occurrence
     @Update
-    void update(PaperTable paper);
+    void update(PaperEntity paper);
 
     /// Delete all papers
     @Query("DELETE FROM paper")
     void deleteAllPapers();
 
     /// Select all papers
+    /// @return All papers in the table
     @Query("SELECT * FROM paper")
-    LiveData<List<PaperTable>> getAllPapers();
+    LiveData<List<PaperEntity>> getAllPapers();
 }

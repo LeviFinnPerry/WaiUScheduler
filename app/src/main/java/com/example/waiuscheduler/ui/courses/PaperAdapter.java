@@ -11,27 +11,29 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.waiuscheduler.R;
-import com.example.waiuscheduler.database.tables.PaperTable;
+import com.example.waiuscheduler.database.tables.PaperEntity;
 
 import java.util.ArrayList;
 
 public class PaperAdapter extends RecyclerView.Adapter<PaperAdapter.PaperViewHolder> {
-    private ArrayList<PaperTable> papers = new ArrayList<>();
+    private ArrayList<PaperEntity> papers = new ArrayList<>();
     private final OnDeleteClickListener deleteClickListener;
 
     /// Interface for deleting a paper when the button is pressed
     public interface OnDeleteClickListener {
-        void onDelete(PaperTable paper);
+        void onDelete(PaperEntity paper);
     }
 
     /// Constructor for paper adapter
+    /// @param deleteClickListener On Click listener for the delete button
     public PaperAdapter(OnDeleteClickListener deleteClickListener) {
         this.deleteClickListener = deleteClickListener;
     }
 
     /// Submits papers to the recycler view
+    /// @param newPapers New paper entities to add
     @SuppressLint("NotifyDataSetChanged")
-    public void submitPapers(ArrayList<PaperTable> newPapers) {
+    public void submitPapers(ArrayList<PaperEntity> newPapers) {
         papers = newPapers;
         notifyDataSetChanged();
     }
@@ -42,16 +44,20 @@ public class PaperAdapter extends RecyclerView.Adapter<PaperAdapter.PaperViewHol
         ImageButton deleteBtn;
 
         /// Constructor for xml items
+        /// @param itemView View for the paper information
         public PaperViewHolder(@NonNull View itemView) {
             super(itemView);
-            code = itemView.findViewById(R.id.staff_paper_code);
-            title = itemView.findViewById(R.id.staff_name);
-            occurrence = itemView.findViewById(R.id.staff_email);
+            code = itemView.findViewById(R.id.paper_code);
+            title = itemView.findViewById(R.id.paper_name);
+            occurrence = itemView.findViewById(R.id.paper_occ);
             deleteBtn = itemView.findViewById(R.id.paper_delete);
         }
     }
 
-    /// Returns new paper view holder when initialised
+    /// Initialises paper information view
+    /// @param parent View Group
+    /// @param viewType Required in override
+    /// @return Paper View holder
     @NonNull @Override
     public PaperViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_paper, parent, false);
@@ -59,9 +65,11 @@ public class PaperAdapter extends RecyclerView.Adapter<PaperAdapter.PaperViewHol
     }
 
     /// Sets data to xml items
+    /// @param holder Paper view holder
+    /// @param position Position of the paper in the view
     @Override
     public void onBindViewHolder(@NonNull PaperViewHolder holder, int position) {
-        PaperTable paper = papers.get(position);
+        PaperEntity paper = papers.get(position);
         String title = paper.getPaperCode();
         if (title.length() >= 25) {
             title = title.substring(0,25);
@@ -77,7 +85,8 @@ public class PaperAdapter extends RecyclerView.Adapter<PaperAdapter.PaperViewHol
         });
     }
 
-    /// Returns count of papers
+    /// Item count
+    /// @return Size of papers table
     @Override
     public int getItemCount() {
         return papers == null ? 0 : papers.size();

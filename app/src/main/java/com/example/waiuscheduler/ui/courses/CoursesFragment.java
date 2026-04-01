@@ -15,8 +15,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.waiuscheduler.R;
-import com.example.waiuscheduler.database.tables.PaperTable;
-import com.example.waiuscheduler.database.tables.StaffTable;
+import com.example.waiuscheduler.database.tables.PaperEntity;
+import com.example.waiuscheduler.database.tables.StaffEntity;
 import com.example.waiuscheduler.databinding.FragmentCoursesBinding;
 
 import java.util.ArrayList;
@@ -34,6 +34,11 @@ public class CoursesFragment extends Fragment {
     // Staff Adapter
     private StaffAdapter staffAdapter;
 
+    /// Initialises fragment view
+    /// @param inflater Layout inflater
+    /// @param container View Group of the fragment
+    /// @param savedInstanceState Bundle for the instance
+    /// @return View for courses
     public View onCreateView(
             @NonNull LayoutInflater inflater,
             ViewGroup container, Bundle savedInstanceState
@@ -45,6 +50,9 @@ public class CoursesFragment extends Fragment {
         return binding.getRoot();
     }
 
+    /// Sets the listeners for user input in the courses fragment
+    /// @param view Created view
+    /// @param savedInstanceState Bundle for the instance
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -86,7 +94,7 @@ public class CoursesFragment extends Fragment {
             coursesViewModel.getAllPapers().observe(
                     getViewLifecycleOwner(), papers -> {
                         if (papers != null) {
-                            paperAdapter.submitPapers((ArrayList<PaperTable>) papers);
+                            paperAdapter.submitPapers((ArrayList<PaperEntity>) papers);
                         }
                     }
             );
@@ -103,7 +111,7 @@ public class CoursesFragment extends Fragment {
             coursesViewModel.getAllStaff().observe(
                     getViewLifecycleOwner(), staffMembers -> {
                         if (staffMembers != null) {
-                            staffAdapter.submitStaff((ArrayList<StaffTable>) staffMembers);
+                            staffAdapter.submitStaff((ArrayList<StaffEntity>) staffMembers);
                         }
                     }
             );
@@ -111,6 +119,7 @@ public class CoursesFragment extends Fragment {
         });
     }
 
+    /// Destroys the view
     @Override
     public void onDestroyView() {
         super.onDestroyView();
@@ -118,6 +127,8 @@ public class CoursesFragment extends Fragment {
     }
 
     /// Function to determine which radiobutton is selected
+    /// @param locationId Id of location selected
+    /// @return Corresponding location if selected
     private String getLocation(int locationId) {
         if (locationId == binding.radioLocationHam.getId()) {
             return "HAM";

@@ -8,7 +8,7 @@ import java.util.Date;
 
 /// Entity for semester table
 @Entity(tableName = "semester")
-public class SemesterTable {
+public class SemesterEntity {
     @PrimaryKey @NonNull
     private String semesterCode;    // Unique occurrence code for each semester eg. 26A
     private Date startDate;       // Start Date for the semester
@@ -17,7 +17,12 @@ public class SemesterTable {
     private Date breakEndDate;    // End date for the mid semester break
 
     /// Constructor for the semester table
-    public SemesterTable(
+    /// @param semesterCode The occurrence code of the semester
+    /// @param startDate The date the semester starts
+    /// @param endDate The date the semester ends
+    /// @param breakStartDate The date the break starts
+    /// @param breakEndDate The date the break ends
+    public SemesterEntity(
             @NonNull String semesterCode, Date startDate,
             Date endDate, Date breakStartDate, Date breakEndDate) {
         this.semesterCode = semesterCode;
@@ -27,45 +32,64 @@ public class SemesterTable {
         this.breakEndDate = breakEndDate;
     }
 
-    /// Getter and setter for each variable
-    // Semester code
+    /// Get semester code
+    /// @return The occurrence code of the semester
     @NonNull
     public String getSemesterCode() {
         return semesterCode;
     }
+
+    /// Set semester code
+    /// @param semesterCode The occurrence code of the semester
     public void setSemesterCode(@NonNull String semesterCode) {
         this.semesterCode = semesterCode;
     }
 
-    // Start date
+    /// Get date semester starts
+    /// @return Start date of the semester
     public Date getStartDate() {
         return startDate;
     }
+
+    /// Set date semester starts
+    /// @param startDate Start date of the semester
     public void setStartDate(Date startDate) {
         this.startDate = startDate;
     }
 
-    // End date
+    /// Get date semester ends
+    /// @return End date of the semester
     public Date getEndDate() {
         return endDate;
     }
+
+    /// Set date semester ends
+    /// @param endDate End date of the semester
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
     }
 
-    // Break Start Date
+    /// Get date semester break starts
+    /// @return Start date of the semester break
     public Date getBreakStartDate() {
         return breakStartDate;
     }
+
+    /// Set date semester break starts
+    /// @param breakStartDate Start date of the semester break
+    public void setBreakStartDate(Date breakStartDate) {
+        this.breakStartDate = breakStartDate;
+    }
+
+    /// Set date semester break ends
+    /// @param breakEndDate End date of the semester break
     public void setBreakEndDate(Date breakEndDate) {
         this.breakEndDate = breakEndDate;
     }
 
-    // Break End Date
+    /// Get date semester break ends
+    /// @return End date of the semester break
     public Date getBreakEndDate() {
         return breakEndDate;
-    }
-    public void setBreakStartDate(Date breakStartDate) {
-        this.breakStartDate = breakStartDate;
     }
 }

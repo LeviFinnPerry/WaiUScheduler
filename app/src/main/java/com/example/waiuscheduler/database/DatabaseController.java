@@ -9,12 +9,12 @@ import com.example.waiuscheduler.dao.SemesterDao;
 import com.example.waiuscheduler.dao.StaffDao;
 import com.example.waiuscheduler.dao.StudySessionDao;
 import com.example.waiuscheduler.dao.TimetablePatternDao;
-import com.example.waiuscheduler.database.tables.AssessmentTable;
-import com.example.waiuscheduler.database.tables.EventTable;
-import com.example.waiuscheduler.database.tables.PaperTable;
-import com.example.waiuscheduler.database.tables.SemesterTable;
-import com.example.waiuscheduler.database.tables.StaffTable;
-import com.example.waiuscheduler.database.tables.TimetablePatternTable;
+import com.example.waiuscheduler.database.tables.AssessmentEntity;
+import com.example.waiuscheduler.database.tables.EventEntity;
+import com.example.waiuscheduler.database.tables.PaperEntity;
+import com.example.waiuscheduler.database.tables.SemesterEntity;
+import com.example.waiuscheduler.database.tables.StaffEntity;
+import com.example.waiuscheduler.database.tables.TimetablePatternEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +32,7 @@ public class DatabaseController {
 
 
     ///  Database controller constructor from database
+    /// @param db The database for the app
     public DatabaseController(AppDatabase db) {
         this.assessmentDao = db.assessmentDao();
         this.eventDao = db.eventDao();
@@ -45,54 +46,65 @@ public class DatabaseController {
 
 
     /// Function to save to paper table
-    public void savePaper(PaperTable paperOutline) {
+    /// @param paperOutline Paper details from the outline
+    public void savePaper(PaperEntity paperOutline) {
         paperDao.insert(paperOutline);
     }
 
     /// Function to retrieve all papers in table
-    public LiveData<List<PaperTable>> getAllPapers() {
+    /// @return All the papers in the table
+    public LiveData<List<PaperEntity>> getAllPapers() {
         return paperDao.getAllPapers();
     }
 
     /// Function to delete specific paper
-    public void deletePaper(PaperTable paper) { paperDao.delete(paper); }
+    /// @param paper A previously selected paper
+    public void deletePaper(PaperEntity paper) { paperDao.delete(paper); }
 
     /// Function to save semester
-    public void saveSemester(SemesterTable semesterTable) {
-        semesterDao.insert(semesterTable);
+    /// @param semesterEntity A Waikato Uni Semester
+    public void saveSemester(SemesterEntity semesterEntity) {
+        semesterDao.insert(semesterEntity);
     }
 
     /// Function to save to event table
-    public void saveEvent(EventTable eventTable) {
-        eventDao.insert(eventTable);
+    /// @param eventEntity An event created from the timetable pattern
+    public void saveEvent(EventEntity eventEntity) {
+        eventDao.insert(eventEntity);
     }
 
     /// Function to save to staff table
-    public void saveStaff(StaffTable staffTable) {
-        staffDao.insert(staffTable);
+    /// @param staffEntity A staff members details
+    public void saveStaff(StaffEntity staffEntity) {
+        staffDao.insert(staffEntity);
     }
 
     /// Function to retrieve all staff in table
-    public LiveData<List<StaffTable>> getAllStaff() {
+    /// @return All staff members in the table
+    public LiveData<List<StaffEntity>> getAllStaff() {
         return staffDao.getAllStaff();
     }
 
     /// Function to save the assessment table
-    public void saveAssessment(AssessmentTable assessmentTable) {
-        assessmentDao.insert(assessmentTable);
+    /// @param assessmentEntity An assessment for a paper
+    public void saveAssessment(AssessmentEntity assessmentEntity) {
+        assessmentDao.insert(assessmentEntity);
     }
 
     /// Function to save the timetable pattern table
-    public void saveTimetablePattern(TimetablePatternTable timetablePatternTable) {
-        timetableDao.insert(timetablePatternTable);
+    /// @param timetablePatternEntity A timetable pattern occurance
+    public void saveTimetablePattern(TimetablePatternEntity timetablePatternEntity) {
+        timetableDao.insert(timetablePatternEntity);
     }
 
     /// Function to return the semester based on the semester code
-    public SemesterTable getSemesterTable(String semesterCode) {
-        ArrayList<SemesterTable> semesters =
-                (ArrayList<SemesterTable>) semesterDao.getAllSemesters();
+    /// @param semesterCode The occurrence code for the semester
+    /// @return The semester matching the semester code
+    public SemesterEntity getSemesters(String semesterCode) {
+        ArrayList<SemesterEntity> semesters =
+                (ArrayList<SemesterEntity>) semesterDao.getAllSemesters();
 
-        for (SemesterTable semester: semesters) {
+        for (SemesterEntity semester: semesters) {
             if (semester.getSemesterCode().equals(semesterCode)) {
                 return semester;
             }
