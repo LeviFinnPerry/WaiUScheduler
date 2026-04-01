@@ -1,4 +1,4 @@
-package com.example.waiuscheduler.dao;
+package com.example.waiuscheduler.database.dao;
 
 import androidx.lifecycle.LiveData;
 

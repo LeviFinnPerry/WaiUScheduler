@@ -2,13 +2,13 @@ package com.example.waiuscheduler.database;
 
 import androidx.lifecycle.LiveData;
 
-import com.example.waiuscheduler.dao.AssessmentDao;
-import com.example.waiuscheduler.dao.EventDao;
-import com.example.waiuscheduler.dao.PaperDao;
-import com.example.waiuscheduler.dao.SemesterDao;
-import com.example.waiuscheduler.dao.StaffDao;
-import com.example.waiuscheduler.dao.StudySessionDao;
-import com.example.waiuscheduler.dao.TimetablePatternDao;
+import com.example.waiuscheduler.database.dao.AssessmentDao;
+import com.example.waiuscheduler.database.dao.EventDao;
+import com.example.waiuscheduler.database.dao.PaperDao;
+import com.example.waiuscheduler.database.dao.SemesterDao;
+import com.example.waiuscheduler.database.dao.StaffDao;
+import com.example.waiuscheduler.database.dao.StudySessionDao;
+import com.example.waiuscheduler.database.dao.TimetablePatternDao;
 import com.example.waiuscheduler.database.tables.AssessmentEntity;
 import com.example.waiuscheduler.database.tables.EventEntity;
 import com.example.waiuscheduler.database.tables.PaperEntity;

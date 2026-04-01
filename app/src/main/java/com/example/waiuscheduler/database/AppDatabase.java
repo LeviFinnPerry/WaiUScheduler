@@ -9,13 +9,13 @@ import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
-import com.example.waiuscheduler.dao.AssessmentDao;
-import com.example.waiuscheduler.dao.EventDao;
-import com.example.waiuscheduler.dao.PaperDao;
-import com.example.waiuscheduler.dao.SemesterDao;
-import com.example.waiuscheduler.dao.StaffDao;
-import com.example.waiuscheduler.dao.StudySessionDao;
-import com.example.waiuscheduler.dao.TimetablePatternDao;
+import com.example.waiuscheduler.database.dao.AssessmentDao;
+import com.example.waiuscheduler.database.dao.EventDao;
+import com.example.waiuscheduler.database.dao.PaperDao;
+import com.example.waiuscheduler.database.dao.SemesterDao;
+import com.example.waiuscheduler.database.dao.StaffDao;
+import com.example.waiuscheduler.database.dao.StudySessionDao;
+import com.example.waiuscheduler.database.dao.TimetablePatternDao;
 
 import com.example.waiuscheduler.database.tables.AssessmentEntity;
 import com.example.waiuscheduler.database.tables.EventEntity;
