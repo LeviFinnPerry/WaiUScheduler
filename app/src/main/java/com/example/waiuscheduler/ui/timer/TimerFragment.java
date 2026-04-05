@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -14,21 +15,30 @@ import com.example.waiuscheduler.databinding.FragmentDashboardBinding;
 
 public class TimerFragment extends Fragment {
 
+    private TimerViewModel timerViewModel;
     private FragmentDashboardBinding binding;
 
     public View onCreateView(
             @NonNull LayoutInflater inflater,
             ViewGroup container, Bundle savedInstanceState
     ) {
-        TimerViewModel timerViewModel =
-                new ViewModelProvider(this).get(TimerViewModel.class);
-
         binding = FragmentDashboardBinding.inflate(inflater, container, false);
-        View root = binding.getRoot();
 
-        final TextView textView = binding.textDashboard;
-        timerViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
-        return root;
+        return binding.getRoot();
+    }
+
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        // Find each element of the UI for the timer
+        timerViewModel = new ViewModelProvider(this).get(TimerViewModel.class);
+
+        timerViewModel.getTimeDisplay().observe(getViewLifecycleOwner(), timeString -> {
+            //timeview.setText(timeString);
+        });
+
     }
 
     @Override
