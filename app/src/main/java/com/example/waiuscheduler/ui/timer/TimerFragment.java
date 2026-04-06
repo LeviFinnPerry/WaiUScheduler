@@ -13,7 +13,6 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.waiuscheduler.database.tables.PaperEntity;
-import com.example.waiuscheduler.databinding.FragmentDashboardBinding;
 import com.example.waiuscheduler.databinding.FragmentTimerBinding;
 
 import java.util.ArrayList;
@@ -51,6 +50,7 @@ public class TimerFragment extends Fragment {
         // Observe papers from the database to fill the spinner
         timerViewModel.getAllPapers().observe(getViewLifecycleOwner(), papers -> {
             List<String> paperNames = new ArrayList<>();
+            paperNames.add("Select a paper...");
             for (PaperEntity paper : papers) {
                 paperNames.add(paper.getPaperId());   // Add selected papers
             }
@@ -73,23 +73,20 @@ public class TimerFragment extends Fragment {
         });
 
         // Update Timer and Button States
-        timerViewModel.getTimeDisplay().observe(getViewLifecycleOwner(), time -> {
-            binding.timeView.setText(time);
-        });
-
-        timerViewModel.getPaperSelected().observe(getViewLifecycleOwner(), isSelected -> {
-            binding.startButton.setEnabled(isSelected);
-            binding.startButton.setAlpha(isSelected ? 1.0f : 0.4f);
-        });
+        timerViewModel.getTimeDisplay().observe(getViewLifecycleOwner(), time -> binding.timeView.setText(time));
 
         // Click Listeners
-        binding.startButton.setOnClickListener(v -> timerViewModel.start());
+        binding.startButton.setOnClickListener(v -> {
+            if (binding.paperSpinner.getSelectedItemPosition() != 0) {
+                timerViewModel.start();
+            }
+        });
         binding.resetButton.setOnClickListener(v -> timerViewModel.reset());
         binding.stopButton.setOnClickListener(v -> { timerViewModel.stop();
             // Get information from user
             String notes = binding.editTextSessionNotes.getText().toString();
             String paperId = binding.paperSpinner.getSelectedItem().toString();
-            timerViewModel.saveStudySession(notes, paperId);
+            timerViewModel.storeStudySession(notes, paperId);
             binding.editTextSessionNotes.setText("");
         });
 

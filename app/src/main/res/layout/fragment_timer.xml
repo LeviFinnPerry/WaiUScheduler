@@ -141,7 +141,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:alpha="0.4"
-                    android:enabled="false"
                     android:paddingHorizontal="20dp"
                     android:text="@string/timer_start"
                     android:textAllCaps="false"
