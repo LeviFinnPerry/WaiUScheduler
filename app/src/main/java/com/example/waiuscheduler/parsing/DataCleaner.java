@@ -114,22 +114,23 @@ public class DataCleaner {
         String query = "table.staff";        // Find the staff table
         Element table = paper.select(query).first();
         // Find the rows in the table
-        assert table != null;       // Make sure there is a table
-        Elements rows = table.select("tr");
-        // Get the columns from the rows
-        for (Element row: rows) {
-            Elements cols = row.select("td");
-            // Process each cell in the row
-            for (Element col: cols) {
-                String cellData = col.text();
-                // Check if there is more than one person listed
-                if (cellData.matches(".*@.*@.*")) {
-                    splitMultipleStaff(cellData, tableData);
-                } else if (cellData.contains("-")) {
-                    // Check if there contains a "-" as it seperates name and email
-                    splitStaffInformation(cellData, tableData);
-                } else {
-                    tableData.add(cellData);
+        if (table != null) {       // Make sure there is a table
+            Elements rows = table.select("tr");
+            // Get the columns from the rows
+            for (Element row : rows) {
+                Elements cols = row.select("td");
+                // Process each cell in the row
+                for (Element col : cols) {
+                    String cellData = col.text();
+                    // Check if there is more than one person listed
+                    if (cellData.matches(".*@.*@.*")) {
+                        splitMultipleStaff(cellData, tableData);
+                    } else if (cellData.contains("-")) {
+                        // Check if there contains a "-" as it seperates name and email
+                        splitStaffInformation(cellData, tableData);
+                    } else {
+                        tableData.add(cellData);
+                    }
                 }
             }
         }
@@ -144,12 +145,13 @@ public class DataCleaner {
         ArrayList<String> colTexts;
         String query = "table.assessments";
         Element table = paper.select(query).first();
-        assert table != null;
-        Elements rows = table.select("tr");
-        for (Element row : rows) {
-            colTexts = checkAssignment(row);
-            if (colTexts != null) {
-                tableData.addAll(colTexts);
+        if (table != null) {
+            Elements rows = table.select("tr");
+            for (Element row : rows) {
+                colTexts = checkAssignment(row);
+                if (colTexts != null) {
+                    tableData.addAll(colTexts);
+                }
             }
         }
         return tableData;
@@ -162,12 +164,13 @@ public class DataCleaner {
         ArrayList<String> tableData = new ArrayList<>();
         String query = "table.timetable";
         Element table = paper.select(query).first();
-        assert table != null;
-        Elements rows = table.select("tr");
-        for (Element row: rows) {
-            Elements cols = row.select("td");
-            for (Element col: cols) {
-                tableData.add(col.text());
+        if (table != null) {
+            Elements rows = table.select("tr");
+            for (Element row : rows) {
+                Elements cols = row.select("td");
+                for (Element col : cols) {
+                    tableData.add(col.text());
+                }
             }
         }
         return tableData;

@@ -54,26 +54,29 @@ public class CourseOutlineScraper {
                 throw new IOException("Unexpected code" + response); // Error for unsuccessful calls
 
             // Parse the result into json forms
-            assert response.body() != null;
-            JsonElement parsed = JsonParser.parseString(response.body().string());
+            if (response.body() != null) {
+                JsonElement parsed = JsonParser.parseString(response.body().string());
 
-            // Format the json element
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            String pretty = gson.toJson(parsed);
+                // Format the json element
+                Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                String pretty = gson.toJson(parsed);
 
-            // Retrieve the html element from json file
-            JsonObject root = JsonParser.parseString(pretty).getAsJsonObject();
-            String escapedHtml = root.get("html").getAsString();
+                // Retrieve the html element from json file
+                JsonObject root = JsonParser.parseString(pretty).getAsJsonObject();
+                String escapedHtml = root.get("html").getAsString();
 
-            // Unescape the html
-            String html = escapedHtml
-                    .replace("\\r\\n", "\n")
-                    .replace("\\\"", "\"")
-                    .replace("\\u003c", "<")
-                    .replace("\\u003e", ">");
+                // Unescape the html
+                String html = escapedHtml
+                        .replace("\\r\\n", "\n")
+                        .replace("\\\"", "\"")
+                        .replace("\\u003c", "<")
+                        .replace("\\u003e", ">");
 
-            // Return the html as a document
-            return Jsoup.parse(html);
+
+                // Return the html as a document
+                return Jsoup.parse(html);
+            }
+            return null;
         }
     }
 }
