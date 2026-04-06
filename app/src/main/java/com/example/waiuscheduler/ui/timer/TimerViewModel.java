@@ -24,16 +24,16 @@ public class TimerViewModel extends ViewModel {
     // Private variables
     private int seconds = 0;
     private boolean running = false;
-    private final DataRepository repository;
     private final DatabaseController dbController;
     private final MutableLiveData<String> timeDisplay = new MutableLiveData<>();
     private final MutableLiveData<Boolean> isPaperSelected = new MutableLiveData<>();
     private final LiveData<List<PaperEntity>> allPapers;
     private long startTimeMillis;
-    private String selectedPaperId;
 
+    // Handler of timer scheduling
     private final Handler handler = new Handler(Looper.getMainLooper());
 
+    // Interface to run the timer
     private final Runnable runnable = new Runnable() {
         @Override
         public void run() {
@@ -45,47 +45,65 @@ public class TimerViewModel extends ViewModel {
         }
     };
 
+    /// Timer View Model Constructor
+    /// @param application Application context
     public TimerViewModel(@NonNull Application application) {
         // Start the timer
         handler.post(runnable);
 
         // Initialise repository
-        this.repository = new DataRepository(application);
+        DataRepository repository = new DataRepository(application);
         this.dbController = repository.getDbController();
         allPapers = dbController.getAllPapers();
     }
 
+    /// Get the time display from the UI
+    /// @return Live Data string of the time
     public LiveData<String> getTimeDisplay() {
         return timeDisplay;
     }
 
+    /// Get whether the paper is selected by the user
+    /// @return Live Data boolean
     public LiveData<Boolean> getPaperSelected() {
         return isPaperSelected;
     }
 
+    /// Set whether the paper is selected by the user
+    /// @param selected Boolean for paper selection
     public void setPaperSelected(boolean selected) {
         isPaperSelected.setValue(selected);
     }
 
+    /// Retrieves all papers in current papers
+    /// @return Live Data list of paper entities
     public LiveData<List<PaperEntity>> getAllPapers() { return allPapers; }
 
+    /// Starts the timer by logging the start time
     public void start() {
-        if (isPaperSelected.getValue() == Boolean.TRUE) {
-            if (!running && seconds == 0) {
+        if (isPaperSelected.getValue() == Boolean.TRUE) {   // If there is a paper selected
+            if (!running && seconds == 0) {                 // If timer is not already running
                 startTimeMillis = System.currentTimeMillis();
             }
-            running = true;
+            running = true;     // Enable timer is running
         }
     }
+
+    /// Stops the timer
     public void stop() { running = false; }
+
+    /// Resets the timer
     public void reset() {
         running = false;
         seconds = 0;
         updateTimeDisplay();
     }
 
+    /// Save the study session to the database
+    /// @param notes Notes from user input
+    /// @param paperId The foreign key for the paper id
     public void saveStudySession(String notes, String paperId) {
-        if (seconds <= 0) return;
+        if (seconds <= 0) return;   // If there is no time
 
         // Get the information from the study session
         long endTimeMillis = System.currentTimeMillis();
@@ -100,6 +118,7 @@ public class TimerViewModel extends ViewModel {
         reset();    // Reset UI after saving
     }
 
+    /// Updates the UI time display
     private void updateTimeDisplay() {
         int hours = seconds / 3600;
         int minutes = (seconds % 3600) / 60;
@@ -108,6 +127,7 @@ public class TimerViewModel extends ViewModel {
         timeDisplay.setValue(time);
     }
 
+    /// Clears the view model and callbacks
     @Override
     protected void onCleared() {
         super.onCleared();

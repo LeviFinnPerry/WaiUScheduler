@@ -21,9 +21,15 @@ import java.util.List;
 
 public class TimerFragment extends Fragment {
 
+    // Private variables
     private TimerViewModel timerViewModel;
     private FragmentTimerBinding binding;
 
+    /// Initialises view elements for the fragment
+    /// @param inflater XML layout with corresponding view objects
+    /// @param container Holds view families
+    /// @param savedInstanceState Bundle saved from previous state
+    /// @return binding root as a View
     public View onCreateView(
             @NonNull LayoutInflater inflater,
             ViewGroup container, Bundle savedInstanceState
@@ -35,7 +41,9 @@ public class TimerFragment extends Fragment {
         return binding.getRoot();
     }
 
-
+    /// Handling of timer once view is created
+    /// @param view User interface components
+    /// @param savedInstanceState Bundle saved from previous state
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -87,6 +95,7 @@ public class TimerFragment extends Fragment {
 
     }
 
+    /// Destroys view when no longer needed
     @Override
     public void onDestroyView() {
         super.onDestroyView();
