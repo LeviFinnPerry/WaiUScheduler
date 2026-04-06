@@ -7,6 +7,7 @@ import com.example.waiuscheduler.database.tables.EventEntity;
 import com.example.waiuscheduler.database.tables.PaperEntity;
 import com.example.waiuscheduler.database.tables.SemesterEntity;
 import com.example.waiuscheduler.database.tables.StaffEntity;
+import com.example.waiuscheduler.database.tables.StudySessionEntity;
 import com.example.waiuscheduler.database.tables.TimetablePatternEntity;
 
 import java.util.ArrayList;
@@ -22,6 +23,10 @@ public class DatabaseController {
     /// @param db The database for the app
     public DatabaseController(AppDatabase db) {
         this.db = db;
+    }
+
+    public void saveStudySession(StudySessionEntity studySession) {
+        db.studySessionDao().insert(studySession);
     }
 
 

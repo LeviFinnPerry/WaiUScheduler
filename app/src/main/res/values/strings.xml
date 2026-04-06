@@ -29,11 +29,11 @@
     <string name="staff_position">Role</string>
     <string name="timer_start_btn_req">Add a course first to start timing</string>
     <string name="timer_select_paper">Select Paper *</string>
-    <string name="timer_time_layout">00:00.00</string>
+    <string name="timer_time_layout">00:00:00</string>
     <string name="timer_session_notes">Session Notes</string>
     <string name="timer_notes_hint">Take notes during your study session…</string>
     <string name="timer_start">Start</string>
     <string name="timer_reset">Reset</string>
-    <string name="timer_delete">Delete</string>
+    <string name="timer_stop">Stop</string>
 
 </resources>
