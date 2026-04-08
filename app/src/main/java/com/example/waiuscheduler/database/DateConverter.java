@@ -58,7 +58,7 @@ public class DateConverter {
     /// @param date Date object
     /// @param time Date object for the time
     /// @return Full date and time
-    public static Date ToDateTime(Date date, Date time) {
+    public static Date toDateTime(Date date, Date time) {
         String dateString = format(date, DATE_PATTERN);
         String timeString = format(time, TIME_PATTERN);
         String dateTimeString = dateString + " " + timeString;

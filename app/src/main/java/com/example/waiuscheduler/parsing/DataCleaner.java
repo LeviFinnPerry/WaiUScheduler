@@ -449,6 +449,6 @@ public class DataCleaner {
     /// @param time Date object for time
     /// @return Combined date and time
     private Date convertToDateTime(Date date, Date time) {
-        return DateConverter.ToDateTime(date, time);
+        return DateConverter.toDateTime(date, time);
     }
 }
