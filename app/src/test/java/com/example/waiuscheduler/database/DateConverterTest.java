@@ -2,21 +2,21 @@ package com.example.waiuscheduler.database;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Calendar;
 import java.util.Date;
 
 /// Tests for converting dates
 /// Verifies string parsing, timestamp conversion, and DateTime merging logic
-/// @Link DateConverter
+/// @see DateConverter
 public class DateConverterTest {
 
     /// Confirms that a standard NZ format date string (dd/MM/yyyy)
     /// is correctly converted to a Date object
-    /// @Link stringToDate
+    /// @see DateConverter#stringToDate(String) 
     @Test
-    public void stringToDate_valid() {
+    void stringToDate_valid() {
         // Given
         String input = "08/04/2026";
 
@@ -36,7 +36,7 @@ public class DateConverterTest {
     }
 
     /// Strings with incorrect format return null
-    /// @Link stringToDate
+    /// @see DateConverter#stringToDate(String) 
     @Test
     public void stringToDate_invalid() {
         // Given
@@ -51,7 +51,7 @@ public class DateConverterTest {
 
     /// Confirms that a abbreviated month NZ format date string (dd MMM yyyy)
     /// is correctly converted to a Date object
-    /// @Link stringAbvToDate
+    /// @see DateConverter#stringAbvToDate(String) 
     @Test
     public void stringAbvToDate_valid() {
         // Given
@@ -73,7 +73,7 @@ public class DateConverterTest {
     }
 
     /// Strings with incorrect format return null
-    /// @Link stringAbvToDate
+    /// @see DateConverter#stringAbvToDate
     @Test
     public void stringAbvToDate_invalid() {
         // Given
@@ -88,7 +88,7 @@ public class DateConverterTest {
 
     /// Confirms that a format time string (HH:mm)
     /// is correctly converted to a Date object
-    /// @Link stringToTime
+    /// @see DateConverter#stringToTime(String) 
     @Test
     public void stringToTime_valid() {
         // Given
@@ -109,7 +109,7 @@ public class DateConverterTest {
     }
 
     /// Strings with incorrect format return null
-    /// @Link stringToTime
+    /// @see DateConverter#stringToTime(String)
     @Test
     public void stringToTime_invalid() {
         // Given
@@ -126,7 +126,7 @@ public class DateConverterTest {
     /// Confirms that a NZ date format date string (dd/MM/yyyy)
     /// and format time string (HH:mm)
     /// is correctly converted to a Date object
-    /// @Link toDateTime
+    /// @see DateConverter#toDateTime(Date, Date) 
     @Test
     public void toDateTime_valid() {
         // Given
@@ -155,7 +155,7 @@ public class DateConverterTest {
     }
 
     /// Returns the default date time (01/01/1970 12:00)
-    /// @Link toDateTime
+    /// @see DateConverter#toDateTime(Date, Date) 
     @Test
     public void toDateTime_invalid() {
         // Given

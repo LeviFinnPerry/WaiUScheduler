@@ -4,7 +4,6 @@ appcompat = "1.7.1"
 constraintlayout = "2.2.1"
 espressoCore = "3.7.0"
 jsoup = "1.22.1"
-junit = "4.13.2"
 junitVersion = "1.3.0"
 gson = "2.13.2"
 material = "1.13.0"
@@ -16,7 +15,7 @@ navigationUi = "2.9.7"
 recyclerview = "1.4.0"
 retrofit = "3.0.0"
 room = "2.8.4"
-junitJupiter = "6.0.3"
+junitJupiter = "5.10.2"
 
 [libraries]
 appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
@@ -24,7 +23,6 @@ constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayo
 ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
-junit = { group = "junit", name = "junit", version.ref = "junit" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson"}
 lifecycle-compiler = { module = "androidx.lifecycle:lifecycle-compiler", version.ref = "lifecycleLivedataKtx" }
 lifecycle-extensions = { module = "androidx.lifecycle:lifecycle-extensions", version.ref = "lifecycleExtensions" }
@@ -39,6 +37,7 @@ retrofit-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref 
 room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junitJupiter" }
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

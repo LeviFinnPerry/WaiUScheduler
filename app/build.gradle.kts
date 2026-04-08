@@ -1,5 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
+    // Add this if you have the google-services plugin in your TOML
+    // alias(libs.plugins.google.services)
 }
 
 android {
@@ -25,48 +27,70 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
     buildFeatures {
         viewBinding = true
     }
+
     testOptions {
         unitTests.isReturnDefaultValues = true
+        // CRITICAL: Tells the Kotlin DSL to use the JUnit 5 engine
+        unitTests.all {
+            it.useJUnitPlatform()
+        }
+    }
+
+    sourceSets {
+        getByName("test") {
+            resources.srcDirs("src/test/java")
+        }
     }
 }
 
 dependencies {
-
+    // Core Android
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.constraintlayout)
+    implementation(libs.recyclerview)
+
+    // Architecture Components
     implementation(libs.lifecycle.livedata.ktx)
     implementation(libs.lifecycle.viewmodel.ktx)
-    implementation(libs.navigation.fragment)
-    implementation(libs.navigation.ui)
-    implementation(libs.recyclerview)
-    testImplementation(libs.junit)
-    testImplementation(libs.junit.jupiter)
-    androidTestImplementation(libs.ext.junit)
-    androidTestImplementation(libs.espresso.core)
-
-    // Add dependencies for room
-    implementation(libs.room.runtime)
-    annotationProcessor(libs.room.compiler)
-
-    // Add dependencies for lifecycle extensions
     implementation(libs.lifecycle.extensions)
     annotationProcessor(libs.lifecycle.compiler)
 
-    // Add dependencies for GSON
+    // Navigation
+    implementation(libs.navigation.fragment)
+    implementation(libs.navigation.ui)
+
+    // Firebase (Using the library name from your TOML)
+    // If you use a BoM, you'd add implementation(platform(libs.firebase.bom)) here
+    implementation("com.google.firebase:firebase-firestore:25.1.0")
+
+    // Unit Testing (JUnit 5)
+    testImplementation(libs.junit.jupiter)
+    // Manually adding the engine to ensure it's present for discovery
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.2")
+
+    // Instrumented Testing
+    androidTestImplementation(libs.ext.junit)
+    androidTestImplementation(libs.espresso.core)
+
+    // Database (Room)
+    implementation(libs.room.runtime)
+    annotationProcessor(libs.room.compiler)
+
+    // JSON and Networking
     implementation(libs.gson)
-
-    // Add dependencies for HTTP
     implementation(libs.retrofit)
-    implementation(libs.retrofit.gson) // For JSON conversion
+    implementation(libs.retrofit.gson)
 
-    // Add dependencies for JSOUP
+    // HTML Scraping
     implementation(libs.jsoup)
 }
