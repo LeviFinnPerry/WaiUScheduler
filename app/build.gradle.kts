@@ -69,18 +69,18 @@ dependencies {
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
 
-    // Firebase (Using the library name from your TOML)
-    // If you use a BoM, you'd add implementation(platform(libs.firebase.bom)) here
-    implementation("com.google.firebase:firebase-firestore:25.1.0")
+    // Firebase
+    implementation(libs.firebase.firestore)
 
     // Unit Testing (JUnit 5)
     testImplementation(libs.junit.jupiter)
     // Manually adding the engine to ensure it's present for discovery
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.2")
+    testRuntimeOnly(libs.junit.jupiter.engine)
 
     // Instrumented Testing
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+    androidTestImplementation(libs.instant.task)
 
     // Database (Room)
     implementation(libs.room.runtime)
