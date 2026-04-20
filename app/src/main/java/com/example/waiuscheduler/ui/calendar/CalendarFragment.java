@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -16,6 +15,12 @@ public class CalendarFragment extends Fragment {
 
     private FragmentCalendarBinding binding;
 
+
+    /// Initialises fragment view
+    /// @param inflater Layout inflater
+    /// @param container View Group of the fragment
+    /// @param savedInstanceState Bundle for the instance
+    /// @return View for calendar
     public View onCreateView(
             @NonNull LayoutInflater inflater,
             ViewGroup container, Bundle savedInstanceState
@@ -24,13 +29,11 @@ public class CalendarFragment extends Fragment {
                 new ViewModelProvider(this).get(CalendarViewModel.class);
 
         binding = FragmentCalendarBinding.inflate(inflater, container, false);
-        View root = binding.getRoot();
+        return binding.getRoot();
 
-        final TextView textView = binding.textCalendar;
-        calendarViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
-        return root;
     }
 
+    /// Destroys the view
     @Override
     public void onDestroyView() {
         super.onDestroyView();

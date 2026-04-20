@@ -36,4 +36,23 @@
     <string name="timer_reset">Reset</string>
     <string name="timer_stop">Stop</string>
 
+    # Calendar fragment
+    <string name="arrow_prev">&lt;</string>
+    <string name="arrow_next">&gt;</string>
+    <string name="today">Today</string>
+    <string name="view_day">Day</string>
+    <string name="view_week">Week</string>
+    <string name="view_month">Month</string>
+    <string name="day_sun">Sun</string>
+    <string name="day_mon">Mon</string>
+    <string name="day_tue">Tue</string>
+    <string name="day_wed">Wed</string>
+    <string name="day_thu">Thu</string>
+    <string name="day_fri">Fri</string>
+    <string name="day_sat">Sat</string>
+    <string name="event_types">Event Types</string>
+    <string name="filter_study">Study Sessions</string>
+    <string name="filter_lecture">Lectures</string>
+    <string name="filter_assignment">Assignments</string>
+
 </resources>

@@ -1,19 +1,56 @@
 package com.example.waiuscheduler.ui.calendar;
 
-import androidx.lifecycle.LiveData;
+import android.app.Application;
+
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
-public class CalendarViewModel extends ViewModel {
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.List;
 
-    private final MutableLiveData<String> mText;
+public class CalendarViewModel extends AndroidViewModel {
 
-    public CalendarViewModel() {
-        mText = new MutableLiveData<>();
-        mText.setValue("This is calendar fragment");
+    // Private variables
+    private final MutableLiveData<Calendar> currentDate = new MutableLiveData<>();
+    private final MutableLiveData<String> viewMode = new MutableLiveData<>();
+    private final MutableLiveData<List<String>> filters = new MutableLiveData<>();
+    private final MutableLiveData<List<CalendarConvertor>> events = new MutableLiveData<>();
+
+
+    /// Constructor for the view model
+    /// @param application Application for the view
+    public CalendarViewModel(@NonNull Application application) {
+        super(application);
+        currentDate.setValue(Calendar.getInstance());
+        viewMode.setValue("month");
+        filters.setValue(new ArrayList<>(Arrays.asList(
+                "Study", "Lecture", "Assessment")));
     }
 
-    public LiveData<String> getText() {
-        return mText;
+    /// Gets the current day
+    /// @return current date
+    public MutableLiveData<Calendar> getCurrentDate() {
+        return currentDate;
+    }
+
+    /// Gets the calendar size
+    /// @return view mode
+    public MutableLiveData<String> getViewMode() {
+        return viewMode;
+    }
+
+    /// Get any filters on the calendar
+    /// @return filters
+    public MutableLiveData<List<String>> getFilters() {
+        return filters;
+    }
+
+    /// Gets all the events for the calendar
+    /// @return events
+    public MutableLiveData<List<CalendarConvertor>> getEvents() {
+        return events;
     }
 }
