@@ -66,7 +66,7 @@ public abstract class AppDatabase extends RoomDatabase {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
                             AppDatabase.class, "app_database")
                             .enableMultiInstanceInvalidation()  // Allow for foreign keys
-                            //.fallbackToDestructiveMigration() // Handle migrations
+                            .fallbackToDestructiveMigration() // Handle migrations
                             .addCallback(initialiseDB)
                             .build();
                 }
