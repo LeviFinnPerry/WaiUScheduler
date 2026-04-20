@@ -15,7 +15,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.waiuscheduler.R;
-import com.example.waiuscheduler.database.tables.PaperEntity;
 import com.example.waiuscheduler.database.tables.StaffEntity;
 import com.example.waiuscheduler.databinding.FragmentCoursesBinding;
 
@@ -43,7 +42,7 @@ public class CoursesFragment extends Fragment {
             @NonNull LayoutInflater inflater,
             ViewGroup container, Bundle savedInstanceState
     ) {
-        coursesViewModel = new ViewModelProvider(this).get(CoursesViewModel.class);
+        coursesViewModel = new ViewModelProvider(requireActivity()).get(CoursesViewModel.class);
 
         binding = FragmentCoursesBinding.inflate(inflater, container, false);
 
@@ -57,12 +56,37 @@ public class CoursesFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Observe the pipeline status
-        coursesViewModel.getStatus().observe(getViewLifecycleOwner(), statusMessage -> {
-            if (statusMessage != null) {
-                Toast.makeText(getContext(), statusMessage, Toast.LENGTH_LONG).show();
-            }
-        });
+
+        // RecyclerView for paper information
+        RecyclerView paperRecycler = view.findViewById(R.id.paper_recycler);
+        paperRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
+        paperAdapter = new PaperAdapter(paper -> coursesViewModel.deletePaper(paper));
+        paperRecycler.setAdapter(paperAdapter);
+
+        // Observe the papers from the view model
+        coursesViewModel.getAllPapers().observe(
+                getViewLifecycleOwner(), papers -> {
+                    if (papers != null) {
+                        paperAdapter.submitPapers(new ArrayList<>(papers));
+                    }
+                }
+        );
+
+        // RecyclerView for staff information
+        RecyclerView staffRecycler = view.findViewById(R.id.staff_recycler);
+        staffRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
+        staffAdapter = new StaffAdapter();
+        staffRecycler.setAdapter(staffAdapter);
+
+        // Observe the staff from the view model
+        coursesViewModel.getAllStaff().observe(
+                getViewLifecycleOwner(), staffMembers -> {
+                    if (staffMembers != null) {
+                        staffAdapter.submitStaff((ArrayList<StaffEntity>) staffMembers);
+                    }
+                }
+        );
+
 
         // Trigger the pipeline via the button
         binding.buttonSearchPaper.setOnClickListener(v -> {
@@ -80,42 +104,13 @@ public class CoursesFragment extends Fragment {
             } catch (Exception e) {
                 Log.e("User Add Paper", "Error in getting paper information");
             }
+        });
 
-
-            // RecyclerView for paper information
-            RecyclerView paperRecycler = view.findViewById(R.id.paper_recycler);
-            paperRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
-
-            paperAdapter = new PaperAdapter(paper -> coursesViewModel.deletePaper(paper));
-
-            paperRecycler.setAdapter(paperAdapter);
-
-            // Observe the data from the view model
-            coursesViewModel.getAllPapers().observe(
-                    getViewLifecycleOwner(), papers -> {
-                        if (papers != null) {
-                            paperAdapter.submitPapers((ArrayList<PaperEntity>) papers);
-                        }
-                    }
-            );
-
-            // RecyclerView for staff information
-            RecyclerView staffRecycler = view.findViewById(R.id.staff_recycler);
-            staffRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
-
-            staffAdapter = new StaffAdapter();
-
-            staffRecycler.setAdapter(staffAdapter);
-
-            // Observe the data from the view model
-            coursesViewModel.getAllStaff().observe(
-                    getViewLifecycleOwner(), staffMembers -> {
-                        if (staffMembers != null) {
-                            staffAdapter.submitStaff((ArrayList<StaffEntity>) staffMembers);
-                        }
-                    }
-            );
-
+        // Observe the pipeline status
+        coursesViewModel.getStatus().observe(getViewLifecycleOwner(), statusMessage -> {
+            if (statusMessage != null) {
+                Toast.makeText(getContext(), statusMessage, Toast.LENGTH_LONG).show();
+            }
         });
     }
 

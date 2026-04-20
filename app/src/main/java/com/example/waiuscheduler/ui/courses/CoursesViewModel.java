@@ -21,6 +21,8 @@ public class CoursesViewModel extends AndroidViewModel {
     private final DataRepository repository;
     private final MutableLiveData<String> status;
     private final DatabaseController dbController;
+    private final LiveData<List<PaperEntity>> papers;
+
 
     /// Constructor for the view model
     /// @param application Application for the view
@@ -29,6 +31,7 @@ public class CoursesViewModel extends AndroidViewModel {
         this.repository = new DataRepository(application);
         this.status = new MutableLiveData<>();
         this.dbController = repository.getDbController();
+        this.papers = dbController.getAllPapers();
     }
 
     /// Get status of the pipeline
@@ -54,7 +57,7 @@ public class CoursesViewModel extends AndroidViewModel {
     /// Get all papers in view
     /// @return All displayed paper entities
     public LiveData<List<PaperEntity>> getAllPapers() {
-        return dbController.getAllPapers();
+        return papers;
     }
 
     /// Deletes paper
