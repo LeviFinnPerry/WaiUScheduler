@@ -17,7 +17,7 @@ public class CalendarViewModel extends AndroidViewModel {
     private final MutableLiveData<Calendar> currentDate = new MutableLiveData<>();
     private final MutableLiveData<String> viewMode = new MutableLiveData<>();
     private final MutableLiveData<List<String>> filters = new MutableLiveData<>();
-    private final MutableLiveData<List<CalendarConvertor>> events = new MutableLiveData<>();
+    private final MutableLiveData<List<CalendarOccurrence>> events = new MutableLiveData<>();
 
 
     /// Constructor for the view model
@@ -50,7 +50,7 @@ public class CalendarViewModel extends AndroidViewModel {
 
     /// Gets all the events for the calendar
     /// @return events
-    public MutableLiveData<List<CalendarConvertor>> getEvents() {
+    public MutableLiveData<List<CalendarOccurrence>> getEvents() {
         return events;
     }
 }
