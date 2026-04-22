@@ -37,4 +37,5 @@ public interface TimetablePatternDao {
     /// @return All timetable patterns in the table
     @Query("SELECT * FROM timetable_pattern")
     LiveData<List<TimetablePatternEntity>> getAllTimetables();
+
 }

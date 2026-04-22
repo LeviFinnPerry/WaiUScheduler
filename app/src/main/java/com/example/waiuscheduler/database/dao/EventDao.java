@@ -37,4 +37,13 @@ public interface EventDao {
     /// @return All events in the table
     @Query("SELECT * FROM event")
     LiveData<List<EventEntity>> getAllEvents();
+
+
+    /// Returns all events within start and end date
+    /// @param start Range start
+    /// @param end Range end
+    @Query("SELECT * FROM event " +
+            "WHERE dateTimeStart <= :end AND dateTimeEnd >= :start " +
+            "ORDER BY dateTimeStart ASC")
+    LiveData<List<EventEntity>> getEventsInRange(long start, long end);
 }

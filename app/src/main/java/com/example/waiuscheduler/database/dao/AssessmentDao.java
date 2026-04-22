@@ -37,4 +37,12 @@ public interface AssessmentDao {
     /// @return All assessments in the table
     @Query("SELECT * FROM assessment")
     LiveData<List<AssessmentEntity>> getAllAssessments();
+
+    /// Returns all assessments within start and end date
+    /// @param start Range start
+    /// @param end Range end
+    @Query("SELECT * FROM assessment " +
+            "WHERE dueDate >= :start AND dueDate <= :end " +
+            "ORDER BY dueDate ASC")
+    LiveData<List<AssessmentEntity>> getAssessmentsInRange(long start, long end);
 }
