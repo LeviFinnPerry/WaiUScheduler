@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 public class CalendarViewModel extends AndroidViewModel {
@@ -38,7 +39,7 @@ public class CalendarViewModel extends AndroidViewModel {
                 CalendarOccurrence.TYPE_EVENT,
                 CalendarOccurrence.TYPE_STUDY)));
 
-        // Reload the range of view
+        reloadRange();
 
     }
 
@@ -55,7 +56,7 @@ public class CalendarViewModel extends AndroidViewModel {
         else { copy.add(Calendar.MONTH, delta); }
         currentDate.setValue(copy);
 
-        // Reload the range of view
+        reloadRange();
 
     }
 
@@ -71,8 +72,7 @@ public class CalendarViewModel extends AndroidViewModel {
     /// Set the view mode
     public void setViewMode(String mode) {
         viewMode.setValue(mode);
-
-        // Reload the range of view
+        reloadRange();
     }
 
     // Filters
@@ -99,7 +99,54 @@ public class CalendarViewModel extends AndroidViewModel {
     }
 
     // Range calculation
-    // TODO: Calculate range of view
+    /// Gets the range of dates currently visible in the view
+    /// @return start and end time stamp
+    public long[] getVisibleRange() {
+        Calendar c = (Calendar) Objects.requireNonNull(currentDate.getValue()).clone();
+        String mode = viewMode.getValue();
+        Calendar start = (Calendar) c.clone();
+        Calendar end = (Calendar) c.clone();
+
+        if (MODE_MONTH.equals(mode)) {
+            start.set(Calendar.DAY_OF_MONTH, 1);
+            end.set(Calendar.DAY_OF_MONTH, end.getActualMaximum(Calendar.DAY_OF_MONTH));
+        } else if (MODE_WEEK.equals(mode)) {
+
+            start.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
+            end.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
+        }
+
+        // Set day
+        setStartDay(start);
+        setEndDay(end);
+
+        return new long[] {start.getTimeInMillis(), end.getTimeInMillis()};
+    }
+
+    /// Helping function to set to beginning of day
+    /// @param start calendar day
+    private void setStartDay(Calendar start) {
+        start.set(Calendar.HOUR_OF_DAY, 0);
+        start.set(Calendar.MINUTE, 0);
+        start.set(Calendar.SECOND, 0);
+        start.set(Calendar.MILLISECOND, 0);
+
+    }
+
+    /// Helping function to set to end of the day
+    /// @param end calendar day
+    private void setEndDay(Calendar end) {
+        end.set(Calendar.HOUR_OF_DAY, 23);
+        end.set(Calendar.MINUTE, 59);
+        end.set(Calendar.SECOND, 59);
+        end.set(Calendar.MILLISECOND, 999);
+    }
+
+    /// Reloads the visible range of the calendar view
+    private void reloadRange() {
+        long[] range = getVisibleRange();
+        calendarRepository.calendarRange(range[0], range[1]);
+    }
 
     // Getters
     /// Gets the current day
