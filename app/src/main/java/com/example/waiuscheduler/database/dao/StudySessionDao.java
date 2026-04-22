@@ -29,10 +29,6 @@ public interface StudySessionDao {
     @Update
     void update(StudySessionEntity session);
 
-    /// Delete all study sessions
-    @Query("DELETE FROM study_session")
-    void deleteAllSessions();
-
     /// Select all study sessions
     /// @return All study sessions in table
     @Query("SELECT * FROM study_session")

@@ -29,10 +29,6 @@ public interface EventDao {
     @Update
     void update(EventEntity event);
 
-    /// Delete all events
-    @Query("DELETE FROM event")
-    void deleteAllEvents();
-
     /// Select all events
     /// @return All events in the table
     @Query("SELECT * FROM event")

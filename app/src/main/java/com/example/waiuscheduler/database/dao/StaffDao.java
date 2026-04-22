@@ -29,10 +29,6 @@ public interface StaffDao {
     @Update
     void update(StaffEntity staff);
 
-    /// Delete all staff
-    @Query("DELETE FROM staff")
-    void deleteAllStaff();
-
     /// Select all staff
     /// @return All staff members in the table
     @Query("SELECT * FROM staff")

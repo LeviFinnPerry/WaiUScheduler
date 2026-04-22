@@ -29,10 +29,6 @@ public interface TimetablePatternDao {
     @Update
     void update(TimetablePatternEntity timetable);
 
-    /// Delete all timetable patterns
-    @Query("DELETE FROM timetable_pattern")
-    void deleteAllTimetables();
-
     /// Select all timetable patterns
     /// @return All timetable patterns in the table
     @Query("SELECT * FROM timetable_pattern")

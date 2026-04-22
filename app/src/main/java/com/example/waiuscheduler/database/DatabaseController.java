@@ -85,7 +85,7 @@ public class DatabaseController {
     /// Function to return the semester based on the semester code
     /// @param semesterCode The occurrence code for the semester
     /// @return The semester matching the semester code
-    public SemesterEntity getSemesters(String semesterCode) {
+    public SemesterEntity getSemester(String semesterCode) {
         ArrayList<SemesterEntity> semesters =
                 (ArrayList<SemesterEntity>) db.semesterDao().getAllSemesters();
 
@@ -95,5 +95,29 @@ public class DatabaseController {
             }
         }
         return null;
+    }
+
+    /// Finds assessments between two dates
+    /// @param start Start date as long
+    /// @param end End date as long
+    /// @return All assessments within range
+    public LiveData<List<AssessmentEntity>> getAssessmentsBetween(long start, long end) {
+        return db.assessmentDao().getAssessmentsInRange(start, end);
+    }
+
+    /// Finds events between two dates
+    /// @param start Start date as long
+    /// @param end End date as long
+    /// @return All events within range
+    public LiveData<List<EventEntity>> getEventsBetween(long start, long end) {
+        return db.eventDao().getEventsInRange(start, end);
+    }
+
+    /// Finds study sessions between two dates
+    /// @param start Start date as long
+    /// @param end End date as long
+    /// @return All study sessions within range
+    public LiveData<List<StudySessionEntity>> getStudySessionsBetween(long start, long end) {
+        return db.studySessionDao().getStudySessionsInRange(start, end);
     }
 }

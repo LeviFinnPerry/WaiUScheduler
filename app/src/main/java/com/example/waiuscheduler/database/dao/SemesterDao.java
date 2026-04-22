@@ -28,10 +28,6 @@ public interface SemesterDao {
     @Update
     void update(SemesterEntity semester);
 
-    /// Delete all semesters
-    @Query("DELETE FROM semester")
-    void deleteAllSemesters();
-
     /// Select all semesters
     /// @return All semesters in table
     @Query("SELECT * FROM semester")

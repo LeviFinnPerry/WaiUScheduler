@@ -29,10 +29,6 @@ public interface AssessmentDao {
     @Update
     void update(AssessmentEntity assessment);
 
-    /// Delete all assessments
-    @Query("DELETE FROM assessment")
-    void deleteAllAssessments();
-
     /// Select all assessments
     /// @return All assessments in the table
     @Query("SELECT * FROM assessment")

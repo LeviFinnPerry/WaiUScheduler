@@ -29,10 +29,6 @@ public interface PaperDao {
     @Update
     void update(PaperEntity paper);
 
-    /// Delete all papers
-    @Query("DELETE FROM paper")
-    void deleteAllPapers();
-
     /// Select all papers
     /// @return All papers in the table
     @Query("SELECT * FROM paper")
