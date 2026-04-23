@@ -53,8 +53,7 @@ public class TimerViewModel extends AndroidViewModel {
         handler.post(runnable);
 
         // Initialise repository
-        DataRepository repository = new DataRepository(application);
-        this.dbController = repository.getDbController();
+        this.dbController = DataRepository.getDbController();
         this.allPapers = dbController.getAllPapers();
         this.seconds = 0.0;
         this.running = false;

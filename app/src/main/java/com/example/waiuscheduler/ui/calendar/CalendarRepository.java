@@ -1,6 +1,7 @@
 package com.example.waiuscheduler.ui.calendar;
 
 import android.app.Application;
+import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
@@ -15,12 +16,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class CalendarRepository {
     private final DatabaseController dbController;
-    private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     // Cached sources within the date range
     private LiveData<List<AssessmentEntity>> assessmentSource;
@@ -37,36 +35,47 @@ public class CalendarRepository {
 
 
     ///  Constructor for the repository
-    /// @param app application instance
-    public CalendarRepository(Application app) {
-        this.dbController = new DatabaseController(AppDatabase.getInstance(app));
+    /// If the constructor isn't initialised yet then it will initialise one
+    /// To ensure data consistency and hopefully solve this bug I have been meaning
+    /// to fix for weeks but couldn't figure it out with debugging
+    /// @param application Application context
+    public CalendarRepository(Application application) {
+        this.dbController  = new DatabaseController(AppDatabase.getInstance(application));
     }
 
     /// When calendar window changes
     /// @param start start time of the window
     /// @param end end time of the window
     public void calendarRange(long start, long end) {
+        // TODO: No sources
+
         // Clear all sources
         if (assessmentSource != null) calendarItems.removeSource(assessmentSource);
         if (eventSource != null) calendarItems.removeSource(eventSource);
         if (studysessionSource != null) calendarItems.removeSource(studysessionSource);
 
+        long debugstart = Long.MIN_VALUE;
+        long debugend = Long.MAX_VALUE;
+
         // Get all sources in the ranges
         assessmentSource = dbController.getAssessmentsBetween(start, end);
-        eventSource = dbController.getEventsBetween(start, end);
+        eventSource = dbController.getEventsBetween(debugstart, debugend);
         studysessionSource = dbController.getStudySessionsBetween(start, end);
 
         // Add each source to the list
         calendarItems.addSource(assessmentSource, list -> {
-            latestAssessments = list;
+            Log.d("CalRepo", "Assessments emitted: " + (list != null ? list.size() : "null"));
+            latestAssessments = list != null ? list : Collections.emptyList();
             convertSources();
         });
         calendarItems.addSource(eventSource, list -> {
-            latestEvents = list;
+            Log.d("CalRepo", "Events emitted: " + (list != null ? list.size() : "null"));
+            latestEvents = list != null ? list : Collections.emptyList();
             convertSources();
         });
         calendarItems.addSource(studysessionSource, list -> {
-            latestStudySessions = list;
+            Log.d("CalRepo", "Study emitted: " + (list != null ? list.size() : "null"));
+            latestStudySessions = list != null ? list : Collections.emptyList();
             convertSources();
         });
     }

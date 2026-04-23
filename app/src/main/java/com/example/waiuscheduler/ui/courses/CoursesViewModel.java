@@ -30,7 +30,7 @@ public class CoursesViewModel extends AndroidViewModel {
         super(application);
         this.repository = new DataRepository(application);
         this.status = new MutableLiveData<>();
-        this.dbController = repository.getDbController();
+        this.dbController = DataRepository.getDbController();
         this.papers = dbController.getAllPapers();
     }
 

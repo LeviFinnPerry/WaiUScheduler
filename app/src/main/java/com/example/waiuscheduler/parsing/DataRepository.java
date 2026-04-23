@@ -24,7 +24,7 @@ public class DataRepository {
     private final CourseOutlineScraper scraper;
     private final DataCleaner cleaner;
 
-    private final DatabaseController dbController;
+    private static DatabaseController dbController;
     private ScrapedData currentOutline = new ScrapedData();
 
     /// Constructor to connect all initialisations
@@ -33,7 +33,7 @@ public class DataRepository {
         this.scraper = new CourseOutlineScraper();
         this.cleaner = new DataCleaner();
         AppDatabase db = AppDatabase.getInstance(context);
-        this.dbController = new DatabaseController(db);
+        dbController = new DatabaseController(db);
 
 
         // Pre initialising the semester table to this years dates
@@ -123,7 +123,7 @@ public class DataRepository {
 
     /// Get the database controller
     /// @return Database controller
-    public DatabaseController getDbController() {
+    public static DatabaseController getDbController() {
         return dbController;
     }
 

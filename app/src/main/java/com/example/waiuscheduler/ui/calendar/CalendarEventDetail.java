@@ -23,7 +23,6 @@ import java.util.Locale;
 
 public class CalendarEventDetail extends BottomSheetDialogFragment {
 
-    private static final String ARG_KEY = "occurrence_index";
     private CalendarOccurrence occurrence;
     private CalendarViewModel viewModel;
 
@@ -90,9 +89,10 @@ public class CalendarEventDetail extends BottomSheetDialogFragment {
         }
 
         view.findViewById(R.id.button_save_grade).setOnClickListener(v -> {
-            Double input =
-                    Double.valueOf(editGrade.getText() != null ? editGrade.getText().toString().trim() : "");
-            if (input.isNaN()) {
+            double input =
+                    Double.parseDouble(editGrade.getText() != null ? editGrade.getText().toString()
+                            .trim() : "");
+            if (Double.isNaN(input)) {
                 Toast.makeText(requireContext(), "Please enter a grade", Toast.LENGTH_SHORT).show();
             }
             if (input < 0 || input > 100) {
@@ -142,5 +142,13 @@ public class CalendarEventDetail extends BottomSheetDialogFragment {
 
         // TODO: Method to delete study sessions
 
+    }
+
+    public CalendarViewModel getViewModel() {
+        return viewModel;
+    }
+
+    public void setViewModel(CalendarViewModel viewModel) {
+        this.viewModel = viewModel;
     }
 }

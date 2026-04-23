@@ -120,4 +120,5 @@ public class DatabaseController {
     public LiveData<List<StudySessionEntity>> getStudySessionsBetween(long start, long end) {
         return db.studySessionDao().getStudySessionsInRange(start, end);
     }
+
 }
