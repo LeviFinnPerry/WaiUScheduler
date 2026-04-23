@@ -71,8 +71,6 @@ public class CalendarOccurrence {
         );
     }
 
-
-
     /// Determines title for the types of events
     /// @param type type of event
     /// @return title
@@ -86,24 +84,38 @@ public class CalendarOccurrence {
         }
     }
 
-
+    /// Get type of event
+    /// @return type
     public String getType() {
         return type;
     }
 
+    /// Get colour
+    /// @return colour
+    public int getColour() {
+        return colour;
+    }
 
+    /// Get title of event
+    /// @return title
     public String getTitle() {
         return title;
     }
 
+    /// Get start of event
+    /// @return start date and time
     public Date getStartDateTime() {
         return startDateTime;
     }
 
+    /// Get end of event
+    /// @return end date and time
     public Date getEndDateTime() {
         return endDateTime;
     }
 
+    /// Get source of event information
+    /// @return table for event type
     public Object getSourceEntity() {
         return sourceEntity;
     }
