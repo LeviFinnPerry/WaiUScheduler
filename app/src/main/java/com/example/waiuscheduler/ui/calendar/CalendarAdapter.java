@@ -13,14 +13,16 @@ import com.example.waiuscheduler.R;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class CalendarAdapter extends BaseAdapter {
 
     private final Context context;
-    private List<Date> days;
-    private List<CalendarOccurrence> events;
-    private List<String> filters;
+    private List<Date> days = new ArrayList<>();
+    private List<CalendarOccurrence> events = new ArrayList<>();
+    private Set<String> filters  = new HashSet<>();
     private OnDayClickListener listener;
     private final Calendar today = Calendar.getInstance();
 
@@ -38,17 +40,17 @@ public class CalendarAdapter extends BaseAdapter {
     /// @param days Days in view
     /// @param events Calendar Occurrences
     /// @param filters Filtering types of occurrences
-    public void update(List<Date> days, List<CalendarOccurrence> events, List<String> filters) {
+    public void update(List<Date> days, List<CalendarOccurrence> events, Set<String> filters) {
         this.days = days != null ? days : new ArrayList<>();            // Set days or initialise
         this.events = events != null ? events : new ArrayList<>();      // Set events or initialise
-        this.filters = filters != null ? filters : new ArrayList<>();   // Set days or initialise
+        this.filters = filters != null ? filters : HashSet.newHashSet(0);   // Set days or initialise
         notifyDataSetChanged();
     }
 
     /// Amount of days in view
     /// @return size of days
     @Override
-    public int getCount() { return days.size(); }
+    public int getCount() { return days != null ? days.size(): 0; }
 
     /// Finds the day selected
     /// @param position day index
@@ -70,11 +72,11 @@ public class CalendarAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         if ( convertView == null) {     // If view not initialised
             convertView = LayoutInflater.from(context)
-                    .inflate(R.layout.fragment_calendar, parent, false);
+                    .inflate(R.layout.calendar_cell, parent, false);
         }
 
-        TextView dayNumber = convertView.findViewById(R.id.day_labels);
-        TextView textOverflow; //= convertView.findViewById(R.id.text_overflow);
+        TextView dayNumber = convertView.findViewById(R.id.text_day_number);
+        TextView textOverflow = convertView.findViewById(R.id.text_overflow);
         View chip1 = convertView.findViewById(R.id.chip_event_1);
         View chip2 = convertView.findViewById(R.id.chip_event_2);
         View chip3 = convertView.findViewById(R.id.chip_event_3);

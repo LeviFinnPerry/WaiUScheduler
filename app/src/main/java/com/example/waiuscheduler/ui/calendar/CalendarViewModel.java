@@ -4,12 +4,14 @@ import android.app.Application;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -171,5 +173,11 @@ public class CalendarViewModel extends AndroidViewModel {
     /// @return calendar repository
     public CalendarRepository getCalendarRepository() {
         return calendarRepository;
+    }
+
+    /// Get all occurrences from the repository
+    /// @return List of all calendar items in view
+    public LiveData<List<CalendarOccurrence>> getOccurrences() {
+        return calendarRepository.getOccurrences();
     }
 }
