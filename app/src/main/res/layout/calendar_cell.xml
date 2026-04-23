@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="2dp"
+        android:background="@drawable/calendar_cell_bg"
+        android:minHeight="60dp">
+
+        <TextView
+            android:id="@+id/text_day_number"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:gravity="center"
+            android:textSize="12sp" />
+
+        <View android:id="@+id/chip_event_1"
+            android:layout_width="match_parent" android:layout_height="4dp"
+            android:layout_marginTop="1dp" android:visibility="gone" />
+
+        <View android:id="@+id/chip_event_2"
+            android:layout_width="match_parent" android:layout_height="4dp"
+            android:layout_marginTop="1dp" android:visibility="gone" />
+
+        <View android:id="@+id/chip_event_3"
+            android:layout_width="match_parent" android:layout_height="4dp"
+            android:layout_marginTop="1dp" android:visibility="gone" />
+
+        <TextView android:id="@+id/text_overflow"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:textSize="11sp" android:gravity="end"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
