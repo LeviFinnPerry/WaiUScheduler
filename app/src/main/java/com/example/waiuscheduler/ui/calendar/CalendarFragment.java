@@ -1,6 +1,8 @@
 package com.example.waiuscheduler.ui.calendar;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,8 +10,10 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.waiuscheduler.database.AppDatabase;
 import com.example.waiuscheduler.databinding.FragmentCalendarBinding;
 
 import java.text.SimpleDateFormat;
@@ -26,6 +30,9 @@ public class CalendarFragment extends Fragment {
     private FragmentCalendarBinding binding;
     private CalendarViewModel viewModel;
     private CalendarAdapter adapter;
+
+    private final Handler refreshHandler = new Handler(Looper.getMainLooper());
+    private Runnable refreshRunnable;
 
 
     /// Initialises fragment view
@@ -57,6 +64,7 @@ public class CalendarFragment extends Fragment {
         setupFilterButtons();
         setupAdapterClickListener();
         observeViewModel();
+        viewModel.initialLoad();
     }
 
     /// Destroys the view
@@ -139,9 +147,9 @@ public class CalendarFragment extends Fragment {
     private void observeViewModel() {
         viewModel.getCurrentDate().observe(getViewLifecycleOwner(), date -> {
             updateHeaderLabel(date);
-            refreshGrid();
+            refreshGrid(viewModel.getOccurrences().getValue());
         });
-        viewModel.getViewMode().observe(getViewLifecycleOwner(), mode -> {
+        viewModel.getViewMode().observe(getViewLifecycleOwner(), (Observer<? super String>) mode -> {
             // Sync radio buttons without triggering listeners
             binding.radioDay.setChecked(CalendarViewModel.MODE_DAY.equals(mode));
             binding.radioWeek.setChecked(CalendarViewModel.MODE_WEEK.equals(mode));
@@ -149,10 +157,12 @@ public class CalendarFragment extends Fragment {
             // Day labels row — only meaningful for month/week
             binding.dayLabels.setVisibility(
                     CalendarViewModel.MODE_DAY.equals(mode) ? View.GONE : View.VISIBLE);
-            refreshGrid();
+            refreshGrid(viewModel.getOccurrences().getValue());
         });
-        viewModel.getCurrentDate().observe(getViewLifecycleOwner(), occ -> refreshGrid());
-        viewModel.getFilters().observe(getViewLifecycleOwner(), f -> refreshGrid());
+
+
+        viewModel.getOccurrences().observe(getViewLifecycleOwner(), (Observer<List<CalendarOccurrence>>) this::refreshGrid);
+        viewModel.getFilters().observe(getViewLifecycleOwner(), (Observer<Set<String>>)  f -> refreshGrid(viewModel.getOccurrences().getValue()));
     }
 
     private void updateHeaderLabel(Calendar date) {
@@ -166,24 +176,38 @@ public class CalendarFragment extends Fragment {
 
     }
 
-    private void refreshGrid() {
-        String mode = viewModel.getViewMode().getValue();
-        Calendar current = viewModel.getCurrentDate().getValue();
-        List<CalendarOccurrence> events = viewModel.getOccurrences().getValue();
+    private void refreshGrid(List<CalendarOccurrence> events) {
         Set<String> filters = viewModel.getFilters().getValue();
 
+        if (refreshRunnable != null) refreshHandler.removeCallbacks(refreshRunnable);
+        refreshRunnable = () -> performRefresh(events, filters);
+        refreshHandler.postDelayed(refreshRunnable, 50);
+    }
+
+    private void performRefresh(List<CalendarOccurrence> events, Set<String> filters) {
+        String mode = viewModel.getViewMode().getValue();
+        Calendar current = viewModel.getCurrentDate().getValue();
         if (current == null || mode == null) return;
 
-        List<Date> days;
-        if (CalendarViewModel.MODE_MONTH.equals(mode)) days = buildMonthDays(current);
-        else if (CalendarViewModel.MODE_WEEK.equals(mode)) days = buildWeekDays(current);
-        else days = buildDay(current);
+        // Run on background thread
+        Calendar currentCopy = (Calendar) current.clone();
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            List<Date> days;
+            if (CalendarViewModel.MODE_MONTH.equals(mode)) days = buildMonthDays(currentCopy);
+            else if (CalendarViewModel.MODE_WEEK.equals(mode)) days = buildWeekDays(currentCopy);
+            else days = buildDay(currentCopy);
 
-        // Adjust GridView column count
-        binding.gridViewCalendar.setNumColumns(
-                CalendarViewModel.MODE_DAY.equals(mode) ? 1 : 7);
+            final List<Date> finalDays = days;
+            requireActivity().runOnUiThread(() -> {
+                if (binding == null) return;
 
-        adapter.update(days, events, filters);
+                // Adjust GridView column count
+                binding.gridViewCalendar.setNumColumns(
+                        CalendarViewModel.MODE_DAY.equals(mode) ? 1 : 7);
+
+                adapter.update(finalDays, events, filters);
+            });
+        });
     }
 
     private List<Date> buildMonthDays(Calendar c) {

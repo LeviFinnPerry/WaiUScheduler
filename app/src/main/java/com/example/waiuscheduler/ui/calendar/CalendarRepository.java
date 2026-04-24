@@ -1,6 +1,8 @@
 package com.example.waiuscheduler.ui.calendar;
 
 import android.app.Application;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
@@ -23,9 +25,13 @@ public class CalendarRepository {
     // Cached sources within the date range
     private LiveData<List<AssessmentEntity>> assessmentSource;
     private LiveData<List<EventEntity>> eventSource;
-    private LiveData<List<StudySessionEntity>> studysessionSource;
+    private LiveData<List<StudySessionEntity>> studySessionSource;
 
     private final MediatorLiveData<List<CalendarOccurrence>> calendarItems = new MediatorLiveData<>();
+
+    // Thread handling
+    private final Handler mergeHandler = new Handler(Looper.getMainLooper());
+    private Runnable mergeRunnable;
 
     // Merged list sources
 
@@ -52,15 +58,15 @@ public class CalendarRepository {
         // Clear all sources
         if (assessmentSource != null) calendarItems.removeSource(assessmentSource);
         if (eventSource != null) calendarItems.removeSource(eventSource);
-        if (studysessionSource != null) calendarItems.removeSource(studysessionSource);
+        if (studySessionSource != null) calendarItems.removeSource(studySessionSource);
 
-        long debugstart = Long.MIN_VALUE;
-        long debugend = Long.MAX_VALUE;
+        long debugStart = Long.MIN_VALUE;
+        long debugEnd = Long.MAX_VALUE;
 
         // Get all sources in the ranges
-        assessmentSource = dbController.getAssessmentsBetween(start, end);
-        eventSource = dbController.getEventsBetween(debugstart, debugend);
-        studysessionSource = dbController.getStudySessionsBetween(start, end);
+        assessmentSource = dbController.getAssessmentsBetween(debugStart, debugEnd);
+        eventSource = dbController.getEventsBetween(debugStart, debugEnd);
+        studySessionSource = dbController.getStudySessionsBetween(debugStart, debugEnd);
 
         // Add each source to the list
         calendarItems.addSource(assessmentSource, list -> {
@@ -73,7 +79,8 @@ public class CalendarRepository {
             latestEvents = list != null ? list : Collections.emptyList();
             convertSources();
         });
-        calendarItems.addSource(studysessionSource, list -> {
+        calendarItems.addSource(
+                studySessionSource, list -> {
             Log.d("CalRepo", "Study emitted: " + (list != null ? list.size() : "null"));
             latestStudySessions = list != null ? list : Collections.emptyList();
             convertSources();
@@ -82,36 +89,30 @@ public class CalendarRepository {
 
     /// Converts each type to a calendar occurance
     public void convertSources() {
-        List<CalendarOccurrence> all = new ArrayList<>();
-
-        // Convert all assessments
-        for (AssessmentEntity a: latestAssessments) {
-            all.add(CalendarOccurrence.from(a));
-        }
-
-        // Convert all events
-        for (EventEntity e: latestEvents) {
-            all.add(CalendarOccurrence.from(e));
-        }
-
-        // Convert all study sessions
-        for (StudySessionEntity s: latestStudySessions) {
-            all.add(CalendarOccurrence.from(s));
-        }
-
-        // Sort all occurrences
-        all.sort(Comparator.comparing(CalendarOccurrence::getStartDateTime));
-
-        // Add to calendar items
-        calendarItems.setValue(all);
+        if (mergeRunnable != null) mergeHandler.removeCallbacks(mergeRunnable);
+        mergeRunnable = () -> {
+            List<CalendarOccurrence> all = new ArrayList<>();
+            // Convert all assessments
+            for (AssessmentEntity a : latestAssessments) {
+                all.add(CalendarOccurrence.from(a));
+            }
+            // Convert all events
+            for (EventEntity e : latestEvents) {
+                all.add(CalendarOccurrence.from(e));
+            }
+            // Convert all study sessions
+            for (StudySessionEntity s : latestStudySessions) {
+                all.add(CalendarOccurrence.from(s));
+            }
+            // Sort all occurrences
+            all.sort(Comparator.comparing(CalendarOccurrence::getStartDateTime));
+            // Add to calendar items
+            calendarItems.setValue(all);
+        };
+        mergeHandler.postDelayed(mergeRunnable, 50);
     }
 
     /// Returns all occurrences for the calendar
     /// @return All calendar items
     public LiveData<List<CalendarOccurrence>> getOccurrences() { return calendarItems; }
-
-
-
-
-
 }

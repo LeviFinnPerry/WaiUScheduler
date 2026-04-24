@@ -34,15 +34,14 @@ public class CalendarViewModel extends AndroidViewModel {
     public CalendarViewModel(@NonNull Application application) {
         super(application);
         calendarRepository = new CalendarRepository(application);
+        Calendar initial = Calendar.getInstance();
         currentDate.setValue(Calendar.getInstance());
         viewMode.setValue(MODE_MONTH);
         filters.setValue(new HashSet<>(Arrays.asList(
                 CalendarOccurrence.TYPE_ASSESSMENT,
                 CalendarOccurrence.TYPE_EVENT,
                 CalendarOccurrence.TYPE_STUDY)));
-
         reloadRange();
-
     }
 
     // Navigation
@@ -179,5 +178,9 @@ public class CalendarViewModel extends AndroidViewModel {
     /// @return List of all calendar items in view
     public LiveData<List<CalendarOccurrence>> getOccurrences() {
         return calendarRepository.getOccurrences();
+    }
+
+    public void initialLoad() {
+        reloadRange();
     }
 }
