@@ -1,4 +1,4 @@
-package com.example.waiuscheduler.ui.calendar;
+package com.example.waiuscheduler.ui.calendar.extension;
 
 import android.app.Application;
 import android.os.Handler;

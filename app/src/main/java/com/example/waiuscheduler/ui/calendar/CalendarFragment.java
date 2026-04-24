@@ -15,6 +15,9 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.waiuscheduler.database.AppDatabase;
 import com.example.waiuscheduler.databinding.FragmentCalendarBinding;
+import com.example.waiuscheduler.ui.calendar.extension.CalendarAdapter;
+import com.example.waiuscheduler.ui.calendar.extension.CalendarEventDetail;
+import com.example.waiuscheduler.ui.calendar.extension.CalendarOccurrence;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;

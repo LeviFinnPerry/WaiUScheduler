@@ -1,4 +1,4 @@
-package com.example.waiuscheduler.ui.calendar;
+package com.example.waiuscheduler.ui.calendar.extension;
 
 import java.util.Date;
 import java.util.List;

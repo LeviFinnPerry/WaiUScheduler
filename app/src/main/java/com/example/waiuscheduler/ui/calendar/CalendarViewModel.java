@@ -7,6 +7,9 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.waiuscheduler.ui.calendar.extension.CalendarOccurrence;
+import com.example.waiuscheduler.ui.calendar.extension.CalendarRepository;
+
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;

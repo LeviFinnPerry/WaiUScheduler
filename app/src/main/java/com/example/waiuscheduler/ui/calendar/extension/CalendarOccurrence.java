@@ -1,4 +1,4 @@
-package com.example.waiuscheduler.ui.calendar;
+package com.example.waiuscheduler.ui.calendar.extension;
 
 import com.example.waiuscheduler.database.tables.AssessmentEntity;
 import com.example.waiuscheduler.database.tables.EventEntity;

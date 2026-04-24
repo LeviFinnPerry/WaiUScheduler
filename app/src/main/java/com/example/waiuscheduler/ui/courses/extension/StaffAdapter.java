@@ -1,4 +1,4 @@
-package com.example.waiuscheduler.ui.courses;
+package com.example.waiuscheduler.ui.courses.extension;
 
 import android.annotation.SuppressLint;
 import android.view.LayoutInflater;

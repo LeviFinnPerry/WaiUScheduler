@@ -1,4 +1,4 @@
-package com.example.waiuscheduler.ui.calendar;
+package com.example.waiuscheduler.ui.calendar.extension;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -15,6 +15,7 @@ import com.example.waiuscheduler.R;
 import com.example.waiuscheduler.database.tables.AssessmentEntity;
 import com.example.waiuscheduler.database.tables.EventEntity;
 import com.example.waiuscheduler.database.tables.StudySessionEntity;
+import com.example.waiuscheduler.ui.calendar.CalendarViewModel;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.textfield.TextInputEditText;
 

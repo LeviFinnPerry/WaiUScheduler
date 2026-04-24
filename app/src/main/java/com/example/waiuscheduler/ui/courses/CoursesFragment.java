@@ -17,6 +17,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.waiuscheduler.R;
 import com.example.waiuscheduler.database.tables.StaffEntity;
 import com.example.waiuscheduler.databinding.FragmentCoursesBinding;
+import com.example.waiuscheduler.ui.courses.extension.PaperAdapter;
+import com.example.waiuscheduler.ui.courses.extension.StaffAdapter;
 
 import java.util.ArrayList;
 
