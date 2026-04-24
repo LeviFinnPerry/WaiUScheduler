@@ -77,9 +77,9 @@ public class CalendarAdapter extends BaseAdapter {
 
         TextView dayNumber = convertView.findViewById(R.id.text_day_number);
         TextView textOverflow = convertView.findViewById(R.id.text_overflow);
-        View chip1 = convertView.findViewById(R.id.chip_event_1);
-        View chip2 = convertView.findViewById(R.id.chip_event_2);
-        View chip3 = convertView.findViewById(R.id.chip_event_3);
+        TextView chip1 = convertView.findViewById(R.id.chip_event_1);
+        TextView chip2 = convertView.findViewById(R.id.chip_event_2);
+        TextView chip3 = convertView.findViewById(R.id.chip_event_3);
 
         Date date = days.get(position);
 
@@ -118,7 +118,7 @@ public class CalendarAdapter extends BaseAdapter {
         }
 
         // Draw up to 3 colour chips
-        View[] chips = { chip1, chip2, chip3 };
+        TextView[] chips = { chip1, chip2, chip3 };
         for (int i = 0; i < chips.length; i++ ) {
             if (i < dayEvents.size()) {
                 chips[i].setVisibility(View.VISIBLE);
