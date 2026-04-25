@@ -38,7 +38,7 @@ public class CalendarViewModel extends AndroidViewModel {
         super(application);
         calendarRepository = new CalendarRepository(application);
         Calendar initial = Calendar.getInstance();
-        currentDate.setValue(Calendar.getInstance());
+        currentDate.setValue(initial);
         viewMode.setValue(MODE_MONTH);
         filters.setValue(new HashSet<>(Arrays.asList(
                 CalendarOccurrence.TYPE_ASSESSMENT,
@@ -49,6 +49,8 @@ public class CalendarViewModel extends AndroidViewModel {
 
     // Navigation
 
+    /// Shifts current date by a given amount
+    /// @param delta Amount to change date by
     private void shiftDate(int delta) {
         Calendar c = currentDate.getValue();
         if (c == null) return;  // Return if no date
@@ -74,6 +76,7 @@ public class CalendarViewModel extends AndroidViewModel {
     // View mode
 
     /// Set the view mode
+    /// @param mode View mode
     public void setViewMode(String mode) {
         viewMode.setValue(mode);
         reloadRange();
@@ -171,18 +174,13 @@ public class CalendarViewModel extends AndroidViewModel {
         return filters;
     }
 
-    /// Get calendar repository instance
-    /// @return calendar repository
-    public CalendarRepository getCalendarRepository() {
-        return calendarRepository;
-    }
-
     /// Get all occurrences from the repository
     /// @return List of all calendar items in view
     public LiveData<List<CalendarOccurrence>> getOccurrences() {
         return calendarRepository.getOccurrences();
     }
 
+    /// Runs an initial loading of calendar view
     public void initialLoad() {
         reloadRange();
     }

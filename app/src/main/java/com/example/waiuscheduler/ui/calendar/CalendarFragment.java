@@ -58,6 +58,9 @@ public class CalendarFragment extends Fragment {
 
     }
 
+    /// Sets the calendar view, calendar layout, initialises buttons and listeners
+    /// @param view Calendar view
+    /// @param savedInstanceState Bundle
     @Override
     public void onViewCreated(@NonNull View view,
                               @Nullable Bundle savedInstanceState) {
@@ -92,12 +95,15 @@ public class CalendarFragment extends Fragment {
         binding = null;
     }
 
+    /// Sets up the date navigation buttons
     private void setupNavButtons() {
         binding.buttonPrev.setOnClickListener(v -> viewModel.goToPrevious());
         binding.buttonNext.setOnClickListener(v -> viewModel.goToNext());
         binding.buttonToday.setOnClickListener(v -> viewModel.goToToday());
     }
 
+
+    /// Sets up the different types of calendar views
     private void setupViewToggle() {
         binding.radioDay.setOnClickListener(v ->
                 viewModel.setViewMode(CalendarViewModel.MODE_DAY));
@@ -108,6 +114,7 @@ public class CalendarFragment extends Fragment {
 
     }
 
+    /// Sets up filter buttons for different types of calendar occurrences
     private void setupFilterButtons() {
         binding.buttonFilterStudy.setOnClickListener(v -> {
             viewModel.toggleFilter(CalendarOccurrence.TYPE_STUDY);
@@ -123,6 +130,7 @@ public class CalendarFragment extends Fragment {
         });
     }
 
+    /// Refreshes all filter buttons to visible
     private void refreshFilterButtons() {
         binding.buttonFilterStudy.setAlpha(
                 viewModel.isFilterActive(CalendarOccurrence.TYPE_STUDY) ? 1f : 0.4f);
@@ -133,6 +141,7 @@ public class CalendarFragment extends Fragment {
 
     }
 
+    /// Sets up the click listener for calendar days
     private void setupAdapterClickListener() {
         adapter.setOnDayClickListener((date, eventsOnDay) -> {
             if (eventsOnDay.isEmpty()) return; // no events
@@ -146,12 +155,16 @@ public class CalendarFragment extends Fragment {
         });
     }
 
+    /// Opens the detail dialog about a calendar occurrence
+    /// @param occ Calendar occurrence
     private void openDetailDialog(CalendarOccurrence occ) {
-        CalendarEventDetail.newInstance(occ, viewModel)
+        CalendarEventDetail.newInstance(occ)
                 .show(getChildFragmentManager(), "event_detail");
 
     }
 
+    /// Shows the event picker to the user to select an event
+    /// @param events List of all calendar occurrences
     private void showEventPickerDialog(List<CalendarOccurrence> events) {
         String[] titles = events.stream()
                 .map(o -> o.getType() + ": " + o.getTitle())
@@ -162,6 +175,7 @@ public class CalendarFragment extends Fragment {
                 .show();
     }
 
+    /// Watches the view model for any changes by user
     private void observeViewModel() {
         viewModel.getCurrentDate().observe(getViewLifecycleOwner(), date -> {
             updateHeaderLabel(date);
@@ -185,6 +199,8 @@ public class CalendarFragment extends Fragment {
         );
     }
 
+    /// Updates the header label in the calendar view
+    /// @param date Date to update label for
     private void updateHeaderLabel(Calendar date) {
         String mode = viewModel.getViewMode().getValue();
         String format;
@@ -196,6 +212,8 @@ public class CalendarFragment extends Fragment {
 
     }
 
+    /// Refreshes entire grid on navigation on calendar
+    /// @param events Events for calendar grid
     private void refreshGrid(List<CalendarOccurrence> events) {
         Set<String> filters = viewModel.getFilters().getValue();
 
@@ -204,6 +222,9 @@ public class CalendarFragment extends Fragment {
         refreshHandler.postDelayed(refreshRunnable, 50);
     }
 
+    /// Performs the refresh from the handler
+    /// @param events Events for calendar grid
+    /// @param filters Selected filters on view
     private void performRefresh(List<CalendarOccurrence> events, Set<String> filters) {
         String mode = viewModel.getViewMode().getValue();
         Calendar current = viewModel.getCurrentDate().getValue();
@@ -257,6 +278,9 @@ public class CalendarFragment extends Fragment {
         });
     }
 
+    /// Builds a calendar month view
+    /// @param c First day for calendar view
+    /// @return Days in the view
     private List<Date> buildMonthDays(Calendar c) {
         List<Date> days = new ArrayList<>();
         Calendar first = (Calendar) c.clone();
@@ -275,6 +299,9 @@ public class CalendarFragment extends Fragment {
         return days;
     }
 
+    /// Builds a calendar week view
+    /// @param c First day for calendar view
+    /// @return Days in the view
     private List<Date> buildWeekDays(Calendar c) {
         List<Date> days = new ArrayList<>();
         Calendar sunday = (Calendar) c.clone();
@@ -286,6 +313,9 @@ public class CalendarFragment extends Fragment {
         return days;
     }
 
+    /// Builds a calendar day view
+    /// @param c Day for calendar view
+    /// @return Day in the view
     private List<Date> buildDay(Calendar c) {
         return Collections.singletonList(c.getTime());
     }

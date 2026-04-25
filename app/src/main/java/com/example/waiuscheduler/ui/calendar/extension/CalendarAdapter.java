@@ -1,5 +1,6 @@
 package com.example.waiuscheduler.ui.calendar.extension;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
@@ -68,6 +69,7 @@ public class CalendarAdapter extends BaseAdapter {
     /// @param position location of the calendar
     /// @param convertView calendar view
     /// @param parent parent of calendar view
+    @SuppressLint("SetTextI18n")
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         if ( convertView == null) {     // If view not initialised

@@ -27,6 +27,10 @@ public class DayTimelineView {
     private final RelativeLayout container;
     private final OnEventClickListener listener;
 
+    /// Day Timeline View Constructor
+    /// @param context Application context
+    /// @param container Relative layout container
+    /// @param listener On event click listener
     public DayTimelineView(Context context, RelativeLayout container, OnEventClickListener listener) {
         this.context = context;
         this.container = container;
@@ -165,12 +169,19 @@ public class DayTimelineView {
         }
     }
 
+    /// Formats hour into string format
+    /// @param hour Hour of day
+    /// @return Time formatted string
     private String formatHour(int hour) {
         if (hour == 12) return "12 PM";
         if (hour > 12) return (hour - 12) + " PM";
         return hour + " AM";
     }
 
+    /// Determines if two calendar objects are set to the same day
+    /// @param a First calendar object
+    /// @param b Second calendar object
+    /// @return True if days are same, else false
     private boolean isSameDay(Calendar a, Calendar b) {
         return a.get(Calendar.YEAR) == b.get(Calendar.YEAR) &&
                 a.get(Calendar.DAY_OF_YEAR) == b.get(Calendar.DAY_OF_YEAR);

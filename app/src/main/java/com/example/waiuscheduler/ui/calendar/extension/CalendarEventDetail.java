@@ -15,7 +15,6 @@ import com.example.waiuscheduler.R;
 import com.example.waiuscheduler.database.tables.AssessmentEntity;
 import com.example.waiuscheduler.database.tables.EventEntity;
 import com.example.waiuscheduler.database.tables.StudySessionEntity;
-import com.example.waiuscheduler.ui.calendar.CalendarViewModel;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.textfield.TextInputEditText;
 
@@ -25,15 +24,21 @@ import java.util.Locale;
 public class CalendarEventDetail extends BottomSheetDialogFragment {
 
     private CalendarOccurrence occurrence;
-    private CalendarViewModel viewModel;
 
-    public static CalendarEventDetail newInstance(CalendarOccurrence occ, CalendarViewModel vm) {
+    /// Static factor for calendar event detail instances
+    /// @param occ Calendar occurrence
+    /// @return details for the occurrence
+    public static CalendarEventDetail newInstance(CalendarOccurrence occ) {
         CalendarEventDetail detail = new CalendarEventDetail();
         detail.occurrence = occ;
-        detail.viewModel = vm;
         return detail;
     }
 
+    /// Create view for calendar event detail
+    /// @param inflater Layout inflater
+    /// @param container View Group
+    /// @param savedInstanceState Bundle
+    /// @return Inflated view model
     @Nullable @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
@@ -41,6 +46,9 @@ public class CalendarEventDetail extends BottomSheetDialogFragment {
         return inflater.inflate(R.layout.calendar_event_detail, container, false);
     }
 
+    /// Handling once view is created with headers, times, and event types
+    /// @param view Calendar view
+    /// @param savedInstanceState Bundle
     @Override
     public void onViewCreated(@NonNull View view,
                               @Nullable Bundle savedInstanceState ) {
@@ -79,7 +87,8 @@ public class CalendarEventDetail extends BottomSheetDialogFragment {
         view.findViewById(R.id.button_close_dialog).setOnClickListener(v -> dismiss());
     }
 
-    // Assessment
+    /// Sets up assessments within the calendar
+    /// @param view Calendar view
     private void setupAssessmentSection(View view) {
         view.findViewById(R.id.section_assessment).setVisibility(View.VISIBLE);
         AssessmentEntity assessment = (AssessmentEntity) occurrence.getSourceEntity();
@@ -106,7 +115,8 @@ public class CalendarEventDetail extends BottomSheetDialogFragment {
         });
     }
 
-    // Event attendance
+    /// Sets up the events within the calendar
+    /// @param view Calendar view
     private void setupEventSection(View view) {
         view.findViewById(R.id.section_event).setVisibility(View.VISIBLE);
         EventEntity event = (EventEntity) occurrence.getSourceEntity();
@@ -129,6 +139,8 @@ public class CalendarEventDetail extends BottomSheetDialogFragment {
         });
     }
 
+    /// Sets up the study sessions within the calendar
+    /// @param view Calendar view
     private void setupStudySection(View view) {
         view.findViewById(R.id.section_study).setVisibility(View.VISIBLE);
         StudySessionEntity studySession = (StudySessionEntity) occurrence.getSourceEntity();
@@ -145,11 +157,4 @@ public class CalendarEventDetail extends BottomSheetDialogFragment {
 
     }
 
-    public CalendarViewModel getViewModel() {
-        return viewModel;
-    }
-
-    public void setViewModel(CalendarViewModel viewModel) {
-        this.viewModel = viewModel;
-    }
 }

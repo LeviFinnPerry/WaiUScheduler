@@ -22,6 +22,11 @@ public class CalendarOccurrence {
     private final Object sourceEntity;  // For dialog actions
 
     /// Converts different events into a uniform calendar object
+    /// @param type Type of calendar occurrence
+    /// @param title Name of occurrence
+    /// @param start Start date and time for the occurrence
+    /// @param end End date and time for the occurrence
+    /// @param src Source of the occurrence
     private CalendarOccurrence(String type, String title, Date start, Date end, Object src) {
         this.type = type;
         this.title = title;
@@ -71,9 +76,9 @@ public class CalendarOccurrence {
         );
     }
 
-    /// Determines title for the types of events
+    /// Determines colour for the types of events
     /// @param type type of event
-    /// @return title
+    /// @return colour code
     private static int findColour(String type) {
         // TODO: Include different assessment types and event types
         switch (type) {
