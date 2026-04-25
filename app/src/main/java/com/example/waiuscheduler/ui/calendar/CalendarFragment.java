@@ -6,6 +6,7 @@ import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,21 +19,25 @@ import com.example.waiuscheduler.databinding.FragmentCalendarBinding;
 import com.example.waiuscheduler.ui.calendar.extension.CalendarAdapter;
 import com.example.waiuscheduler.ui.calendar.extension.CalendarEventDetail;
 import com.example.waiuscheduler.ui.calendar.extension.CalendarOccurrence;
+import com.example.waiuscheduler.ui.calendar.extension.DayTimelineView;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
 public class CalendarFragment extends Fragment {
-
+    // TODO: Make the week view easier to read
+    // TODO: Make the day view fit the page
     private FragmentCalendarBinding binding;
     private CalendarViewModel viewModel;
     private CalendarAdapter adapter;
+    private DayTimelineView dayTimelineView;
 
     private final Handler refreshHandler = new Handler(Looper.getMainLooper());
     private Runnable refreshRunnable;
@@ -58,8 +63,18 @@ public class CalendarFragment extends Fragment {
                               @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         viewModel = new ViewModelProvider(this).get(CalendarViewModel.class);
+
+        // Grid adapter
         adapter = new CalendarAdapter(requireContext());
         binding.gridViewCalendar.setAdapter(adapter);
+
+        // Day timeline
+        RelativeLayout timelineContainer = binding.timelineContainer;
+        this.dayTimelineView = new DayTimelineView(
+                requireContext(),
+                timelineContainer,
+                this::openDetailDialog
+        );
 
         // Set up methods
         setupNavButtons();
@@ -164,8 +179,10 @@ public class CalendarFragment extends Fragment {
         });
 
 
-        viewModel.getOccurrences().observe(getViewLifecycleOwner(), (Observer<List<CalendarOccurrence>>) this::refreshGrid);
-        viewModel.getFilters().observe(getViewLifecycleOwner(), (Observer<Set<String>>)  f -> refreshGrid(viewModel.getOccurrences().getValue()));
+        viewModel.getOccurrences().observe(getViewLifecycleOwner(), this::refreshGrid);
+        viewModel.getFilters().observe(getViewLifecycleOwner(),
+                f -> refreshGrid(viewModel.getOccurrences().getValue())
+        );
     }
 
     private void updateHeaderLabel(Calendar date) {
@@ -191,6 +208,33 @@ public class CalendarFragment extends Fragment {
         String mode = viewModel.getViewMode().getValue();
         Calendar current = viewModel.getCurrentDate().getValue();
         if (current == null || mode == null) return;
+
+        // Safe defaults
+        List<CalendarOccurrence> safeEvents = events != null ? events : new ArrayList<>();
+        Set<String> safeFilters = filters != null ? filters : new HashSet<>();
+
+        // Handling of timeline for days
+        if (CalendarViewModel.MODE_DAY.equals(mode)) {
+            // Day view
+            binding.scrollDayTimeline.setVisibility(View.VISIBLE);
+            binding.calendarGrid.setVisibility(View.GONE);
+            binding.dayLabels.setVisibility(View.GONE);
+
+            // Apply filters
+            List<CalendarOccurrence> filtered = new ArrayList<>();
+            for (CalendarOccurrence occ: safeEvents) {
+                if (safeFilters.contains(occ.getType())) filtered.add(occ);
+            }
+
+            dayTimelineView.build(current.getTime(), filtered);
+        } else {
+            binding.scrollDayTimeline.setVisibility(View.GONE);
+            binding.calendarGrid.setVisibility(View.VISIBLE);
+            binding.dayLabels.setVisibility(View.VISIBLE);
+
+            // Set column count
+            binding.gridViewCalendar.setNumColumns(7);
+        }
 
         // Run on background thread
         Calendar currentCopy = (Calendar) current.clone();

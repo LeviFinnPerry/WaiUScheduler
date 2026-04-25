@@ -54,5 +54,16 @@
     <string name="filter_study">Study Sessions</string>
     <string name="filter_lecture">Lectures</string>
     <string name="filter_assignment">Assignments</string>
+    <string name="save_grade">Save Grade</string>
+    <string name="attendance">Attendance</string>
+    <string name="attended">Attended</string>
+    <string name="missed">Missed</string>
+    <string name="save_attendance">Save Attendance</string>
+    <string name="view_session">View Session</string>
+    <string name="delete">Delete</string>
+    <string name="close">Close</string>
+    <string name="grade">Grade</string>
+    <string name="e_g_85">e.g. 85</string>
+    <string name="_100">/ 100</string>
 
 </resources>
