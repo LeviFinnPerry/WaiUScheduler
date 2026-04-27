@@ -19,7 +19,8 @@ import com.example.waiuscheduler.databinding.FragmentCalendarBinding;
 import com.example.waiuscheduler.ui.calendar.extension.CalendarAdapter;
 import com.example.waiuscheduler.ui.calendar.extension.CalendarEventDetail;
 import com.example.waiuscheduler.ui.calendar.extension.CalendarOccurrence;
-import com.example.waiuscheduler.ui.calendar.extension.DayTimelineView;
+import com.example.waiuscheduler.ui.calendar.extension.timeline.DayTimelineView;
+import com.example.waiuscheduler.ui.calendar.extension.timeline.WeekTimelineView;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -35,6 +36,7 @@ public class CalendarFragment extends Fragment {
     private CalendarViewModel viewModel;
     private CalendarAdapter adapter;
     private DayTimelineView dayTimelineView;
+    private WeekTimelineView weekTimelineView;
 
     private final Handler refreshHandler = new Handler(Looper.getMainLooper());
     private Runnable refreshRunnable;
@@ -68,10 +70,18 @@ public class CalendarFragment extends Fragment {
         binding.gridViewCalendar.setAdapter(adapter);
 
         // Day timeline
-        RelativeLayout timelineContainer = binding.timelineContainer;
+        RelativeLayout timelineContainer = binding.dayTimelineContainer;
         dayTimelineView = new DayTimelineView(
                 requireContext(),
                 timelineContainer,
+                this::openDetailDialog
+        );
+
+        // Day timeline
+        RelativeLayout weekContainer = binding.weekTimelineContainer;
+        weekTimelineView = new WeekTimelineView(
+                requireContext(),
+                weekContainer,
                 this::openDetailDialog
         );
 
@@ -247,12 +257,13 @@ public class CalendarFragment extends Fragment {
         if (CalendarViewModel.MODE_DAY.equals(mode)) {
             // Day view
             binding.scrollDayTimeline.setVisibility(View.VISIBLE);
+            binding.scrollWeekTimeline.setVisibility(View.GONE);
             binding.calendarGrid.setVisibility(View.GONE);
             binding.dayLabels.setVisibility(View.GONE);
 
             // Apply filters
             List<CalendarOccurrence> filtered = new ArrayList<>();
-            for (CalendarOccurrence occ: safeEvents) {
+            for (CalendarOccurrence occ : safeEvents) {
                 if (safeFilters.contains(occ.getType())) filtered.add(occ);
             }
 
@@ -264,12 +275,27 @@ public class CalendarFragment extends Fragment {
                 }
             });
             dayTimelineView.build(current.getTime(), filtered);
+        } else if (CalendarViewModel.MODE_WEEK.equals(mode)) {
+            binding.scrollDayTimeline.setVisibility(View.GONE);
+            binding.scrollWeekTimeline.setVisibility(View.VISIBLE);
+            binding.gridViewCalendar.setVisibility(View.GONE);
+            binding.dayLabels.setVisibility(View.GONE);
+
+            List<CalendarOccurrence> filtered = new ArrayList<>();
+            for (CalendarOccurrence occ: safeEvents) {
+                if (safeFilters.contains(occ.getType())) filtered.add(occ);
+            }
+            final List<CalendarOccurrence> finalFiltered = filtered;
+            final List<Date> weekDays = buildWeekDays(current);
+            binding.scrollWeekTimeline.post(() -> {
+                if (binding == null) return;
+                weekTimelineView.build(weekDays, finalFiltered);
+            });
         } else {
             binding.scrollDayTimeline.setVisibility(View.GONE);
+            binding.scrollWeekTimeline.setVisibility(View.GONE);
             binding.calendarGrid.setVisibility(View.VISIBLE);
             binding.dayLabels.setVisibility(View.VISIBLE);
-
-            boolean isWeek = CalendarViewModel.MODE_WEEK.equals(mode);
 
             // Set column count
             binding.gridViewCalendar.setNumColumns(5);
@@ -277,14 +303,11 @@ public class CalendarFragment extends Fragment {
             // Run on background thread
             Calendar currentCopy = (Calendar) current.clone();
             AppDatabase.databaseWriteExecutor.execute(() -> {
-
-                final List<Date> finalDays = isWeek
-                        ? buildWeekDays(currentCopy)
-                        : buildMonthDays(currentCopy);
+                List<Date> days = buildMonthDays(currentCopy);
                 if (getActivity() == null) return;
                 requireActivity().runOnUiThread(() -> {
                     if (binding == null) return;
-                    adapter.update(finalDays, events, filters);
+                    adapter.update(days, safeEvents, safeFilters);
                 });
             });
         }

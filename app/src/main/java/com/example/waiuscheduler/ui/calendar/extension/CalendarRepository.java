@@ -58,9 +58,6 @@ public class CalendarRepository {
         if (eventSource != null) calendarItems.removeSource(eventSource);
         if (studySessionSource != null) calendarItems.removeSource(studySessionSource);
 
-        long debugStart = Long.MIN_VALUE;
-        long debugEnd = Long.MAX_VALUE;
-
         // Get all sources in the ranges
         assessmentSource = dbController.getAssessmentsBetween(start, end);
         eventSource = dbController.getEventsBetween(start, end);
@@ -119,17 +116,13 @@ public class CalendarRepository {
     /// @param s Study session
     public void deleteStudySession(StudySessionEntity s) {
         if (mergeRunnable != null) mergeHandler.removeCallbacks(mergeRunnable);
-        mergeRunnable = () -> {
-            dbController.deleteStudySession(s);
-        };
+        mergeRunnable = () -> dbController.deleteStudySession(s);
     }
 
     /// Update study session
     /// @param s Study session
     public void updateStudySession(StudySessionEntity s) {
         if (mergeRunnable != null) mergeHandler.removeCallbacks(mergeRunnable);
-        mergeRunnable = () -> {
-            dbController.updateStudySession(s);
-        };
+        mergeRunnable = () -> dbController.updateStudySession(s);
     }
 }
