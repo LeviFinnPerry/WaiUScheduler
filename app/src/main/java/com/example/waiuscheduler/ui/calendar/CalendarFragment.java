@@ -24,7 +24,6 @@ import com.example.waiuscheduler.ui.calendar.extension.DayTimelineView;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -32,8 +31,6 @@ import java.util.Locale;
 import java.util.Set;
 
 public class CalendarFragment extends Fragment {
-    // TODO: Make the week view easier to read
-    // TODO: Make the day view fit the page
     private FragmentCalendarBinding binding;
     private CalendarViewModel viewModel;
     private CalendarAdapter adapter;
@@ -55,7 +52,6 @@ public class CalendarFragment extends Fragment {
     ) {
         binding = FragmentCalendarBinding.inflate(inflater, container, false);
         return binding.getRoot();
-
     }
 
     /// Sets the calendar view, calendar layout, initialises buttons and listeners
@@ -73,13 +69,14 @@ public class CalendarFragment extends Fragment {
 
         // Day timeline
         RelativeLayout timelineContainer = binding.timelineContainer;
-        this.dayTimelineView = new DayTimelineView(
+        dayTimelineView = new DayTimelineView(
                 requireContext(),
                 timelineContainer,
                 this::openDetailDialog
         );
 
         // Set up methods
+        setUpDayLabels();
         setupNavButtons();
         setupViewToggle();
         setupFilterButtons();
@@ -158,7 +155,7 @@ public class CalendarFragment extends Fragment {
     /// Opens the detail dialog about a calendar occurrence
     /// @param occ Calendar occurrence
     private void openDetailDialog(CalendarOccurrence occ) {
-        CalendarEventDetail.newInstance(occ)
+        CalendarEventDetail.newInstance(occ, viewModel)
                 .show(getChildFragmentManager(), "event_detail");
 
     }
@@ -169,9 +166,15 @@ public class CalendarFragment extends Fragment {
         String[] titles = events.stream()
                 .map(o -> o.getType() + ": " + o.getTitle())
                 .toArray(String[]::new);
+
+        final int[] selected = { 0 };
+
         new android.app.AlertDialog.Builder(requireContext())
                 .setTitle("Select event")
-                .setItems(titles, (dlg, which) -> openDetailDialog(events.get(which)))
+                .setSingleChoiceItems(titles, 0, (dialog, which) -> selected[0] = which)
+                .setPositiveButton("Open", (dialog, which) ->
+                        openDetailDialog(events.get(selected[0])))
+                .setNegativeButton("Cancel", null)
                 .show();
     }
 
@@ -181,6 +184,7 @@ public class CalendarFragment extends Fragment {
             updateHeaderLabel(date);
             refreshGrid(viewModel.getOccurrences().getValue());
         });
+
         viewModel.getViewMode().observe(getViewLifecycleOwner(), (Observer<? super String>) mode -> {
             // Sync radio buttons without triggering listeners
             binding.radioDay.setChecked(CalendarViewModel.MODE_DAY.equals(mode));
@@ -189,6 +193,11 @@ public class CalendarFragment extends Fragment {
             // Day labels row — only meaningful for month/week
             binding.dayLabels.setVisibility(
                     CalendarViewModel.MODE_DAY.equals(mode) ? View.GONE : View.VISIBLE);
+
+            // Update header labels on any change
+            Calendar current = viewModel.getCurrentDate().getValue();
+            if (current != null) updateHeaderLabel(current);
+
             refreshGrid(viewModel.getOccurrences().getValue());
         });
 
@@ -247,36 +256,46 @@ public class CalendarFragment extends Fragment {
                 if (safeFilters.contains(occ.getType())) filtered.add(occ);
             }
 
+            final List<CalendarOccurrence> finalFiltered = filtered;
+            final Date finalDate = current.getTime();
+            binding.scrollDayTimeline.post(() -> {
+                if (binding != null) {
+                    dayTimelineView.build(finalDate, finalFiltered);
+                }
+            });
             dayTimelineView.build(current.getTime(), filtered);
         } else {
             binding.scrollDayTimeline.setVisibility(View.GONE);
             binding.calendarGrid.setVisibility(View.VISIBLE);
             binding.dayLabels.setVisibility(View.VISIBLE);
 
+            boolean isWeek = CalendarViewModel.MODE_WEEK.equals(mode);
+
             // Set column count
-            binding.gridViewCalendar.setNumColumns(7);
-        }
+            binding.gridViewCalendar.setNumColumns(5);
 
-        // Run on background thread
-        Calendar currentCopy = (Calendar) current.clone();
-        AppDatabase.databaseWriteExecutor.execute(() -> {
-            List<Date> days;
-            if (CalendarViewModel.MODE_MONTH.equals(mode)) days = buildMonthDays(currentCopy);
-            else if (CalendarViewModel.MODE_WEEK.equals(mode)) days = buildWeekDays(currentCopy);
-            else days = buildDay(currentCopy);
+            // Run on background thread
+            Calendar currentCopy = (Calendar) current.clone();
+            AppDatabase.databaseWriteExecutor.execute(() -> {
 
-            final List<Date> finalDays = days;
-            requireActivity().runOnUiThread(() -> {
-                if (binding == null) return;
-
-                // Adjust GridView column count
-                binding.gridViewCalendar.setNumColumns(
-                        CalendarViewModel.MODE_DAY.equals(mode) ? 1 : 7);
-
-                adapter.update(finalDays, events, filters);
+                final List<Date> finalDays = isWeek
+                        ? buildWeekDays(currentCopy)
+                        : buildMonthDays(currentCopy);
+                if (getActivity() == null) return;
+                requireActivity().runOnUiThread(() -> {
+                    if (binding == null) return;
+                    adapter.update(finalDays, events, filters);
+                });
             });
-        });
+        }
     }
+
+    /// Indefinitely hide weekends
+    private void setUpDayLabels() {
+        binding.dayLabels.getChildAt(0).setVisibility(View.GONE);
+        binding.dayLabels.getChildAt(6).setVisibility(View.GONE);
+    }
+
 
     /// Builds a calendar month view
     /// @param c First day for calendar view
@@ -285,17 +304,31 @@ public class CalendarFragment extends Fragment {
         List<Date> days = new ArrayList<>();
         Calendar first = (Calendar) c.clone();
         first.set(Calendar.DAY_OF_MONTH, 1);
-        int startOffset = first.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY;
+
+        // Offset from monday
+        int dayOfWeek = first.get(Calendar.DAY_OF_WEEK);
+        int startOffset;
+
+        if (dayOfWeek == Calendar.SATURDAY || dayOfWeek == Calendar.SUNDAY) {
+            startOffset = 0;
+        } else {
+            startOffset = dayOfWeek - Calendar.MONDAY;
+        }
+
         // Prepend nulls
         for (int i = 0; i < startOffset; i++) days.add(null);
+
         int max = first.getActualMaximum(Calendar.DAY_OF_MONTH);
         Calendar day = (Calendar) first.clone();
         for (int d = 1; d <= max; d++) {
             day.set(Calendar.DAY_OF_MONTH, d);
-            days.add(day.getTime());
+            int dow = day.get(Calendar.DAY_OF_WEEK);
+            if (dow != Calendar.SATURDAY && dow != Calendar.SUNDAY) {
+                days.add(day.getTime());
+            }
         }
         // Pad to multiple of 7
-        while (days.size() % 7 != 0) days.add(null);
+        while (days.size() % 5 != 0) days.add(null);
         return days;
     }
 
@@ -304,19 +337,18 @@ public class CalendarFragment extends Fragment {
     /// @return Days in the view
     private List<Date> buildWeekDays(Calendar c) {
         List<Date> days = new ArrayList<>();
-        Calendar sunday = (Calendar) c.clone();
-        sunday.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
-        for (int i = 0; i < 7; i++) {
-            days.add(sunday.getTime());
-            sunday.add(Calendar.DAY_OF_MONTH, 1);
+        Calendar monday = (Calendar) c.clone();
+
+        int dow = monday.get(Calendar.DAY_OF_WEEK);
+        // If it is a sunday it is 6 days, otherwise calculation works
+        int daysFromMonday = (dow == Calendar.SUNDAY) ? 6 : dow - Calendar.MONDAY;
+        monday.add(Calendar.DAY_OF_MONTH, -daysFromMonday);
+
+        int dom = monday.get(Calendar.DAY_OF_MONTH);
+        for (int i = 1; i < 6; i++) {
+            days.add(monday.getTime());
+            monday.set(Calendar.DAY_OF_MONTH, dom + i);
         }
         return days;
-    }
-
-    /// Builds a calendar day view
-    /// @param c Day for calendar view
-    /// @return Day in the view
-    private List<Date> buildDay(Calendar c) {
-        return Collections.singletonList(c.getTime());
     }
 }

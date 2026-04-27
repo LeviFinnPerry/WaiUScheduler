@@ -20,12 +20,16 @@ public class DayTimelineView {
     // Constant variables
     private static final int START_HOUR = 8;
     private static final int END_HOUR = 18;
-    private static final int HOUR_HEIGHT_DP = 60;
 
     // Private variables
     private final Context context;
     private final RelativeLayout container;
     private final OnEventClickListener listener;
+
+    // Colours
+    private static final int COLOUR_EVENT = 0xFF007968;
+    private static final int COLOUR_STUDY = 0xFF3946AB;
+    private static final int COLOUR_ASSESSMENT = 0xFFE65100;
 
     /// Day Timeline View Constructor
     /// @param context Application context
@@ -42,8 +46,11 @@ public class DayTimelineView {
         container.removeAllViews();
 
         float density = context.getResources().getDisplayMetrics().density;
-        int hourHeightPx = (int) (HOUR_HEIGHT_DP * density);
         int totalHours = END_HOUR - START_HOUR;
+
+        int screenHeight = context.getResources().getDisplayMetrics().heightPixels;
+        int availableHeight = screenHeight - (int) (200 * density);
+        int hourHeightPx = Math.max(availableHeight / totalHours, (int) (56 * density));
 
         // Draw hour slot background and labels
         for (int h = 0; h < totalHours; h++) {
@@ -54,10 +61,10 @@ public class DayTimelineView {
             label.setText(formatHour(hour));
             label.setTextSize(11);
             label.setTextColor(0xFF757575);
-            label.setPadding(8, 4, 8, 0);
+            label.setPadding((int) (8 * density), (int) (4 * density), (int) (8 * density), 0);
 
             RelativeLayout.LayoutParams labelParams = new RelativeLayout.LayoutParams(
-                    (int) (48 * density), hourHeightPx);
+                    (int) (52 * density), hourHeightPx);
             labelParams.topMargin = h * hourHeightPx;
             container.addView(label, labelParams);
 
@@ -68,7 +75,7 @@ public class DayTimelineView {
             RelativeLayout.LayoutParams divParams = new RelativeLayout.LayoutParams(
                     RelativeLayout.LayoutParams.MATCH_PARENT, (int) (1 * density));
             divParams.topMargin = h * hourHeightPx;
-            divParams.leftMargin = (int) (48 * density);
+            divParams.leftMargin = (int) (52 * density);
             container.addView(divider, divParams);
         }
 
@@ -88,9 +95,8 @@ public class DayTimelineView {
         Calendar now = Calendar.getInstance();
         Calendar selectCal = Calendar.getInstance();
         selectCal.setTime(date);
-        boolean isToday = isSameDay(now, selectCal);
 
-        if (isToday) {
+        if (isSameDay(now, selectCal)) {
             int currentHour = now.get(Calendar.HOUR_OF_DAY);
             int currentMinute = now.get(Calendar.MINUTE);
             if (currentHour >= START_HOUR && currentHour < END_HOUR) {
@@ -104,13 +110,13 @@ public class DayTimelineView {
                 RelativeLayout.LayoutParams timeParams = new RelativeLayout.LayoutParams(
                         RelativeLayout.LayoutParams.MATCH_PARENT, (int) (2 * density));
                 timeParams.topMargin = topPx;
-                timeParams.leftMargin = (int) (48 * density);
+                timeParams.leftMargin = (int) (52 * density);
                 container.addView(timeline, timeParams);
             }
         }
 
         // Draw events
-        if (events == null) return;
+        if (events == null || events.isEmpty()) return;
         SimpleDateFormat timeFmt = new SimpleDateFormat("h:mm a", Locale.getDefault());
 
         for (CalendarOccurrence occ: events) {
@@ -137,20 +143,21 @@ public class DayTimelineView {
             float durationHours = endHour - startHour;
 
             int topPx = (int) (topOffset * hourHeightPx);
-            int heightPx = Math.max((int) (durationHours * hourHeightPx), (int) (28 * density));
+            int heightPx = Math.max((int) (durationHours * hourHeightPx), (int) (32 * density));
 
             // Inflate event chip
+            View chip = LayoutInflater.from(context)
+                    .inflate(R.layout.timeline_event_chip, container, false);
+
             String startTime = timeFmt.format(occ.getStartDateTime().getTime());
             String endTime = timeFmt.format(occ.getEndDateTime().getTime());
             String timeRange = startTime + " - " + endTime;
-            View chip = LayoutInflater.from(context)
-                    .inflate(R.layout.timeline_event_chip, container, false);
             ((TextView) chip.findViewById(R.id.text_timeline_title)).setText(occ.getTitle());
             ((TextView) chip.findViewById(R.id.text_timeline_time)).setText(timeRange);
 
             // Colour the background
             GradientDrawable bg = new GradientDrawable();
-            bg.setColor(occ.getColour());
+            bg.setColor(chipColour(occ.getType()));
             bg.setCornerRadius(6 * density);
             chip.setBackground(bg);
 
@@ -162,7 +169,7 @@ public class DayTimelineView {
             RelativeLayout.LayoutParams chipParams = new RelativeLayout.LayoutParams(
                     RelativeLayout.LayoutParams.MATCH_PARENT, heightPx);
             chipParams.topMargin = topPx;
-            chipParams.leftMargin = (int) (52 * density);
+            chipParams.leftMargin = (int) (56 * density);
             chipParams.rightMargin = (int) (4 * density);
             container.addView(chip, chipParams);
 
@@ -185,5 +192,17 @@ public class DayTimelineView {
     private boolean isSameDay(Calendar a, Calendar b) {
         return a.get(Calendar.YEAR) == b.get(Calendar.YEAR) &&
                 a.get(Calendar.DAY_OF_YEAR) == b.get(Calendar.DAY_OF_YEAR);
+    }
+
+    /// Determines chip colour based on type of occurrence
+    /// @param type Type of occurrence
+    /// @return Colour for occurrence
+    private int chipColour(String type) {
+        switch (type) {
+            case CalendarOccurrence.TYPE_STUDY: return COLOUR_STUDY;
+            case CalendarOccurrence.TYPE_ASSESSMENT: return COLOUR_ASSESSMENT;
+            case CalendarOccurrence.TYPE_EVENT: return COLOUR_EVENT;
+            default: return 0xFF757575;
+        }
     }
 }

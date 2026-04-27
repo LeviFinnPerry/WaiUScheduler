@@ -15,6 +15,7 @@ import com.example.waiuscheduler.R;
 import com.example.waiuscheduler.database.tables.AssessmentEntity;
 import com.example.waiuscheduler.database.tables.EventEntity;
 import com.example.waiuscheduler.database.tables.StudySessionEntity;
+import com.example.waiuscheduler.ui.calendar.CalendarViewModel;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.textfield.TextInputEditText;
 
@@ -24,13 +25,15 @@ import java.util.Locale;
 public class CalendarEventDetail extends BottomSheetDialogFragment {
 
     private CalendarOccurrence occurrence;
+    private CalendarViewModel vm;
 
     /// Static factor for calendar event detail instances
     /// @param occ Calendar occurrence
     /// @return details for the occurrence
-    public static CalendarEventDetail newInstance(CalendarOccurrence occ) {
+    public static CalendarEventDetail newInstance(CalendarOccurrence occ, CalendarViewModel viewModel) {
         CalendarEventDetail detail = new CalendarEventDetail();
         detail.occurrence = occ;
+        detail.vm = viewModel;
         return detail;
     }
 
@@ -55,6 +58,7 @@ public class CalendarEventDetail extends BottomSheetDialogFragment {
         super.onViewCreated(view, savedInstanceState);
         if (occurrence == null) {
             dismiss();
+            return;
         }
 
         // Header
@@ -151,9 +155,18 @@ public class CalendarEventDetail extends BottomSheetDialogFragment {
                 + "End: "     + fmt.format(studySession.getDateTimeEnd());
         ((TextView) view.findViewById(R.id.text_study_details)).setText(details);
 
-        // TODO: Navigate to study session details
+        view.findViewById(R.id.button_view_study).setOnClickListener(v -> {
+            // TODO: Navigate to study session details
+            dismiss();
+        });
 
-        // TODO: Method to delete study sessions
+        view.findViewById(R.id.button_delete_study).setOnClickListener(v -> {
+            if (vm != null) {
+                vm.deleteStudySession(studySession);
+            }
+            Toast.makeText(requireContext(), "Study session deleted", Toast.LENGTH_SHORT).show();
+            dismiss();
+        });
 
     }
 

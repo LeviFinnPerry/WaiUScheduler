@@ -25,10 +25,23 @@ public class DatabaseController {
         this.db = db;
     }
 
+    /// Function to save to study session table
+    /// @param studySession Study session to add
     public void saveStudySession(StudySessionEntity studySession) {
         db.studySessionDao().insert(studySession);
     }
 
+    /// Function to remove to study session table
+    /// @param studySession Study session to delete
+    public void deleteStudySession(StudySessionEntity studySession) {
+        db.studySessionDao().delete(studySession);
+    }
+
+    /// Function to update to study session table
+    /// @param studySession Study session to update
+    public void updateStudySession(StudySessionEntity studySession) {
+        db.studySessionDao().update(studySession);
+    }
 
     /// Function to save to paper table
     /// @param paperOutline Paper details from the outline

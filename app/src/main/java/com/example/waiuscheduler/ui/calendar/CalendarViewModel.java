@@ -7,6 +7,7 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.waiuscheduler.database.tables.StudySessionEntity;
 import com.example.waiuscheduler.ui.calendar.extension.CalendarOccurrence;
 import com.example.waiuscheduler.ui.calendar.extension.CalendarRepository;
 
@@ -183,5 +184,17 @@ public class CalendarViewModel extends AndroidViewModel {
     /// Runs an initial loading of calendar view
     public void initialLoad() {
         reloadRange();
+    }
+
+    /// Deletes the study session
+    /// @param s Study session
+    public void deleteStudySession(StudySessionEntity s) {
+        calendarRepository.deleteStudySession(s);
+    }
+
+    /// Updates the study session
+    /// @param s study session
+    public void updateStudySession(StudySessionEntity s) {
+        calendarRepository.updateStudySession(s);
     }
 }

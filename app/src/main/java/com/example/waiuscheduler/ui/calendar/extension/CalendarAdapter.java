@@ -3,6 +3,7 @@ package com.example.waiuscheduler.ui.calendar.extension;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Typeface;
+import android.graphics.drawable.GradientDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +27,11 @@ public class CalendarAdapter extends BaseAdapter {
     private Set<String> filters  = new HashSet<>();
     private OnDayClickListener listener;
     private final Calendar today = Calendar.getInstance();
+
+    // Colours
+    private static final int COLOUR_EVENT = 0xFF007968;
+    private static final int COLOUR_STUDY = 0xFF3946AB;
+    private static final int COLOUR_ASSESSMENT = 0xFFE65100;
 
     /// Constructor for calendar adapter
     /// @param context Application context
@@ -121,10 +127,20 @@ public class CalendarAdapter extends BaseAdapter {
 
         // Draw up to 3 colour chips
         TextView[] chips = { chip1, chip2, chip3 };
+        float density = context.getResources().getDisplayMetrics().density;
+
         for (int i = 0; i < chips.length; i++ ) {
             if (i < dayEvents.size()) {
+                CalendarOccurrence occ = dayEvents.get(i);
                 chips[i].setVisibility(View.VISIBLE);
-                chips[i].setBackgroundColor(dayEvents.get(i).getColour());
+                chips[i].setText(occ.getTitle());
+                chips[i].setTextColor(0xFFFFFFFF);
+
+                // Rounded coloured background
+                GradientDrawable bg = new GradientDrawable();
+                bg.setColor(chipColour(occ.getType()));
+                bg.setCornerRadius(3 * density);
+                chips[i].setBackground(bg);
             } else {
                 chips[i].setVisibility(View.GONE);
             }
@@ -155,8 +171,21 @@ public class CalendarAdapter extends BaseAdapter {
     /// Method to determine if two days are the same
     /// @param a First day
     /// @param b Second day
+    /// @return If the day is the same
     private static boolean isSameDay(Calendar a, Calendar b) {
         return a.get(Calendar.YEAR) == b.get(Calendar.YEAR) &&
                 a.get(Calendar.DAY_OF_YEAR) == b.get(Calendar.DAY_OF_YEAR);
+    }
+
+    /// Determines chip colour based on type of occurrence
+    /// @param type Type of occurrence
+    /// @return Colour for occurrence
+    private int chipColour(String type) {
+        switch (type) {
+            case CalendarOccurrence.TYPE_STUDY: return COLOUR_STUDY;
+            case CalendarOccurrence.TYPE_ASSESSMENT: return COLOUR_ASSESSMENT;
+            case CalendarOccurrence.TYPE_EVENT: return COLOUR_EVENT;
+            default: return 0xFF757575;
+        }
     }
 }

@@ -222,8 +222,7 @@
         <RelativeLayout
             android:id="@+id/timeline_container"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="600dp" />
+            android:layout_height="wrap_content"/>
 
     </ScrollView>
 
