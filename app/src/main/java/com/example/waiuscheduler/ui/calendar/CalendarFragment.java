@@ -36,6 +36,7 @@ public class CalendarFragment extends Fragment {
     private CalendarAdapter adapter;
     private DayTimelineView dayTimelineView;
     private WeekTimelineView weekTimelineView;
+    private String lastBuiltMode = null;
 
     private final Handler refreshHandler = new Handler(Looper.getMainLooper());
     private Runnable refreshRunnable;
@@ -261,6 +262,8 @@ public class CalendarFragment extends Fragment {
         } else {
             buildMonth(current, safeEvents, safeFilters);
         }
+
+        lastBuiltMode = mode;
     }
 
     /// Hides all calendar views
@@ -288,12 +291,17 @@ public class CalendarFragment extends Fragment {
         // Set to calendar
         final List<CalendarOccurrence> finalFiltered = filtered;
         final Date finalDate = current.getTime();
-        binding.scrollDayTimeline.post(() -> {
-            if (binding != null) {
-                dayTimelineView.build(finalDate, finalFiltered);
-            }
-        });
-        dayTimelineView.build(current.getTime(), filtered);
+
+        if (!CalendarViewModel.MODE_DAY.equals(lastBuiltMode)) {
+            dayTimelineView.reset();
+            binding.scrollDayTimeline.post(() -> {
+                if (binding != null) {
+                    dayTimelineView.build(finalDate, finalFiltered);
+                }
+            });
+        } else {
+            dayTimelineView.build(current.getTime(), filtered);
+        }
     }
 
     /// Adds all calendar occurrences to the calendar week
@@ -313,10 +321,16 @@ public class CalendarFragment extends Fragment {
         // Set to calendar
         final List<CalendarOccurrence> finalFiltered = filtered;
         final List<Date> weekDays = buildWeekDays(current);
-        binding.scrollWeekTimeline.post(() -> {
-            if (binding == null) return;
+
+        if (!CalendarViewModel.MODE_WEEK.equals(lastBuiltMode)) {
+            weekTimelineView.reset();
+            binding.scrollWeekTimeline.post(() -> {
+                if (binding == null) return;
+                weekTimelineView.build(weekDays, finalFiltered);
+            });
+        } else {
             weekTimelineView.build(weekDays, finalFiltered);
-        });
+        }
     }
 
     /// Adds all calendar occurrences to the calendar month

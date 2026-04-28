@@ -27,6 +27,7 @@ public abstract class TimeLineView {
     protected final Context context;
     protected final RelativeLayout container;
     protected final OnEventClickListener listener;
+    protected int cachedHourHeightPx = 0;
 
     // Colours
     protected static final int COLOUR_EVENT = 0xFF007968;
@@ -54,17 +55,25 @@ public abstract class TimeLineView {
     protected int hourHeightPx() {
         float density = context.getResources().getDisplayMetrics().density;
         int totalHours = END_HOUR - START_HOUR;
-        int measured = container.getHeight();
 
+        if (cachedHourHeightPx > 0) return cachedHourHeightPx;
+
+        int measured = container.getHeight();
         if (measured > 0) {
-            return measured / totalHours;
+            cachedHourHeightPx = measured / totalHours;
+            return cachedHourHeightPx;
         }
+
         // Calculate from screen height
         int screenHeight = context.getResources().getDisplayMetrics().heightPixels;
         int available = (screenHeight - (int) (220 * density));
         return Math.max(available / totalHours, (int) (48 * density));
     }
 
+    /// Clears the cached heights
+    public void reset() {
+        cachedHourHeightPx = 0;
+    }
 
     /// Draws a divider between each hour
     protected void drawDivider(int topPx, int leftMarginPx) {
