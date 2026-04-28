@@ -77,7 +77,7 @@ public class CalendarFragment extends Fragment {
                 this::openDetailDialog
         );
 
-        // Day timeline
+        // Week timeline
         RelativeLayout weekContainer = binding.weekTimelineContainer;
         weekTimelineView = new WeekTimelineView(
                 requireContext(),
@@ -200,7 +200,7 @@ public class CalendarFragment extends Fragment {
             binding.radioDay.setChecked(CalendarViewModel.MODE_DAY.equals(mode));
             binding.radioWeek.setChecked(CalendarViewModel.MODE_WEEK.equals(mode));
             binding.radioMonth.setChecked(CalendarViewModel.MODE_MONTH.equals(mode));
-            // Day labels row — only meaningful for month/week
+            // Day labels row
             binding.dayLabels.setVisibility(
                     CalendarViewModel.MODE_DAY.equals(mode) ? View.GONE : View.VISIBLE);
 
@@ -255,62 +255,91 @@ public class CalendarFragment extends Fragment {
 
         // Handling of timeline for days
         if (CalendarViewModel.MODE_DAY.equals(mode)) {
-            // Day view
-            binding.scrollDayTimeline.setVisibility(View.VISIBLE);
-            binding.scrollWeekTimeline.setVisibility(View.GONE);
-            binding.calendarGrid.setVisibility(View.GONE);
-            binding.dayLabels.setVisibility(View.GONE);
-
-            // Apply filters
-            List<CalendarOccurrence> filtered = new ArrayList<>();
-            for (CalendarOccurrence occ : safeEvents) {
-                if (safeFilters.contains(occ.getType())) filtered.add(occ);
-            }
-
-            final List<CalendarOccurrence> finalFiltered = filtered;
-            final Date finalDate = current.getTime();
-            binding.scrollDayTimeline.post(() -> {
-                if (binding != null) {
-                    dayTimelineView.build(finalDate, finalFiltered);
-                }
-            });
-            dayTimelineView.build(current.getTime(), filtered);
+            buildDay(current, safeEvents, safeFilters);
         } else if (CalendarViewModel.MODE_WEEK.equals(mode)) {
-            binding.scrollDayTimeline.setVisibility(View.GONE);
-            binding.scrollWeekTimeline.setVisibility(View.VISIBLE);
-            binding.gridViewCalendar.setVisibility(View.GONE);
-            binding.dayLabels.setVisibility(View.GONE);
-
-            List<CalendarOccurrence> filtered = new ArrayList<>();
-            for (CalendarOccurrence occ: safeEvents) {
-                if (safeFilters.contains(occ.getType())) filtered.add(occ);
-            }
-            final List<CalendarOccurrence> finalFiltered = filtered;
-            final List<Date> weekDays = buildWeekDays(current);
-            binding.scrollWeekTimeline.post(() -> {
-                if (binding == null) return;
-                weekTimelineView.build(weekDays, finalFiltered);
-            });
+            buildWeek(current, safeEvents, safeFilters);
         } else {
-            binding.scrollDayTimeline.setVisibility(View.GONE);
-            binding.scrollWeekTimeline.setVisibility(View.GONE);
-            binding.calendarGrid.setVisibility(View.VISIBLE);
-            binding.dayLabels.setVisibility(View.VISIBLE);
-
-            // Set column count
-            binding.gridViewCalendar.setNumColumns(5);
-
-            // Run on background thread
-            Calendar currentCopy = (Calendar) current.clone();
-            AppDatabase.databaseWriteExecutor.execute(() -> {
-                List<Date> days = buildMonthDays(currentCopy);
-                if (getActivity() == null) return;
-                requireActivity().runOnUiThread(() -> {
-                    if (binding == null) return;
-                    adapter.update(days, safeEvents, safeFilters);
-                });
-            });
+            buildMonth(current, safeEvents, safeFilters);
         }
+    }
+
+    /// Adds all calendar occurrences to the calendar day
+    /// @param current Current calendar date
+    /// @param safeEvents Calendar occurrences to display
+    /// @param safeFilters Calendar occurrence type as user input
+    private void buildDay(Calendar current, List<CalendarOccurrence> safeEvents, Set<String> safeFilters) {
+        // Day view
+        binding.scrollDayTimeline.setVisibility(View.VISIBLE);
+        binding.scrollWeekTimeline.setVisibility(View.GONE);
+        binding.calendarGrid.setVisibility(View.GONE);
+        binding.dayLabels.setVisibility(View.GONE);
+
+        // Apply filters
+        List<CalendarOccurrence> filtered = new ArrayList<>();
+        for (CalendarOccurrence occ : safeEvents) {
+            if (safeFilters.contains(occ.getType())) filtered.add(occ);
+        }
+
+        // Set to calendar
+        final List<CalendarOccurrence> finalFiltered = filtered;
+        final Date finalDate = current.getTime();
+        binding.scrollDayTimeline.post(() -> {
+            if (binding != null) {
+                dayTimelineView.build(finalDate, finalFiltered);
+            }
+        });
+        dayTimelineView.build(current.getTime(), filtered);
+    }
+
+    /// Adds all calendar occurrences to the calendar week
+    /// @param current Current calendar date
+    /// @param safeEvents Calendar occurrences to display
+    /// @param safeFilters Calendar occurrence type as user input
+    private void buildWeek(Calendar current, List<CalendarOccurrence> safeEvents, Set<String> safeFilters) {
+        // Week view
+        binding.scrollDayTimeline.setVisibility(View.GONE);
+        binding.scrollWeekTimeline.setVisibility(View.VISIBLE);
+        binding.gridViewCalendar.setVisibility(View.GONE);
+        binding.dayLabels.setVisibility(View.GONE);
+
+        // Check filters
+        List<CalendarOccurrence> filtered = new ArrayList<>();
+        for (CalendarOccurrence occ: safeEvents) {
+            if (safeFilters.contains(occ.getType())) filtered.add(occ);
+        }
+
+        // Set to calendar
+        final List<CalendarOccurrence> finalFiltered = filtered;
+        final List<Date> weekDays = buildWeekDays(current);
+        binding.scrollWeekTimeline.post(() -> {
+            if (binding == null) return;
+            weekTimelineView.build(weekDays, finalFiltered);
+        });
+    }
+
+    /// Adds all calendar occurrences to the calendar month
+    /// @param current Current calendar date
+    /// @param safeEvents Calendar occurrences to display
+    /// @param safeFilters Calendar occurrence type as user input
+    private void buildMonth(Calendar current, List<CalendarOccurrence> safeEvents, Set<String> safeFilters) {
+        binding.scrollDayTimeline.setVisibility(View.GONE);
+        binding.scrollWeekTimeline.setVisibility(View.GONE);
+        binding.calendarGrid.setVisibility(View.VISIBLE);
+        binding.dayLabels.setVisibility(View.VISIBLE);
+
+        // Set column count
+        binding.gridViewCalendar.setNumColumns(5);
+
+        // Run on background thread
+        Calendar currentCopy = (Calendar) current.clone();
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            List<Date> days = buildMonthDays(currentCopy);
+            if (getActivity() == null) return;
+            requireActivity().runOnUiThread(() -> {
+                if (binding == null) return;
+                adapter.update(days, safeEvents, safeFilters);
+            });
+        });
     }
 
     /// Indefinitely hide weekends

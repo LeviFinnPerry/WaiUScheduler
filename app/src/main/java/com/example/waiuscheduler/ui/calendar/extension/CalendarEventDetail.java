@@ -64,7 +64,7 @@ public class CalendarEventDetail extends BottomSheetDialogFragment {
         // Header
         ((TextView) view.findViewById(R.id.text_event_title)).setText(occurrence.getTitle());
         ((TextView) view.findViewById(R.id.text_event_type_badge)).setText(occurrence.getType());
-        view.findViewById(R.id.view_toggle).setBackgroundColor(occurrence.getColour());
+        view.findViewById(R.id.view_colour_indicator).setBackgroundColor(occurrence.getColour());
 
         // Time
         SimpleDateFormat fmt = new SimpleDateFormat("EEE d MMM yyyy, h:mm a", Locale.getDefault());

@@ -1,22 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:paddingTop="40dp"
     tools:context=".ui.calendar.CalendarFragment">
 
     <!-- ── Header: prev / month label / today / next ── -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/calendar_header"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/view_toggle">
+        android:layout_gravity="center">
 
         <Button
             android:id="@+id/button_prev"
@@ -26,10 +23,10 @@
             android:layout_marginEnd="8dp"
             android:text="@string/arrow_prev"
             android:textSize="14sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/text_month_year" />
+            app:layout_constraintEnd_toStartOf="@+id/text_month_year"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/text_month_year"
@@ -38,10 +35,10 @@
             android:textAlignment="center"
             android:textSize="18sp"
             android:textStyle="bold"
-            app:layout_constraintStart_toEndOf="@+id/button_prev"
-            app:layout_constraintEnd_toStartOf="@+id/button_today"
-            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/button_today"
+            app:layout_constraintStart_toEndOf="@+id/button_prev"
+            app:layout_constraintTop_toTopOf="parent"
             tools:text="April 2026" />
 
         <Button
@@ -50,10 +47,10 @@
             android:layout_height="wrap_content"
             android:text="@string/today"
             android:textSize="12sp"
-            app:layout_constraintStart_toEndOf="@+id/text_month_year"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/button_next"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent" />
+            app:layout_constraintStart_toEndOf="@+id/text_month_year"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <Button
             android:id="@+id/button_next"
@@ -63,25 +60,21 @@
             android:layout_marginEnd="16dp"
             android:text="@string/arrow_next"
             android:textSize="14sp"
-            app:layout_constraintStart_toEndOf="@+id/button_today"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent" />
+            app:layout_constraintStart_toEndOf="@+id/button_today"
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!-- ── View mode toggle: Day / Week / Month ── -->
     <LinearLayout
         android:id="@+id/view_toggle"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
         android:layout_marginTop="8dp"
-        app:layout_constraintTop_toBottomOf="@id/calendar_header"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/day_labels">
+        android:gravity="center"
+        android:orientation="horizontal">
 
         <RadioButton
             android:id="@+id/radio_day"
@@ -109,14 +102,10 @@
     <!-- ── Day column labels (Sun–Sat) — hidden in day view ── -->
     <LinearLayout
         android:id="@+id/day_labels"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:layout_marginTop="8dp"
-        app:layout_constraintTop_toBottomOf="@id/view_toggle"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/calendar_grid">
+        android:orientation="horizontal">
 
         <TextView
             android:layout_width="0dp"
@@ -186,20 +175,15 @@
     <!-- ── Month / Week grid ── -->
     <LinearLayout
         android:id="@+id/calendar_grid"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_marginTop="4dp"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toTopOf="@+id/event_filters"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/day_labels"
-        app:layout_constraintVertical_weight="1">
+        android:orientation="vertical">
 
         <GridView
             android:id="@+id/gridView_calendar"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:horizontalSpacing="2dp"
             android:numColumns="7"
             android:stretchMode="columnWidth"
@@ -210,52 +194,39 @@
     <!-- ── Day timeline (8am–6pm scrollable) — shown only in day view ── -->
     <ScrollView
         android:id="@+id/scroll_day_timeline"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:fillViewport="true"
-        app:layout_constraintTop_toBottomOf="@id/view_toggle"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/event_filters">
+        android:visibility="gone">
 
         <RelativeLayout
             android:id="@+id/day_timeline_container"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content" />
 
     </ScrollView>
 
     <ScrollView
         android:id="@+id/scroll_week_timeline"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:fillViewport="true"
-        app:layout_constraintTop_toBottomOf="@id/view_toggle"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/event_filters">
+        android:visibility="gone">
 
         <RelativeLayout
             android:id="@+id/week_timeline_container"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content" />
 
     </ScrollView>
     <!-- ── Filter buttons ── -->
     <LinearLayout
         android:id="@+id/event_filters"
-        style="?android:attr/buttonBarStyle"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:gravity="center"
-        android:padding="4dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/calendar_grid">
+        android:orientation="horizontal"
+        android:padding="4dp">
 
         <Button
             android:id="@+id/button_filter_study"
@@ -263,9 +234,9 @@
             android:layout_width="wrap_content"
             android:layout_height="36dp"
             android:layout_marginEnd="8dp"
+            android:backgroundTint="#1565C0"
             android:text="@string/filter_study"
-            android:textSize="12sp"
-            android:backgroundTint="#1565C0" />
+            android:textSize="12sp" />
 
         <Button
             android:id="@+id/button_filter_lecture"
@@ -273,19 +244,19 @@
             android:layout_width="wrap_content"
             android:layout_height="36dp"
             android:layout_marginEnd="8dp"
+            android:backgroundTint="#2E7D32"
             android:text="@string/filter_lecture"
-            android:textSize="12sp"
-            android:backgroundTint="#2E7D32" />
+            android:textSize="12sp" />
 
         <Button
             android:id="@+id/button_filter_assignment"
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="36dp"
+            android:backgroundTint="#D32F2F"
             android:text="@string/filter_assignment"
-            android:textSize="12sp"
-            android:backgroundTint="#D32F2F" />
+            android:textSize="12sp" />
 
     </LinearLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

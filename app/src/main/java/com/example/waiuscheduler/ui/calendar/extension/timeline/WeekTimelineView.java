@@ -107,7 +107,7 @@ public class WeekTimelineView extends TimeLineView {
             p.leftMargin = labelWidthPx + col * dayColumnWidth;
             container.addView(colDivider, p);
         }
-        setContainerHeight(headerHeightPx + headerHeightPx * totalHours);
+        setContainerHeight(headerHeightPx + (headerHeightPx * totalHours));
 
         // Current time indicator
         Calendar now = Calendar.getInstance();

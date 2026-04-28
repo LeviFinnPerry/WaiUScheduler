@@ -59,7 +59,7 @@ public abstract class TimeLineView {
         if (measured > 0) {
             newMeasure = measured / totalHours;
         } else {
-            newMeasure = (int) (56 * density);
+            newMeasure = (int) (5 * density);
         }
         return newMeasure;
     }
