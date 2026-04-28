@@ -55,13 +55,14 @@ public abstract class TimeLineView {
         float density = context.getResources().getDisplayMetrics().density;
         int totalHours = END_HOUR - START_HOUR;
         int measured = container.getHeight();
-        int newMeasure;
+
         if (measured > 0) {
-            newMeasure = measured / totalHours;
-        } else {
-            newMeasure = (int) (5 * density);
+            return measured / totalHours;
         }
-        return newMeasure;
+        // Calculate from screen height
+        int screenHeight = context.getResources().getDisplayMetrics().heightPixels;
+        int available = (screenHeight - (int) (220 * density));
+        return Math.max(available / totalHours, (int) (48 * density));
     }
 
 

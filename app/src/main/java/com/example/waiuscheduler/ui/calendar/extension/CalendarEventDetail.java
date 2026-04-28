@@ -1,9 +1,11 @@
 package com.example.waiuscheduler.ui.calendar.extension;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -17,7 +19,6 @@ import com.example.waiuscheduler.database.tables.EventEntity;
 import com.example.waiuscheduler.database.tables.StudySessionEntity;
 import com.example.waiuscheduler.ui.calendar.CalendarViewModel;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-import com.google.android.material.textfield.TextInputEditText;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -96,24 +97,30 @@ public class CalendarEventDetail extends BottomSheetDialogFragment {
     private void setupAssessmentSection(View view) {
         view.findViewById(R.id.section_assessment).setVisibility(View.VISIBLE);
         AssessmentEntity assessment = (AssessmentEntity) occurrence.getSourceEntity();
-        TextInputEditText editGrade = view.findViewById(R.id.edit_grade);
+        EditText editGrade = view.findViewById(R.id.edit_grade);
 
         if(assessment.getGrade() != null ) {
             editGrade.setText(String.valueOf(assessment.getGrade()));
         }
 
         view.findViewById(R.id.button_save_grade).setOnClickListener(v -> {
-            double input =
-                    Double.parseDouble(editGrade.getText() != null ? editGrade.getText().toString()
-                            .trim() : "");
-            if (Double.isNaN(input)) {
+            String input = editGrade.getText() != null ? editGrade.getText().toString().trim(): "";
+            if (input.isEmpty()) {
                 Toast.makeText(requireContext(), "Please enter a grade", Toast.LENGTH_SHORT).show();
+                return;
             }
-            if (input < 0 || input > 100) {
+            double grade;
+            try {
+                grade = Double.parseDouble(input);
+            } catch (NumberFormatException e) {
+                Log.e("Number Format", "Invalid Grade Value");
+                return;
+            }
+            if (grade < 0 || grade > 100) {
                 Toast.makeText(requireContext(), "Grade out of bounds", Toast.LENGTH_SHORT).show();
                 return;
             }
-            assessment.setGrade(input);
+            assessment.setGrade(grade);
             Toast.makeText(requireContext(), "Grade saved: " + input, Toast.LENGTH_SHORT).show();
             dismiss();
         });
@@ -124,6 +131,7 @@ public class CalendarEventDetail extends BottomSheetDialogFragment {
     private void setupEventSection(View view) {
         view.findViewById(R.id.section_event).setVisibility(View.VISIBLE);
         EventEntity event = (EventEntity) occurrence.getSourceEntity();
+
         RadioGroup radioGroup = view.findViewById(R.id.radiogroup_attendance);
         if (event.getAttended().equals(true)) radioGroup.check(R.id.radio_attended);
         else if (event.getAttended().equals(false)) radioGroup.check(R.id.radio_missed);
@@ -148,6 +156,7 @@ public class CalendarEventDetail extends BottomSheetDialogFragment {
     private void setupStudySection(View view) {
         view.findViewById(R.id.section_study).setVisibility(View.VISIBLE);
         StudySessionEntity studySession = (StudySessionEntity) occurrence.getSourceEntity();
+
         SimpleDateFormat fmt = new SimpleDateFormat(
                 "EEE d MMM, h:mm a", Locale.getDefault());
         String details = "Subject: " + studySession.getPaperId_fk().split("-")[0] + "\n"
@@ -156,7 +165,9 @@ public class CalendarEventDetail extends BottomSheetDialogFragment {
         ((TextView) view.findViewById(R.id.text_study_details)).setText(details);
 
         view.findViewById(R.id.button_view_study).setOnClickListener(v -> {
-            // TODO: Navigate to study session details
+            if(vm != null) {
+                vm.updateStudySession(studySession);
+            }
             dismiss();
         });
 

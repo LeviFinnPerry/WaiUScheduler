@@ -6,7 +6,6 @@ import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -70,18 +69,16 @@ public class CalendarFragment extends Fragment {
         binding.gridViewCalendar.setAdapter(adapter);
 
         // Day timeline
-        RelativeLayout timelineContainer = binding.dayTimelineContainer;
         dayTimelineView = new DayTimelineView(
                 requireContext(),
-                timelineContainer,
+                binding.dayTimelineContainer,
                 this::openDetailDialog
         );
 
         // Week timeline
-        RelativeLayout weekContainer = binding.weekTimelineContainer;
         weekTimelineView = new WeekTimelineView(
                 requireContext(),
-                weekContainer,
+                binding.weekTimelineContainer,
                 this::openDetailDialog
         );
 
@@ -253,6 +250,9 @@ public class CalendarFragment extends Fragment {
         List<CalendarOccurrence> safeEvents = events != null ? events : new ArrayList<>();
         Set<String> safeFilters = filters != null ? filters : new HashSet<>();
 
+        // Switch layout visibilities off
+        disappearView();
+
         // Handling of timeline for days
         if (CalendarViewModel.MODE_DAY.equals(mode)) {
             buildDay(current, safeEvents, safeFilters);
@@ -263,6 +263,14 @@ public class CalendarFragment extends Fragment {
         }
     }
 
+    /// Hides all calendar views
+    private void disappearView() {
+        binding.scrollDayTimeline.setVisibility(View.GONE);
+        binding.scrollWeekTimeline.setVisibility(View.GONE);
+        binding.calendarGrid.setVisibility(View.GONE);
+        binding.dayLabels.setVisibility(View.GONE);
+    }
+
     /// Adds all calendar occurrences to the calendar day
     /// @param current Current calendar date
     /// @param safeEvents Calendar occurrences to display
@@ -270,9 +278,6 @@ public class CalendarFragment extends Fragment {
     private void buildDay(Calendar current, List<CalendarOccurrence> safeEvents, Set<String> safeFilters) {
         // Day view
         binding.scrollDayTimeline.setVisibility(View.VISIBLE);
-        binding.scrollWeekTimeline.setVisibility(View.GONE);
-        binding.calendarGrid.setVisibility(View.GONE);
-        binding.dayLabels.setVisibility(View.GONE);
 
         // Apply filters
         List<CalendarOccurrence> filtered = new ArrayList<>();
@@ -297,10 +302,7 @@ public class CalendarFragment extends Fragment {
     /// @param safeFilters Calendar occurrence type as user input
     private void buildWeek(Calendar current, List<CalendarOccurrence> safeEvents, Set<String> safeFilters) {
         // Week view
-        binding.scrollDayTimeline.setVisibility(View.GONE);
         binding.scrollWeekTimeline.setVisibility(View.VISIBLE);
-        binding.gridViewCalendar.setVisibility(View.GONE);
-        binding.dayLabels.setVisibility(View.GONE);
 
         // Check filters
         List<CalendarOccurrence> filtered = new ArrayList<>();
@@ -322,8 +324,6 @@ public class CalendarFragment extends Fragment {
     /// @param safeEvents Calendar occurrences to display
     /// @param safeFilters Calendar occurrence type as user input
     private void buildMonth(Calendar current, List<CalendarOccurrence> safeEvents, Set<String> safeFilters) {
-        binding.scrollDayTimeline.setVisibility(View.GONE);
-        binding.scrollWeekTimeline.setVisibility(View.GONE);
         binding.calendarGrid.setVisibility(View.VISIBLE);
         binding.dayLabels.setVisibility(View.VISIBLE);
 

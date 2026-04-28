@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="vertical"
     android:paddingTop="40dp"
     tools:context=".ui.calendar.CalendarFragment">
@@ -101,6 +101,45 @@
 
     <!-- ── Day column labels (Sun–Sat) — hidden in day view ── -->
     <LinearLayout
+        android:id="@+id/event_filters"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="4dp">
+
+        <Button
+            android:id="@+id/button_filter_study"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:layout_marginEnd="8dp"
+            android:backgroundTint="#1565C0"
+            android:text="@string/filter_study"
+            android:textSize="12sp" />
+
+        <Button
+            android:id="@+id/button_filter_lecture"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:layout_marginEnd="8dp"
+            android:backgroundTint="#2E7D32"
+            android:text="@string/filter_lecture"
+            android:textSize="12sp" />
+
+        <Button
+            android:id="@+id/button_filter_assignment"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:backgroundTint="#D32F2F"
+            android:text="@string/filter_assignment"
+            android:textSize="12sp" />
+
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/day_labels"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -173,17 +212,18 @@
     </LinearLayout>
 
     <!-- ── Month / Week grid ── -->
+
     <LinearLayout
         android:id="@+id/calendar_grid"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:orientation="vertical">
 
         <GridView
             android:id="@+id/gridView_calendar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:horizontalSpacing="2dp"
             android:numColumns="7"
             android:stretchMode="columnWidth"
@@ -220,43 +260,5 @@
 
     </ScrollView>
     <!-- ── Filter buttons ── -->
-    <LinearLayout
-        android:id="@+id/event_filters"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:padding="4dp">
-
-        <Button
-            android:id="@+id/button_filter_study"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="36dp"
-            android:layout_marginEnd="8dp"
-            android:backgroundTint="#1565C0"
-            android:text="@string/filter_study"
-            android:textSize="12sp" />
-
-        <Button
-            android:id="@+id/button_filter_lecture"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="36dp"
-            android:layout_marginEnd="8dp"
-            android:backgroundTint="#2E7D32"
-            android:text="@string/filter_lecture"
-            android:textSize="12sp" />
-
-        <Button
-            android:id="@+id/button_filter_assignment"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="36dp"
-            android:backgroundTint="#D32F2F"
-            android:text="@string/filter_assignment"
-            android:textSize="12sp" />
-
-    </LinearLayout>
 
 </LinearLayout>
