@@ -164,13 +164,6 @@ public class CalendarEventDetail extends BottomSheetDialogFragment {
                 + "End: "     + fmt.format(studySession.getDateTimeEnd());
         ((TextView) view.findViewById(R.id.text_study_details)).setText(details);
 
-        view.findViewById(R.id.button_view_study).setOnClickListener(v -> {
-            if(vm != null) {
-                vm.updateStudySession(studySession);
-            }
-            dismiss();
-        });
-
         view.findViewById(R.id.button_delete_study).setOnClickListener(v -> {
             if (vm != null) {
                 vm.deleteStudySession(studySession);

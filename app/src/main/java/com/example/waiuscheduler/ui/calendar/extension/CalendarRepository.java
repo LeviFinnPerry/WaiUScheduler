@@ -1,6 +1,5 @@
 package com.example.waiuscheduler.ui.calendar.extension;
 
-import android.app.Application;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
@@ -13,6 +12,7 @@ import com.example.waiuscheduler.database.DatabaseController;
 import com.example.waiuscheduler.database.tables.AssessmentEntity;
 import com.example.waiuscheduler.database.tables.EventEntity;
 import com.example.waiuscheduler.database.tables.StudySessionEntity;
+import com.example.waiuscheduler.parsing.DataRepository;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -44,9 +44,8 @@ public class CalendarRepository {
     /// If the constructor isn't initialised yet then it will initialise one
     /// To ensure data consistency and hopefully solve this bug I have been meaning
     /// to fix for weeks but couldn't figure it out with debugging
-    /// @param application Application context
-    public CalendarRepository(Application application) {
-        this.dbController  = new DatabaseController(AppDatabase.getInstance(application));
+    public CalendarRepository() {
+        this.dbController  = DataRepository.getDbController();
     }
 
     /// When calendar window changes
@@ -115,14 +114,12 @@ public class CalendarRepository {
     /// Deletes study session
     /// @param s Study session
     public void deleteStudySession(StudySessionEntity s) {
-        if (mergeRunnable != null) mergeHandler.removeCallbacks(mergeRunnable);
-        mergeRunnable = () -> dbController.deleteStudySession(s);
+        AppDatabase.databaseWriteExecutor.execute(() -> dbController.deleteStudySession(s));
     }
 
     /// Update study session
     /// @param s Study session
     public void updateStudySession(StudySessionEntity s) {
-        if (mergeRunnable != null) mergeHandler.removeCallbacks(mergeRunnable);
-        mergeRunnable = () -> dbController.updateStudySession(s);
+        AppDatabase.databaseWriteExecutor.execute(() -> dbController.updateStudySession(s));
     }
 }

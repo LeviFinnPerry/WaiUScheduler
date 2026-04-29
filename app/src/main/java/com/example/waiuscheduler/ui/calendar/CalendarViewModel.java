@@ -37,7 +37,7 @@ public class CalendarViewModel extends AndroidViewModel {
     /// @param application Application for the view
     public CalendarViewModel(@NonNull Application application) {
         super(application);
-        calendarRepository = new CalendarRepository(application);
+        calendarRepository = new CalendarRepository();
         Calendar initial = Calendar.getInstance();
         currentDate.setValue(initial);
         viewMode.setValue(MODE_MONTH);
