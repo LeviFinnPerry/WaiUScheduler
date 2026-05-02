@@ -12,7 +12,6 @@ import java.util.List;
 
 @Dao
 public interface DashboardDao {
-    double TO_HOUR = 3600000.0;
 
     // Study hours
     ///  Total study hours across all sessions
@@ -46,5 +45,5 @@ public interface DashboardDao {
     // Upcoming deadlines
     /// Upcoming assessments ordered by date
     @Query("SELECT title, type, dueDate, paperId_fk FROM assessment WHERE dueDate >= date('now') ORDER BY dueDate ASC LIMIT 10")
-    LiveData<UpcomingAssessments> getUpcomingAssessments();
+    LiveData<List<UpcomingAssessments>> getUpcomingAssessments();
 }
