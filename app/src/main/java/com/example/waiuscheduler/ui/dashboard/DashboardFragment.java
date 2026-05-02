@@ -11,10 +11,12 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.waiuscheduler.databinding.FragmentDashboardBinding;
+import com.example.waiuscheduler.ui.dashboard.extension.DashboardRepository;
 
 public class DashboardFragment extends Fragment {
 
     private FragmentDashboardBinding binding;
+    private DashboardRepository repo;
 
     public View onCreateView(
             @NonNull LayoutInflater inflater,
@@ -25,6 +27,7 @@ public class DashboardFragment extends Fragment {
 
         binding = FragmentDashboardBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+        repo = new DashboardRepository(requireContext());
 
         final TextView textView = binding.textDashboard;
         dashboardViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);

@@ -4,17 +4,24 @@ import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Query;
 
+import com.example.waiuscheduler.ui.dashboard.extension.rows.CourseGradeRow;
+import com.example.waiuscheduler.ui.dashboard.extension.rows.StudyHourRow;
 import com.example.waiuscheduler.ui.dashboard.extension.rows.UpcomingAssessments;
+
+import java.util.List;
 
 @Dao
 public interface DashboardDao {
+    double TO_HOUR = 3600000.0;
+
     // Study hours
     ///  Total study hours across all sessions
-    @Query("SELECT COALESCE(SUM(dateTimeEnd - dateTimeStart)) AS duration FROM study_session")
+    @Query("SELECT COALESCE(SUM(dateTimeEnd - dateTimeStart) / 3600000.0, 0) AS duration FROM study_session")
     LiveData<Double> getTotalStudyHours();
 
     /// Study hours grouped by paper
-    // TODO: Make a study hour object
+    @Query("SELECT paperId_fk, SUM(dateTimeEnd - dateTimeStart) / 3600000.0 AS hours FROM study_session GROUP BY paperId_fk ORDER BY hours DESC")
+    LiveData<List<StudyHourRow>> getStudyHoursByPaper();
 
     // Grades
     /// Average grade across all graded assignments
@@ -22,7 +29,10 @@ public interface DashboardDao {
     LiveData<Double> getAvgGrade();
 
     /// Grade per paper for course grades
-    // TODO: Make a grade total object
+    @Query("SELECT paperId_fk AS paperId, AVG(grade) AS avgGrade, COUNT(*) AS total, " +
+            "SUM(CASE WHEN grade IS NOT NULL THEN 1 ELSE 0 END) AS graded FROM assessment " +
+            "GROUP BY paperId")
+    LiveData<List<CourseGradeRow>> getGradesByPaper();
 
     // Events
     /// Count of upcoming events today onwards

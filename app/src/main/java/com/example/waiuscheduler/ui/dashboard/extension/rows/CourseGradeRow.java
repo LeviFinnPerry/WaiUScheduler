@@ -1,4 +1,4 @@
-package com.example.waiuscheduler.ui.dashboard.rows;
+package com.example.waiuscheduler.ui.dashboard.extension.rows;
 
 public class CourseGradeRow {
     public String paperId;
