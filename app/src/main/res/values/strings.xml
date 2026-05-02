@@ -67,5 +67,11 @@
     <string name="_100">/ 100</string>
     <string name="drop_down_arrow">Drop down arrow</string>
     <string name="icon_for_statistic">Icon for statistic</string>
+    <string name="study_hours_by_course">Study Hours by Course</string>
+    <string name="grades">Grades</string>
+    <string name="upcoming_assessments">Upcoming Assessments</string>
+    <string name="total_study_hours">Total Study Hours</string>
+    <string name="average_grade">Average Grade</string>
+    <string name="upcoming_events">Upcoming Events</string>
 
 </resources>
