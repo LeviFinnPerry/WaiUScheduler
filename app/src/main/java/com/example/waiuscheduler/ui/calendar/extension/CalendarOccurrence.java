@@ -80,7 +80,6 @@ public class CalendarOccurrence {
     /// @param type type of event
     /// @return colour code
     private static int findColour(String type) {
-        // TODO: Include different assessment types and event types
         switch (type) {
             case TYPE_STUDY: return 0xFF0000FF; // Blue
             case TYPE_ASSESSMENT: return 0xFFFF0000; // Red

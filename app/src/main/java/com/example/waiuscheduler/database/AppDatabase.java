@@ -10,6 +10,7 @@ import androidx.room.TypeConverters;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import com.example.waiuscheduler.database.dao.AssessmentDao;
+import com.example.waiuscheduler.database.dao.DashboardDao;
 import com.example.waiuscheduler.database.dao.EventDao;
 import com.example.waiuscheduler.database.dao.PaperDao;
 import com.example.waiuscheduler.database.dao.SemesterDao;
@@ -47,6 +48,7 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract StaffDao staffDao();    // Staff database object
     public abstract StudySessionDao studySessionDao();  // Study session database object
     public abstract TimetablePatternDao timetablePatternDao();  // Timetable pattern database object
+    public abstract DashboardDao dashboardDao(); // Dashboard queries object
 
 
     // Instance for the database
