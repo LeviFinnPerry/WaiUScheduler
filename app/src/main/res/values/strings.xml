@@ -65,5 +65,6 @@
     <string name="grade">Grade</string>
     <string name="e_g_85">e.g. 85</string>
     <string name="_100">/ 100</string>
+    <string name="drop_down_arrow">Drop down arrow</string>
 
 </resources>

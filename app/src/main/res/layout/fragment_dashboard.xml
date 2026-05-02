@@ -6,17 +6,128 @@
     android:layout_height="match_parent"
     tools:context=".ui.dashboard.DashboardFragment">
 
-    <TextView
-        android:id="@+id/text_dashboard"
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:textAlignment="center"
-        android:textSize="20sp"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <LinearLayout
+                android:id="@+id/stats_row1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:baselineAligned="false"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
+                <include layout="@layout/dashboard_stat_card"
+                    android:id="@+id/card_study_hours"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"/>
+                <include layout="@layout/dashboard_stat_card"
+                    android:id="@+id/card_avg_grade"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/stats_row2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp">
+                <include layout="@layout/dashboard_stat_card"
+                    android:id="@+id/card_courses"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"/>
+                <include layout="@layout/dashboard_stat_card"
+                    android:id="@+id/card_events"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/section_study_hours"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="@drawable/card_background"
+                android:layout_marginBottom="8dp">
+                <include layout="@layout/dashboard_section_header"
+                    android:id="@+id/header_study_hours"/>
+                <LinearLayout
+                    android:id="@+id/content_study_hours"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    android:padding="16dp">
+
+                    <!-- TODO: Bar Chart -->
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/section_course_grades"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="@drawable/card_background"
+                android:layout_marginBottom="8dp">
+                <include layout="@layout/dashboard_section_header"
+                    android:id="@+id/header_course_grades"/>
+                <LinearLayout
+                    android:id="@+id/content_course_grades"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    android:padding="16dp">
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recycleview_course_grades"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:nestedScrollingEnabled="false"/>
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/section_upcoming_assessments"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="@drawable/card_background"
+                android:layout_marginBottom="8dp">
+                <include layout="@layout/dashboard_section_header"
+                    android:id="@+id/header_upcoming_assessments"/>
+                <LinearLayout
+                    android:id="@+id/content_upcoming_assessments"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    android:padding="16dp">
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recycleview_upcoming_assessments"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:nestedScrollingEnabled="false"/>
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>
