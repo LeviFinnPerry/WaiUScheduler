@@ -89,6 +89,10 @@ public class DashboardFragment extends Fragment {
             binding.cardStudyHours.statValue.setText(
                     String.valueOf(count));
         });
+        viewModel.getUpcomingEventCount().observe(getViewLifecycleOwner(), count -> {
+            binding.cardEvents.statLabel.setText(R.string.enrolled_courses);
+            binding.cardEvents.statValue.setText(String.valueOf(count));
+        });
     }
 
 

@@ -3,8 +3,8 @@ package com.example.waiuscheduler.ui.dashboard;
 import android.app.Application;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.ViewModel;
 
 import com.example.waiuscheduler.ui.dashboard.extension.DashboardRepository;
 import com.example.waiuscheduler.ui.dashboard.extension.rows.CourseGradeRow;
@@ -13,11 +13,12 @@ import com.example.waiuscheduler.ui.dashboard.extension.rows.UpcomingAssessments
 
 import java.util.List;
 
-public class DashboardViewModel extends ViewModel {
+public class DashboardViewModel extends AndroidViewModel {
 
     private final DashboardRepository dashRepository;
     
     public DashboardViewModel(@NonNull Application app) {
+        super(app);
         dashRepository = new DashboardRepository(app);
     }
 

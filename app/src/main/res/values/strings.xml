@@ -73,5 +73,7 @@
     <string name="total_study_hours">Total Study Hours</string>
     <string name="average_grade">Average Grade</string>
     <string name="upcoming_events">Upcoming Events</string>
+    <string name="urgent">Urgent</string>
+    <string name="enrolled_courses">Enrolled Courses</string>
 
 </resources>

@@ -1,6 +1,6 @@
 package com.example.waiuscheduler.ui.dashboard.extension;
 
-import android.content.Context;
+import android.app.Application;
 
 import androidx.lifecycle.LiveData;
 
@@ -15,8 +15,8 @@ import java.util.List;
 public class DashboardRepository {
     private final DashboardDao dao;
 
-    public DashboardRepository(Context context) {
-        dao = AppDatabase.getInstance(context).dashboardDao();
+    public DashboardRepository(Application application) {
+        dao = AppDatabase.getInstance(application).dashboardDao();
     }
 
     public LiveData<Double> getTotalStudy() { return dao.getTotalStudyHours(); }
