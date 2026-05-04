@@ -37,6 +37,7 @@ public class DashboardRepository {
     /// Total enrolled papers
     /// @return number of papers
     public LiveData<Integer> getTotalPaperCount() { return dao.getTotalPaperCount(); }
+
     /// All assessments that are not already past
     /// @return each assessment
     public LiveData<List<UpcomingAssessments>> getUpcomingAssessments() { return dao.getUpcomingAssessments(System.currentTimeMillis()); }
