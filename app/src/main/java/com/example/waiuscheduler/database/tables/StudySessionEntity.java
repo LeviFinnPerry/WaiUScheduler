@@ -12,10 +12,10 @@ import java.util.Date;
         foreignKeys = @ForeignKey(
                 entity = PaperEntity.class,  // Class of foreign key
                 parentColumns = "paperId",  // Foreign key variable
-                childColumns = "paperId_fk",    // Foreign key name
+                childColumns = "paperId",    // Foreign key name
                 onDelete = ForeignKey.CASCADE   // Dependency on paper
         ),
-        indices = {@Index("paperId_fk")}
+        indices = {@Index("paperId")}
 )
 public class StudySessionEntity {
     @PrimaryKey(autoGenerate = true)        // Unique Id for the study session
@@ -24,21 +24,22 @@ public class StudySessionEntity {
     private Date dateTimeEnd;             // End time of study session
     private Double duration;                // Duration of study session
     private String notes;                   // Notes from session
-    private String paperId_fk;          // Foreign key referencing paper
+    private String paperId;          // Foreign key referencing paper
 
     /// Constructor for the study session table
     /// @param dateTimeStart Start date and time as the study session
     /// @param dateTimeEnd  End date and time as the study session
     /// @param duration Length of study session
     /// @param notes Additional user input for the session
-    /// @param paperId_fk The id for the paper being studied for
+    /// @param paperId The id for the paper being studied for
     public StudySessionEntity(Date dateTimeStart, Date dateTimeEnd, Double duration,
-                              String notes, String paperId_fk) {
+                              String notes, String paperId
+    ) {
         this.dateTimeStart = dateTimeStart;
         this.dateTimeEnd = dateTimeEnd;
         this.duration = duration;
         this.notes = notes;
-        this.paperId_fk = paperId_fk;
+        this.paperId = paperId;
     }
 
     /// Get study session id
@@ -103,13 +104,13 @@ public class StudySessionEntity {
 
     /// Get paper id assigned for the session
     /// @return Foreign key paper id
-    public String getPaperId_fk() {
-        return paperId_fk;
+    public String getPaperId() {
+        return paperId;
     }
 
     /// Set paper id assigned for the study session
-    /// @param paperId_fk Foreign key paper id
-    public void setPaperId_fk(String paperId_fk) {
-        this.paperId_fk = paperId_fk;
+    /// @param paperId Foreign key paper id
+    public void setPaperId(String paperId) {
+        this.paperId = paperId;
     }
 }

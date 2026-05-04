@@ -102,4 +102,7 @@ dependencies {
 
     // HTML Scraping
     implementation(libs.jsoup)
+
+    // Dashboard graph
+    implementation(libs.mpandroidchart)
 }

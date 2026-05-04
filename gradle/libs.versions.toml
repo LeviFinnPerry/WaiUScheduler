@@ -19,6 +19,7 @@ room = "2.8.4"
 junitJupiter = "5.10.2"
 junit-jupiter-engine = "5.10.2"
 instant-task = "1.0.0"
+mpAndroidChart = "3.1.0"
 
 [libraries]
 appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
@@ -43,6 +44,7 @@ room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junitJupiter" }
 junit-jupiter-engine = { group = "org.junit.jupiter", name = "journeys-junit-engine", version.ref = "junit-jupiter-engine" }
 instant-task = { group = "io.github.neboskreb", name = "instant-task-executor-extension", version.ref = "instant-task"}
+mpandroidchart = { group = "com.github.PhilJay", name = "MPAndroidChart", version.ref = "mpAndroidChart"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -19,7 +19,7 @@ public interface DashboardDao {
     LiveData<Double> getTotalStudyHours();
 
     /// Study hours grouped by paper
-    @Query("SELECT paperId_fk, SUM(dateTimeEnd - dateTimeStart) / 3600000.0 AS hours FROM study_session GROUP BY paperId_fk ORDER BY hours DESC")
+    @Query("SELECT paperId, SUM(dateTimeEnd - dateTimeStart) / 3600000.0 AS hours FROM study_session GROUP BY paperId ORDER BY hours DESC")
     LiveData<List<StudyHourRow>> getStudyHoursByPaper();
 
     // Grades
@@ -28,7 +28,7 @@ public interface DashboardDao {
     LiveData<Double> getAvgGrade();
 
     /// Grade per paper for course grades
-    @Query("SELECT paperId_fk AS paperId, AVG(grade) AS avgGrade, COUNT(*) AS total, " +
+    @Query("SELECT paperId AS paperId, AVG(grade) AS avgGrade, COUNT(*) AS total, " +
             "SUM(CASE WHEN grade IS NOT NULL THEN 1 ELSE 0 END) AS graded FROM assessment " +
             "GROUP BY paperId")
     LiveData<List<CourseGradeRow>> getGradesByPaper();
@@ -44,6 +44,6 @@ public interface DashboardDao {
 
     // Upcoming deadlines
     /// Upcoming assessments ordered by date
-    @Query("SELECT title, type, dueDate, paperId_fk FROM assessment WHERE dueDate >= date('now') ORDER BY dueDate ASC LIMIT 10")
+    @Query("SELECT title, type, dueDate, paperId FROM assessment WHERE dueDate >= date('now') ORDER BY dueDate ASC LIMIT 10")
     LiveData<List<UpcomingAssessments>> getUpcomingAssessments();
 }

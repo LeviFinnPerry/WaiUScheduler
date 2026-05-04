@@ -16,7 +16,15 @@ import com.example.waiuscheduler.R;
 import com.example.waiuscheduler.databinding.FragmentDashboardBinding;
 import com.example.waiuscheduler.ui.dashboard.extension.adapters.CourseGradeAdapter;
 import com.example.waiuscheduler.ui.dashboard.extension.adapters.UpcomingAssessmentAdapter;
+import com.example.waiuscheduler.ui.dashboard.extension.rows.StudyHourRow;
+import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 public class DashboardFragment extends Fragment {
@@ -89,9 +97,7 @@ public class DashboardFragment extends Fragment {
             binding.cardEvents.statLabel.setText(R.string.enrolled_courses);
             binding.cardEvents.statValue.setText(String.valueOf(count));
         });
-        viewModel.getTotalStudyByPaper().observe(getViewLifecycleOwner(), count -> {
-            // TODO: Make a bar chart
-        });
+        viewModel.getTotalStudyByPaper().observe(getViewLifecycleOwner(), this::setUpBarChart);
         viewModel.getGradesByPaper().observe(getViewLifecycleOwner(), rows -> binding.recycleviewCourseGrades.setAdapter(new CourseGradeAdapter(rows)));
         viewModel.getUpcomingAssessments().observe(getViewLifecycleOwner(), rows -> binding.recycleviewUpcomingAssessments.setAdapter(new UpcomingAssessmentAdapter(rows)));
     }
@@ -132,5 +138,39 @@ public class DashboardFragment extends Fragment {
     /// Animates the icon
     private void iconAnimation(ImageView icon, float rotation) {
         icon.animate().rotation(rotation).setDuration(200).start();
+    }
+
+    private void setUpBarChart(List<StudyHourRow> rows) {
+        if (rows == null || rows.isEmpty()) return;
+
+        List<BarEntry> entries = new ArrayList<>();
+        List<String> labels = new ArrayList<>();
+
+        for (int i = 0; i < rows.size(); i++) {
+            entries.add(new BarEntry(i, (float) rows.get(i).hours));
+            // Shorten paper id for label
+            labels.add(rows.get(i).paperId_fk.split("-")[0]);
+        }
+
+        BarDataSet dataSet = new BarDataSet(entries, "");
+        dataSet.setColor(0xFF3949AB);
+        dataSet.setDrawValues(true);
+        dataSet.setValueTextSize(10f);
+
+        BarData barData = new BarData(dataSet);
+        barData.setBarWidth(0.6f);
+
+        BarChart chart = binding.chartStudyHours;
+        chart.setData(barData);
+        chart.getDescription().setEnabled(false);
+        chart.getLegend().setEnabled(false);
+        chart.setFitBars(true);
+        chart.getAxisLeft().setAxisMinimum(0f);
+        chart.getAxisRight().setEnabled(false);
+        chart.getXAxis().setValueFormatter(new IndexAxisValueFormatter(labels));
+        chart.getXAxis().setGranularity(1f);
+        chart.getXAxis().setDrawGridLines(false);
+        chart.animateY(600);
+        chart.invalidate();
     }
 }
