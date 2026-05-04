@@ -14,6 +14,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.waiuscheduler.R;
 import com.example.waiuscheduler.databinding.FragmentDashboardBinding;
+import com.example.waiuscheduler.ui.dashboard.extension.adapters.CourseGradeAdapter;
+import com.example.waiuscheduler.ui.dashboard.extension.adapters.UpcomingAssessmentAdapter;
 
 import java.util.Locale;
 
@@ -55,15 +57,9 @@ public class DashboardFragment extends Fragment {
         binding.headerUpcomingAssessments.sectionTitle.setText(R.string.upcoming_assessments);
 
         // Set on click listeners for each event
-        binding.headerStudyHours.getRoot().setOnClickListener(v -> {
-            toggleSection(binding.contentStudyHours, binding.headerStudyHours.sectionDropdown);
-        });
-        binding.headerCourseGrades.getRoot().setOnClickListener(v -> {
-            toggleSection(binding.contentCourseGrades, binding.headerCourseGrades.sectionDropdown);
-        });
-        binding.headerUpcomingAssessments.getRoot().setOnClickListener(v -> {
-            toggleSection(binding.contentUpcomingAssessments, binding.headerUpcomingAssessments.sectionDropdown);
-        });
+        binding.headerStudyHours.getRoot().setOnClickListener(v -> toggleSection(binding.contentStudyHours, binding.headerStudyHours.sectionDropdown));
+        binding.headerCourseGrades.getRoot().setOnClickListener(v -> toggleSection(binding.contentCourseGrades, binding.headerCourseGrades.sectionDropdown));
+        binding.headerUpcomingAssessments.getRoot().setOnClickListener(v -> toggleSection(binding.contentUpcomingAssessments, binding.headerUpcomingAssessments.sectionDropdown));
     }
 
     private void setupRecyclerView() {
@@ -80,19 +76,24 @@ public class DashboardFragment extends Fragment {
                     String.format(Locale.getDefault(), "%.1f", hours));
         });
         viewModel.getAvgGrade().observe(getViewLifecycleOwner(), grade -> {
-            binding.cardStudyHours.statLabel.setText(R.string.average_grade);
-            binding.cardStudyHours.statValue.setText(
+            binding.cardAvgGrade.statLabel.setText(R.string.average_grade);
+            binding.cardAvgGrade.statValue.setText(
                     String.format(Locale.getDefault(), "%.1f%%", grade));
         });
         viewModel.getTotalPaperCount().observe(getViewLifecycleOwner(), count -> {
-            binding.cardStudyHours.statLabel.setText(R.string.upcoming_events);
-            binding.cardStudyHours.statValue.setText(
+            binding.cardCourses.statLabel.setText(R.string.upcoming_events);
+            binding.cardCourses.statValue.setText(
                     String.valueOf(count));
         });
         viewModel.getUpcomingEventCount().observe(getViewLifecycleOwner(), count -> {
             binding.cardEvents.statLabel.setText(R.string.enrolled_courses);
             binding.cardEvents.statValue.setText(String.valueOf(count));
         });
+        viewModel.getTotalStudyByPaper().observe(getViewLifecycleOwner(), count -> {
+            // TODO: Make a bar chart
+        });
+        viewModel.getGradesByPaper().observe(getViewLifecycleOwner(), rows -> binding.recycleviewCourseGrades.setAdapter(new CourseGradeAdapter(rows)));
+        viewModel.getUpcomingAssessments().observe(getViewLifecycleOwner(), rows -> binding.recycleviewUpcomingAssessments.setAdapter(new UpcomingAssessmentAdapter(rows)));
     }
 
 
