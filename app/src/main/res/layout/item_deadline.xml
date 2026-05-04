@@ -30,7 +30,7 @@
                 android:background="@drawable/calendar_chip_bg"
                 android:paddingHorizontal="8dp"
                 android:paddingVertical="2dp"
-                android:textColor="@color/white"
+                android:textColor="@color/black"
                 android:textSize="11sp" />
 
             <TextView

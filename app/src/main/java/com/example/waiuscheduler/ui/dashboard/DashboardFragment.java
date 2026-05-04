@@ -1,6 +1,7 @@
 package com.example.waiuscheduler.ui.dashboard;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -119,9 +120,15 @@ public class DashboardFragment extends Fragment {
         // Study hours by paper
         viewModel.getTotalStudyByPaper().observe(getViewLifecycleOwner(), this::setUpBarChart);
         // Grades by paper
-        viewModel.getGradesByPaper().observe(getViewLifecycleOwner(), rows -> binding.recycleviewCourseGrades.setAdapter(new CourseGradeAdapter(rows)));
+        viewModel.getGradesByPaper().observe(getViewLifecycleOwner(), rows -> {
+            Log.d("Dashboard", "Grades returned: " + rows.size());
+            binding.recycleviewCourseGrades.setAdapter(new CourseGradeAdapter(rows));
+        });
         // Upcoming events
-        viewModel.getUpcomingAssessments().observe(getViewLifecycleOwner(), rows -> binding.recycleviewUpcomingAssessments.setAdapter(new UpcomingAssessmentAdapter(rows)));
+        viewModel.getUpcomingAssessments().observe(getViewLifecycleOwner(), rows -> {
+            Log.d("Dashboard", "Assessments returned: " + rows.size());
+            binding.recycleviewUpcomingAssessments.setAdapter(new UpcomingAssessmentAdapter(rows));
+        });
     }
 
 
