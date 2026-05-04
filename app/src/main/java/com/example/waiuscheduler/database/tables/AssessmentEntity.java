@@ -12,10 +12,10 @@ import java.util.Date;
         foreignKeys = @ForeignKey(
                 entity = PaperEntity.class,      // Class of foreign key
                 parentColumns = "paperId",      // Foreign key variable
-                childColumns = "paperId_fk",    // Foreign key name
+                childColumns = "paperId",    // Foreign key name
                 onDelete = ForeignKey.CASCADE   // Dependency on paper
         ),
-        indices = {@Index("paperId_fk")}        // Index of the foreign key
+        indices = {@Index("paperId")}        // Index of the foreign key
 )
 public class AssessmentEntity {
     @PrimaryKey(autoGenerate = true)
@@ -25,7 +25,7 @@ public class AssessmentEntity {
     private Double weight;          // Weight of marks for the assessment
     private String type;            // Type of assessment (eg. test, assessment, exam)
     private Double grade;           // Grade given on assessment
-    private String paperId_fk;     // Foreign key to reference the paper table
+    private String paperId;     // Foreign key to reference the paper table
 
     /// Constructor for the paper table
     /// @param title The title of the assessment
@@ -33,15 +33,16 @@ public class AssessmentEntity {
     /// @param weight The percentage of the grade the assessment is worth
     /// @param type The type of assessment the assessment is
     /// @param grade The grade received after completing the assessment
-    /// @param paperId_fk Foreign key for which paper the assessment is for
+    /// @param paperId Foreign key for which paper the assessment is for
     public AssessmentEntity(String title, Date dueDate, Double weight,
-                            String type, Double grade, String paperId_fk) {
+                            String type, Double grade, String paperId
+    ) {
         this.title = title;
         this.dueDate = dueDate;
         this.weight = weight;
         this.type = type;
         this.grade = grade;
-        this.paperId_fk = paperId_fk;
+        this.paperId = paperId;
     }
 
     /// Set assessment Id
@@ -118,13 +119,13 @@ public class AssessmentEntity {
 
     /// Get the paper Id foreign key
     /// @return The paper Id that the assessment is for
-    public String getPaperId_fk() {
-        return paperId_fk;
+    public String getPaperId() {
+        return paperId;
     }
 
     /// Get the paper Id foreign key
-    /// @param paperId_fk The paper id the assessment is for
-    public void setPaperId_fk(String paperId_fk) {
-        this.paperId_fk = paperId_fk;
+    /// @param paperId The paper id the assessment is for
+    public void setPaperId(String paperId) {
+        this.paperId = paperId;
     }
 }

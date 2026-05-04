@@ -38,7 +38,7 @@ import java.util.concurrent.Executors;
         StaffEntity.class,
         StudySessionEntity.class,
         TimetablePatternEntity.class
-}, version = 10, exportSchema = false)
+}, version = 11, exportSchema = false)
 @TypeConverters({DateConverter.class})  // Type converter for dates
 public abstract class AppDatabase extends RoomDatabase {
     public abstract AssessmentDao assessmentDao();  // Assessment database object

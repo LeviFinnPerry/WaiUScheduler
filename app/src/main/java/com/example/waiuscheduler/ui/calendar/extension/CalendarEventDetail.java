@@ -159,7 +159,7 @@ public class CalendarEventDetail extends BottomSheetDialogFragment {
 
         SimpleDateFormat fmt = new SimpleDateFormat(
                 "EEE d MMM, h:mm a", Locale.getDefault());
-        String details = "Subject: " + studySession.getPaperId_fk().split("-")[0] + "\n"
+        String details = "Subject: " + studySession.getPaperId().split("-")[0] + "\n"
                 + "Start: "   + fmt.format(studySession.getDateTimeStart()) + "\n"
                 + "End: "     + fmt.format(studySession.getDateTimeEnd());
         ((TextView) view.findViewById(R.id.text_study_details)).setText(details);

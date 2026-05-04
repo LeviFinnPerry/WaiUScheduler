@@ -10,10 +10,10 @@ import androidx.room.PrimaryKey;
         foreignKeys = @ForeignKey(
                 entity = PaperEntity.class,      // Class of foreign key
                 parentColumns = "paperId",      // Foreign key variable
-                childColumns = "paperId_fk",    // Foreign key name
+                childColumns = "paperId",    // Foreign key name
                 onDelete = ForeignKey.CASCADE   // Dependency on paper
         ),
-        indices = {@Index("paperId_fk")}
+        indices = {@Index("paperId")}
 )
 public class StaffEntity {
     @PrimaryKey(autoGenerate = true)
@@ -21,18 +21,18 @@ public class StaffEntity {
     private String name;        // Name of staff member
     private String email;       // Email of staff member
     private String position;    // Position of staff member (eg. conveyor, tutor, etc.)
-    private String paperId_fk; // Foreign key for paper ID
+    private String paperId; // Foreign key for paper ID
 
     /// Constructor for staff table
     /// @param name Full name of the staff member
     /// @param email Email address of the staff member
     /// @param position Role of the staff member for the paper
     /// @param paperId_fk Paper the staff member information is from
-    public StaffEntity(String name, String email, String position, String paperId_fk) {
+    public StaffEntity(String name, String email, String position, String paperId) {
         this.name = name;
         this.email = email;
         this.position = position;
-        this.paperId_fk = paperId_fk;
+        this.paperId = paperId;
     }
 
     /// Get staff Id
@@ -85,13 +85,13 @@ public class StaffEntity {
 
     /// Get foreign key of paper id
     /// @return Id of the paper the staff is in
-    public String getPaperId_fk() {
-        return paperId_fk;
+    public String getPaperId() {
+        return paperId;
     }
 
     /// Set foreign key of paper id
     /// @param paperId_fk Id of the paper the staff is in
-    public void setPaperId_fk(String paperId_fk) {
-        this.paperId_fk = paperId_fk;
+    public void setPaperId(String paperId) {
+        this.paperId = paperId;
     }
 }

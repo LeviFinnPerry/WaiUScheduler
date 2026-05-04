@@ -13,10 +13,10 @@ import java.util.Date;
         foreignKeys = @ForeignKey(
                 entity = PaperEntity.class,      // Class of the foreign key
                 parentColumns = "paperId",      // Foreign key variable
-                childColumns = "paperId_fk",    // Foreign key name
+                childColumns = "paperId",    // Foreign key name
                 onDelete = ForeignKey.CASCADE   // Dependency on paper
         ),
-        indices = {@Index("paperId_fk")}
+        indices = {@Index("paperId")}
 )
 public class TimetablePatternEntity {
     @PrimaryKey @NonNull
@@ -26,7 +26,7 @@ public class TimetablePatternEntity {
     private Date endTime;         // End time
     private String location;        // Location for event
     private Double duration;        // Total duration in hours
-    private String paperId_fk;     // Foreign key references event table
+    private String paperId;     // Foreign key references event table
 
     /// Constructor for the timetable table
     /// @param type Type of scheduled timetable occurrence
@@ -35,10 +35,10 @@ public class TimetablePatternEntity {
     /// @param endTime Time the timetable occurrence ended
     /// @param location Building the timetable occurrence is in
     /// @param duration Duration of the timetable occurrence
-    /// @param paperId_fk Foreign key to the paper id the timetable is from
+    /// @param paperId Foreign key to the paper id the timetable is from
     public TimetablePatternEntity(
             @NonNull String type, int dayOfWeek, Date startTime,
-            Date endTime, String location, Double duration, String paperId_fk
+            Date endTime, String location, Double duration, String paperId
     ) {
         this.type = type;
         this.dayOfWeek = dayOfWeek;
@@ -46,7 +46,7 @@ public class TimetablePatternEntity {
         this.endTime = endTime;
         this.location = location;
         this.duration = duration;
-        this.paperId_fk = paperId_fk;
+        this.paperId = paperId;
     }
 
     /// Get the type of timetable pattern occurrence
@@ -124,13 +124,13 @@ public class TimetablePatternEntity {
 
     /// Get the paper id that corresponds to the timetable occurrence
     /// @return Foreign key paper id the timetable pattern is from
-    public String getPaperId_fk() {
-        return paperId_fk;
+    public String getPaperId() {
+        return paperId;
     }
 
     /// Set the paper id that corresponds to the timetable occurrence
-    /// @param paperId_fk Foreign key paper id the timetable pattern is from
-    public void setPaperId_fk(String paperId_fk) {
-        this.paperId_fk = paperId_fk;
+    /// @param paperId Foreign key paper id the timetable pattern is from
+    public void setPaperId(String paperId) {
+        this.paperId = paperId;
     }
 }
