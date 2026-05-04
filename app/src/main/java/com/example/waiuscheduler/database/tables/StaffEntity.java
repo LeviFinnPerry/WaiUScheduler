@@ -19,7 +19,7 @@ public class StaffEntity {
     @PrimaryKey(autoGenerate = true)
     private int staffId;     // Unique Id for the staff member
     private String name;        // Name of staff member
-    private final String email;       // Email of staff member
+    private String email;       // Email of staff member
     private String position;    // Position of staff member (eg. conveyor, tutor, etc.)
     private String paperId; // Foreign key for paper ID
 
@@ -27,7 +27,7 @@ public class StaffEntity {
     /// @param name Full name of the staff member
     /// @param email Email address of the staff member
     /// @param position Role of the staff member for the paper
-    /// @param paperId Paper the staff member information is from
+    /// @param paperId_fk Paper the staff member information is from
     public StaffEntity(String name, String email, String position, String paperId) {
         this.name = name;
         this.email = email;
@@ -65,6 +65,12 @@ public class StaffEntity {
         return email;
     }
 
+    /// Set staff email
+    /// @param email Email of the staff member
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     /// Get staff position
     /// @return Role the staff member has for the paper
     public String getPosition() {
@@ -84,7 +90,7 @@ public class StaffEntity {
     }
 
     /// Set foreign key of paper id
-    /// @param paperId Id of the paper the staff is in
+    /// @param paperId_fk Id of the paper the staff is in
     public void setPaperId(String paperId) {
         this.paperId = paperId;
     }
