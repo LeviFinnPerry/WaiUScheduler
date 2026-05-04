@@ -29,10 +29,15 @@ import java.util.Locale;
 
 public class DashboardFragment extends Fragment {
 
+    // Private variables
     private FragmentDashboardBinding binding;
     private DashboardViewModel viewModel;
     private View openSection = null;
 
+    /// Initialises the dashboard view
+    /// @param inflater Layout inflater
+    /// @param container View group
+    /// @param savedInstanceState Bundle
     public View onCreateView(
             @NonNull LayoutInflater inflater,
             ViewGroup container, Bundle savedInstanceState
@@ -41,35 +46,44 @@ public class DashboardFragment extends Fragment {
         return binding.getRoot();
     }
 
+    /// Methods once the view is created
+    /// @param view created view
+    /// @param savedInstanceState Bundle
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        viewModel = new ViewModelProvider(this).get(DashboardViewModel.class);
+        this.viewModel = new ViewModelProvider(this).get(DashboardViewModel.class);
 
         // Functions to set up view
         setUpDropDown();
+        setUpDropDownListeners();
         setupRecyclerView();
         observeViewModel();
     }
 
+    /// Destroys view
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
     }
 
+    /// Sets up UI in drop down menu
     private void setUpDropDown() {
         // Set header titles
         binding.headerStudyHours.sectionTitle.setText(R.string.study_hours_by_course);
         binding.headerCourseGrades.sectionTitle.setText(R.string.grades);
         binding.headerUpcomingAssessments.sectionTitle.setText(R.string.upcoming_assessments);
+    }
 
-        // Set on click listeners for each event
+    /// Set on click listeners for each event
+    private void setUpDropDownListeners() {
         binding.headerStudyHours.getRoot().setOnClickListener(v -> toggleSection(binding.contentStudyHours, binding.headerStudyHours.sectionDropdown));
         binding.headerCourseGrades.getRoot().setOnClickListener(v -> toggleSection(binding.contentCourseGrades, binding.headerCourseGrades.sectionDropdown));
         binding.headerUpcomingAssessments.getRoot().setOnClickListener(v -> toggleSection(binding.contentUpcomingAssessments, binding.headerUpcomingAssessments.sectionDropdown));
     }
 
+    /// Set up managers for the recycler views
     private void setupRecyclerView() {
         binding.recycleviewCourseGrades.setLayoutManager(
                 new LinearLayoutManager(requireContext()));
@@ -77,33 +91,43 @@ public class DashboardFragment extends Fragment {
                 new LinearLayoutManager(requireContext()));
     }
 
+    /// Observe all the elements in the UI
     private void observeViewModel() {
+        // Total Study Hours
         viewModel.getTotalStudy().observe(getViewLifecycleOwner(), hours -> {
             binding.cardStudyHours.statLabel.setText(R.string.total_study_hours);
             binding.cardStudyHours.statValue.setText(
                     String.format(Locale.getDefault(), "%.1f", hours));
         });
+        // Grade average
         viewModel.getAvgGrade().observe(getViewLifecycleOwner(), grade -> {
             binding.cardAvgGrade.statLabel.setText(R.string.average_grade);
             binding.cardAvgGrade.statValue.setText(
                     String.format(Locale.getDefault(), "%.1f%%", grade));
         });
+        // Paper count
         viewModel.getTotalPaperCount().observe(getViewLifecycleOwner(), count -> {
             binding.cardCourses.statLabel.setText(R.string.upcoming_events);
             binding.cardCourses.statValue.setText(
                     String.valueOf(count));
         });
+        // Upcoming events
         viewModel.getUpcomingEventCount().observe(getViewLifecycleOwner(), count -> {
             binding.cardEvents.statLabel.setText(R.string.enrolled_courses);
             binding.cardEvents.statValue.setText(String.valueOf(count));
         });
+        // Study hours by paper
         viewModel.getTotalStudyByPaper().observe(getViewLifecycleOwner(), this::setUpBarChart);
+        // Grades by paper
         viewModel.getGradesByPaper().observe(getViewLifecycleOwner(), rows -> binding.recycleviewCourseGrades.setAdapter(new CourseGradeAdapter(rows)));
+        // Upcoming events
         viewModel.getUpcomingAssessments().observe(getViewLifecycleOwner(), rows -> binding.recycleviewUpcomingAssessments.setAdapter(new UpcomingAssessmentAdapter(rows)));
     }
 
 
     /// Opens the selected section and closes any other open section
+    /// @param content View selected
+    /// @param icon Icon to toggle
     private void toggleSection(View content, ImageView icon) {
         boolean isOpen = content.getVisibility()  == View.VISIBLE;
 
@@ -127,6 +151,7 @@ public class DashboardFragment extends Fragment {
     }
 
     /// Rotates the icon based on section visibility
+    /// @param icon Icon to rotate
     private void rotateIcon(ImageView icon) {
         View prevHeader = (View) openSection.getParent();
         ImageView prevIcon = prevHeader.findViewById(R.id.section_dropdown);
@@ -136,10 +161,14 @@ public class DashboardFragment extends Fragment {
     }
 
     /// Animates the icon
+    /// @param icon Icon to rotate
+    /// @param rotation rotation amount (degrees)
     private void iconAnimation(ImageView icon, float rotation) {
         icon.animate().rotation(rotation).setDuration(200).start();
     }
 
+    /// Sets up the bar chart for the total study hours
+    /// @param rows Study hours per paper
     private void setUpBarChart(List<StudyHourRow> rows) {
         if (rows == null || rows.isEmpty()) return;
 
@@ -152,14 +181,32 @@ public class DashboardFragment extends Fragment {
             labels.add(rows.get(i).paperId_fk.split("-")[0]);
         }
 
+        // Set up bar data
+        BarData barData = setBarData(entries);
+
+        // Set up bar chart
+        drawChart(barData, labels);
+    }
+
+    /// Sets the data for the bar chart
+    /// @param entries data
+    private BarData setBarData(List<BarEntry> entries) {
+        // Dataset
         BarDataSet dataSet = new BarDataSet(entries, "");
         dataSet.setColor(0xFF3949AB);
         dataSet.setDrawValues(true);
         dataSet.setValueTextSize(10f);
 
+        // Bar data from dataset
         BarData barData = new BarData(dataSet);
         barData.setBarWidth(0.6f);
+        return barData;
+    }
 
+    /// Draws the chart
+    /// @param barData created barData
+    /// @param labels labels for each paper
+    private void drawChart(BarData barData, List<String> labels) {
         BarChart chart = binding.chartStudyHours;
         chart.setData(barData);
         chart.getDescription().setEnabled(false);
