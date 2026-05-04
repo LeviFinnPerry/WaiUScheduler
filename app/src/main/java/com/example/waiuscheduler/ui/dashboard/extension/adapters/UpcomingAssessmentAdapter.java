@@ -24,10 +24,16 @@ public class UpcomingAssessmentAdapter extends RecyclerView.Adapter<UpcomingAsse
     private final List<UpcomingAssessments> items;
     private final SimpleDateFormat fmt = new SimpleDateFormat("MMM d, h:mm a", Locale.getDefault());
 
+    /// Initialises the items to the upcoming assessments adapter
+    /// @param items upcoming assessments
     public UpcomingAssessmentAdapter(List<UpcomingAssessments> items) {
         this.items = items != null ? items: new ArrayList<>();
     }
 
+    /// Create view holder for upcoming assessments
+    /// @param parent View group
+    /// @param viewType used in override
+    /// @return custom view holder
     @NonNull
     @Override
     public VH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -35,6 +41,9 @@ public class UpcomingAssessmentAdapter extends RecyclerView.Adapter<UpcomingAsse
         return new VH(v);
     }
 
+    /// View holder to update assessment information
+    /// @param holder custom view holder
+    /// @param position position of grade section
     @Override
     public void onBindViewHolder(@NonNull VH holder, int position) {
         UpcomingAssessments row = items.get(position);
@@ -55,6 +64,9 @@ public class UpcomingAssessmentAdapter extends RecyclerView.Adapter<UpcomingAsse
         }
     }
 
+    /// Sets the item colour based on the assessment type
+    /// @param holder custom view holder
+    /// @param type assessment type
     private void setBadgeColor(VH holder, String type) {
         int badgeColour;
         switch (type) {
@@ -66,6 +78,9 @@ public class UpcomingAssessmentAdapter extends RecyclerView.Adapter<UpcomingAsse
         holder.textTypeBadge.setBackgroundTintList(ColorStateList.valueOf(badgeColour));
     }
 
+    /// If the assessment is due within two days
+    /// @param dueDate due date of assessment
+    /// @return true if urgent else false
     private boolean ifUrgent(Date dueDate) {
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DATE, 2);
@@ -73,12 +88,15 @@ public class UpcomingAssessmentAdapter extends RecyclerView.Adapter<UpcomingAsse
         return dueDate.before(newDate);
     }
 
-
+    /// Amount of items
+    /// @return total items
     @Override
     public int getItemCount() {
         return items.size();
     }
 
+    /// Static class for the custom view holder
+    /// @extends RecyclerView.ViewHolder
     static class VH extends RecyclerView.ViewHolder {
         TextView textTitle, textDate, textPaper, textTypeBadge, textUrgent;
         VH(View v) {
@@ -90,5 +108,4 @@ public class UpcomingAssessmentAdapter extends RecyclerView.Adapter<UpcomingAsse
             textUrgent    = v.findViewById(R.id.text_deadline_urgent);
         }
     }
-
 }

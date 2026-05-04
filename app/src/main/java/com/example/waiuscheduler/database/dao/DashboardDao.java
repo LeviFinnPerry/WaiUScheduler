@@ -28,15 +28,15 @@ public interface DashboardDao {
     LiveData<Double> getAvgGrade();
 
     /// Grade per paper for course grades
-    @Query("SELECT paperId AS paperId, AVG(grade) AS avgGrade, COUNT(*) AS total, " +
+    @Query("SELECT paperId, AVG(grade) AS avgGrade, COUNT(*) AS total, " +
             "SUM(CASE WHEN grade IS NOT NULL THEN 1 ELSE 0 END) AS graded FROM assessment " +
             "GROUP BY paperId")
     LiveData<List<CourseGradeRow>> getGradesByPaper();
 
     // Events
     /// Count of upcoming events today onwards
-    @Query("SELECT COUNT(eventId) FROM event WHERE dateTimeStart >= date('now')")
-    LiveData<Integer> getUpcomingEventCount();
+    @Query("SELECT COUNT(eventId) FROM event WHERE dateTimeStart >= :nowMs")
+    LiveData<Integer> getUpcomingEventCount(long nowMs);
 
     /// Enrolled paper count
     @Query("SELECT COUNT(paperId) FROM paper")
@@ -44,6 +44,6 @@ public interface DashboardDao {
 
     // Upcoming deadlines
     /// Upcoming assessments ordered by date
-    @Query("SELECT title, type, dueDate, paperId FROM assessment WHERE dueDate >= date('now') ORDER BY dueDate ASC LIMIT 10")
-    LiveData<List<UpcomingAssessments>> getUpcomingAssessments();
+    @Query("SELECT title, type, dueDate, paperId FROM assessment WHERE dueDate >= :nowMs ORDER BY dueDate ASC LIMIT 10")
+    LiveData<List<UpcomingAssessments>> getUpcomingAssessments(long nowMs);
 }
