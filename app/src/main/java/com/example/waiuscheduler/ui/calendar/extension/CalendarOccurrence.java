@@ -69,7 +69,7 @@ public class CalendarOccurrence {
     public static CalendarOccurrence from(StudySessionEntity study) {
         return new CalendarOccurrence(
                 TYPE_STUDY,
-                study.getPaperId_fk().split("-")[0] != null ? study.getPaperId_fk() : "Study Session",
+                study.getPaperId().split("-")[0] != null ? study.getPaperId() : "Study Session",
                 study.getDateTimeStart(),
                 study.getDateTimeEnd(),
                 study
