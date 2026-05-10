@@ -64,6 +64,11 @@ public class WeekTimelineView extends TimeLineView {
         Calendar today = Calendar.getInstance();
         SimpleDateFormat dayFmt = new SimpleDateFormat("EEE\nd", Locale.getDefault());
 
+        // Split events
+        List<CalendarOccurrence> allDay = new ArrayList<>();
+        List<CalendarOccurrence> timed = new ArrayList<>();
+        splitEvents(events, allDay, timed);
+
         // Day header row
         for (int col = 0; col < 5; col++) {
             Date dayDate = weekDays.get(col);
@@ -89,9 +94,64 @@ public class WeekTimelineView extends TimeLineView {
             container.addView(header, p);
         }
 
+        // Per column all day banners
+        int maxAllDay = 0;
+        for (int c = 0; c < 5; c++) {
+            Date dueDate = weekDays.get(c);
+            if (dueDate == null) continue;
+            Calendar myCal = Calendar.getInstance();
+            myCal.setTime(dueDate);
+            int count = 0;
+            for (CalendarOccurrence occ: allDay) {
+                Calendar occCal = Calendar.getInstance();
+                occCal.setTime(occ.getStartDateTime());
+                if (isSameDay(occCal, myCal)) count++;
+            }
+            maxAllDay = Math.max(maxAllDay, count);
+        }
+
+        int chipHeightPx = (int) (20 * density);
+        int chipPaddingPx = (int) (4 * density);
+        int allDayRowHeightPx = maxAllDay == 0 ? 0
+                : maxAllDay * (chipHeightPx + chipPaddingPx) + chipPaddingPx * 2;
+
+        // Background strip for all-day row
+        if (allDayRowHeightPx > 0) {
+            View strip = new View(context);
+            strip.setBackgroundColor(0xFFF0F0F0);
+            RelativeLayout.LayoutParams stripParams = new RelativeLayout.LayoutParams(
+                    RelativeLayout.LayoutParams.MATCH_PARENT, allDayRowHeightPx);
+            stripParams.topMargin = headerHeightPx;
+            container.addView(strip, stripParams);
+        }
+
+        // Draw assessment chips per column
+        for (int col = 0; col < 5; col++) {
+            Date dayDate = weekDays.get(col);
+            if (dayDate == null) continue;
+            Calendar dayCal = Calendar.getInstance();
+            dayCal.setTime(dayDate);
+
+            int row = 0;
+            for (CalendarOccurrence occ : allDay) {
+                Calendar occCal = Calendar.getInstance();
+                occCal.setTime(occ.getStartDateTime());
+                if (!isSameDay(occCal, dayCal)) continue;
+
+                int topPx = headerHeightPx + chipPaddingPx + row * (chipHeightPx + chipPaddingPx);
+                int chipLeft = labelWidthPx + col * dayColumnWidth + (int) (1 * density);
+                int chipWidth = dayColumnWidth - (int) (2 * density);
+                drawEventChip(occ, topPx, chipHeightPx, chipLeft, chipWidth);
+                row++;
+            }
+        }
+
+        // Grid origin
+        int gridTopPx = headerHeightPx + allDayRowHeightPx;
+
         // Hour labels
         for (int h = 0; h < totalHours; h++) {
-            int topPx = headerHeightPx + h * hourHeightPx;
+            int topPx = gridTopPx + h * hourHeightPx;
             drawHourLabel(START_HOUR + h, topPx, labelWidthPx, hourHeightPx);
             drawDivider(topPx, labelWidthPx);
         }
@@ -132,7 +192,7 @@ public class WeekTimelineView extends TimeLineView {
             }
         }
 
-        // ── Event chips ───────────────────────────────────────────────────────
+        // Event chips
         if (events == null || events.isEmpty()) return;
 
         for (CalendarOccurrence occ : events) {

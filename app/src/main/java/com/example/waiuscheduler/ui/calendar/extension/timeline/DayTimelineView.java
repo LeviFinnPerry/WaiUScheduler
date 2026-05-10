@@ -6,6 +6,7 @@ import android.widget.RelativeLayout;
 import com.example.waiuscheduler.ui.calendar.extension.CalendarOccurrence;
 import com.example.waiuscheduler.ui.calendar.extension.OnEventClickListener;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -29,11 +30,22 @@ public class DayTimelineView extends TimeLineView {
         int totalHours = END_HOUR - START_HOUR;
         int hourHeightPx = hourHeightPx();
         int labelWidthPx = (int) (52 * density);
+        int chipWidthPx = context.getResources().getDisplayMetrics().widthPixels
+                - labelWidthPx - (int) (4 * density);
+
+        List<CalendarOccurrence> allDay = new ArrayList<>();
+        List<CalendarOccurrence> timed = new ArrayList<>();
+        splitEvents(events, allDay, timed);
+
+
+        int allDayHeightPx = drawAllDayBanner(allDay, labelWidthPx, chipWidthPx);
+
 
         // Draw hour slot background and labels
         for (int h = 0; h < totalHours; h++) {
-            int topPx = h * hourHeightPx;
+            int topPx = h * hourHeightPx + allDayHeightPx;
             drawHourLabel(START_HOUR + h, topPx, labelWidthPx, hourHeightPx);
+            drawDivider(topPx, labelWidthPx);
         }
 
         // Set total container height
@@ -47,18 +59,12 @@ public class DayTimelineView extends TimeLineView {
         if (isSameDay(now, selectCal)) {
             float numHour = toFractionalHour(now);
             if (numHour >= START_HOUR && numHour < END_HOUR) {
-                int topPx = (int) ((numHour - START_HOUR) * hourHeightPx);
+                int topPx = allDayHeightPx + (int) ((numHour - START_HOUR) * hourHeightPx);
                 drawCurrentTimeline(topPx, labelWidthPx, RelativeLayout.LayoutParams.MATCH_PARENT);
             }
         }
 
-        // Draw events
-        if (events == null || events.isEmpty()) return;
-
-        int chipWidth = context.getResources().getDisplayMetrics().widthPixels
-                - labelWidthPx - (int) (4 * density);
-
-        for (CalendarOccurrence occ: events) {
+        for (CalendarOccurrence occ: timed) {
             Calendar startCal = Calendar.getInstance();
             startCal.setTime(occ.getStartDateTime());
             Calendar endCal = Calendar.getInstance();
@@ -74,12 +80,12 @@ public class DayTimelineView extends TimeLineView {
             float topOffset = startHour - START_HOUR;
             float durationHours = endHour - startHour;
 
-            int topPx = (int) (topOffset * hourHeightPx);
+            int topPx = allDayHeightPx + (int) (topOffset * hourHeightPx);
             int heightPx = Math.max((int) (durationHours * hourHeightPx), (int) (32 * density));
 
             // Inflate event chip
             drawEventChip(occ, topPx, heightPx,
-                    labelWidthPx + (int) (2 * density), chipWidth);
+                    labelWidthPx + (int) (2 * density), chipWidthPx);
         }
     }
 }
