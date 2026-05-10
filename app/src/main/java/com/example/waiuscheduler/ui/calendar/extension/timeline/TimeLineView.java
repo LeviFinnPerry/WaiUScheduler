@@ -75,6 +75,54 @@ public abstract class TimeLineView {
         cachedHourHeightPx = 0;
     }
 
+    /// Separates all day occurrences from timed ones
+    /// @param events full list of occurrences
+    /// @param allDay Output list for all day items
+    /// @param timed Output list for timed items
+    protected static void splitEvents(List<CalendarOccurrence> events,
+                                      List<CalendarOccurrence> allDay,
+                                      List<CalendarOccurrence> timed) {
+        if (events == null) return;
+        for (CalendarOccurrence c: events) {
+            if (isAllDay(c)) allDay.add(c);
+            else timed.add(c);
+        }
+    }
+
+    /// Draws the all day banner strip for chips above the hourly grid
+    ///
+    /// @param allDayEvents All-day occurrences to render
+    /// @param labelWidthPx Left offset for the time label column
+    /// @param chipWidthPx  Width of each chip
+    /// @return Height in px of the rendered banner area
+    protected int drawAllDayBanner(List<CalendarOccurrence> allDayEvents,
+                                   int labelWidthPx, int chipWidthPx
+    ) {
+        if (allDayEvents == null || allDayEvents.isEmpty()) return 0;
+
+        float density = context.getResources().getDisplayMetrics().density;
+        int chipHeightPx = (int) (28 * density);
+        int chipPaddingPx = (int) (6 * density);
+        int bannerHeight = allDayEvents.size() * (chipHeightPx + chipPaddingPx) + chipPaddingPx;
+
+        // Background strip
+        View strip = new View(context);
+        strip.setBackgroundColor(0xFFF0F0F0);
+        RelativeLayout.LayoutParams stripParams = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.MATCH_PARENT, bannerHeight);
+        stripParams.topMargin = 0;
+        container.addView(strip, stripParams);
+
+        // One chip per all-day event
+        for (int i = 0; i < allDayEvents.size(); i++) {
+            int chipTop = chipPaddingPx + i * (chipHeightPx + chipPaddingPx);
+            drawEventChip(allDayEvents.get(i), chipTop, chipHeightPx,
+                    labelWidthPx + (int) (2 * density), chipWidthPx);
+        }
+
+        return bannerHeight;
+    }
+
     /// Draws a divider between each hour
     protected void drawDivider(int topPx, int leftMarginPx) {
         float density = context.getResources().getDisplayMetrics().density;
@@ -130,7 +178,9 @@ public abstract class TimeLineView {
         String endTime = timeFmt.format(occ.getEndDateTime().getTime());
         String timeRange = startTime + " - " + endTime;
         ((TextView) chip.findViewById(R.id.text_timeline_title)).setText(occ.getTitle());
-        ((TextView) chip.findViewById(R.id.text_timeline_time)).setText(timeRange);
+        ((TextView) chip.findViewById(R.id.text_timeline_time)).setText(
+                isAllDay(occ) ? "Due Today": timeRange
+        );
 
         // Colour the background
         GradientDrawable bg = new GradientDrawable();
@@ -205,5 +255,11 @@ public abstract class TimeLineView {
     /// Converts a calendars time to a fractional hour value
     protected float toFractionalHour(Calendar cal) {
         return cal.get(Calendar.HOUR_OF_DAY) + cal.get(Calendar.MINUTE) / 60F;
+    }
+
+    /// Determines if the occurrence is an all day occurrence
+    /// @return Whether the calendar occurrence is an assessment
+    protected static boolean isAllDay(CalendarOccurrence occ) {
+        return CalendarOccurrence.TYPE_ASSESSMENT.equals(occ.getType());
     }
 }

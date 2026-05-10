@@ -62,7 +62,7 @@ public class CalendarViewModel extends AndroidViewModel {
         if (MODE_DAY.equals(mode)) {
             copy.add(Calendar.DAY_OF_MONTH, delta);
             // Skip weekends
-            copy = avoidWeekend(copy, delta);
+            avoidWeekend(copy, delta);
         }
         else if (MODE_WEEK.equals(mode)) { copy.add(Calendar.WEEK_OF_YEAR, delta); }
         else { copy.add(Calendar.MONTH, delta); }
@@ -79,7 +79,7 @@ public class CalendarViewModel extends AndroidViewModel {
     /// Moves back to today's occurrences of view
     public void goToToday() {
         Calendar c = Calendar.getInstance();
-        c = avoidWeekend(c, -1);
+        avoidWeekend(c, -1);
 
         currentDate.setValue(c);
         reloadRange();
