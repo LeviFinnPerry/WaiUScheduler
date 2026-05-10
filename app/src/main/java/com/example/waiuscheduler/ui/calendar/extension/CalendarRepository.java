@@ -52,10 +52,15 @@ public class CalendarRepository {
     /// @param start start time of the window
     /// @param end end time of the window
     public void calendarRange(long start, long end) {
+        Log.d("CAL_DEBUG", "calendarRange called: " + start + " - " + end);
+
         // Clear all sources
         if (assessmentSource != null) calendarItems.removeSource(assessmentSource);
         if (eventSource != null) calendarItems.removeSource(eventSource);
         if (studySessionSource != null) calendarItems.removeSource(studySessionSource);
+
+        // Cancel pending merges
+        if (mergeRunnable != null) mergeHandler.removeCallbacks(mergeRunnable);
 
         // Get all sources in the ranges
         assessmentSource = dbController.getAssessmentsBetween(start, end);
@@ -102,6 +107,8 @@ public class CalendarRepository {
             all.sort(Comparator.comparing(CalendarOccurrence::getStartDateTime));
             // Add to calendar items
             calendarItems.setValue(all);
+            Log.d("CAL_DEBUG", "convertSources fired, assessments=" + latestAssessments.size()
+                    + " events=" + latestEvents.size() + " study=" + latestStudySessions.size());
         };
         mergeHandler.postDelayed(mergeRunnable, 50);
     }

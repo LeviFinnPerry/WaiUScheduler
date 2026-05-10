@@ -3,6 +3,7 @@ package com.example.waiuscheduler.ui.calendar;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,6 +38,8 @@ public class CalendarFragment extends Fragment {
     private DayTimelineView dayTimelineView;
     private WeekTimelineView weekTimelineView;
     private String lastBuiltMode = null;
+    private boolean ignoreToggle = false;
+    private boolean filterButtonPressed = false;
 
     private final Handler refreshHandler = new Handler(Looper.getMainLooper());
     private Runnable refreshRunnable;
@@ -110,26 +113,32 @@ public class CalendarFragment extends Fragment {
 
     /// Sets up the different types of calendar views
     private void setupViewToggle() {
-        binding.radioDay.setOnClickListener(v ->
-                viewModel.setViewMode(CalendarViewModel.MODE_DAY));
-        binding.radioWeek.setOnClickListener(v ->
-                viewModel.setViewMode(CalendarViewModel.MODE_WEEK));
-        binding.radioMonth.setOnClickListener(v ->
-                viewModel.setViewMode(CalendarViewModel.MODE_MONTH));
+        binding.radioDay.setOnCheckedChangeListener((btn, isChecked) -> {
+            if (isChecked && !ignoreToggle) viewModel.setViewMode(CalendarViewModel.MODE_DAY);
+        });
+        binding.radioWeek.setOnCheckedChangeListener((btn, isChecked) -> {
+            if (isChecked && !ignoreToggle) viewModel.setViewMode(CalendarViewModel.MODE_WEEK);
+        });
+        binding.radioMonth.setOnCheckedChangeListener((btn, isChecked) -> {
+            if (isChecked && !ignoreToggle) viewModel.setViewMode(CalendarViewModel.MODE_MONTH);
+        });
 
     }
 
     /// Sets up filter buttons for different types of calendar occurrences
     private void setupFilterButtons() {
         binding.buttonFilterStudy.setOnClickListener(v -> {
+            filterButtonPressed = true;
             viewModel.toggleFilter(CalendarOccurrence.TYPE_STUDY);
             refreshFilterButtons();
         });
         binding.buttonFilterLecture.setOnClickListener(v -> {
+            filterButtonPressed = true;
             viewModel.toggleFilter(CalendarOccurrence.TYPE_EVENT);
             refreshFilterButtons();
         });
         binding.buttonFilterAssignment.setOnClickListener(v -> {
+            filterButtonPressed = true;
             viewModel.toggleFilter(CalendarOccurrence.TYPE_ASSESSMENT);
             refreshFilterButtons();
         });
@@ -194,10 +203,13 @@ public class CalendarFragment extends Fragment {
         });
 
         viewModel.getViewMode().observe(getViewLifecycleOwner(), (Observer<? super String>) mode -> {
+            ignoreToggle = true;
             // Sync radio buttons without triggering listeners
             binding.radioDay.setChecked(CalendarViewModel.MODE_DAY.equals(mode));
             binding.radioWeek.setChecked(CalendarViewModel.MODE_WEEK.equals(mode));
             binding.radioMonth.setChecked(CalendarViewModel.MODE_MONTH.equals(mode));
+            ignoreToggle = false;
+
             // Day labels row
             binding.dayLabels.setVisibility(
                     CalendarViewModel.MODE_DAY.equals(mode) ? View.GONE : View.VISIBLE);
@@ -211,9 +223,12 @@ public class CalendarFragment extends Fragment {
 
 
         viewModel.getOccurrences().observe(getViewLifecycleOwner(), this::refreshGrid);
-        viewModel.getFilters().observe(getViewLifecycleOwner(),
-                f -> refreshGrid(viewModel.getOccurrences().getValue())
-        );
+        viewModel.getFilters().observe(getViewLifecycleOwner(),f -> {
+            if (filterButtonPressed) {
+                filterButtonPressed = false;
+                refreshGrid(viewModel.getOccurrences().getValue());
+            }
+        });
     }
 
     /// Updates the header label in the calendar view
@@ -233,6 +248,7 @@ public class CalendarFragment extends Fragment {
     /// @param events Events for calendar grid
     private void refreshGrid(List<CalendarOccurrence> events) {
         Set<String> filters = viewModel.getFilters().getValue();
+        Log.d("CAL_DEBUG", "refreshGrid called, events=" + (events != null ? events.size() : "null"));
 
         if (refreshRunnable != null) refreshHandler.removeCallbacks(refreshRunnable);
         refreshRunnable = () -> performRefresh(events, filters);
@@ -243,6 +259,7 @@ public class CalendarFragment extends Fragment {
     /// @param events Events for calendar grid
     /// @param filters Selected filters on view
     private void performRefresh(List<CalendarOccurrence> events, Set<String> filters) {
+
         String mode = viewModel.getViewMode().getValue();
         Calendar current = viewModel.getCurrentDate().getValue();
         if (current == null || mode == null) return;
@@ -264,6 +281,7 @@ public class CalendarFragment extends Fragment {
         }
 
         lastBuiltMode = mode;
+        Log.d("CAL_DEBUG", "performRefresh fired, mode=" + mode + " events=" + safeEvents.size());
     }
 
     /// Hides all calendar views

@@ -38,7 +38,7 @@ public class CalendarViewModel extends AndroidViewModel {
     public CalendarViewModel(@NonNull Application application) {
         super(application);
         calendarRepository = new CalendarRepository();
-        Calendar initial = Calendar.getInstance();
+        Calendar initial = avoidWeekend(Calendar.getInstance(), -1);
         currentDate.setValue(initial);
         viewMode.setValue(MODE_MONTH);
         filters.setValue(new HashSet<>(Arrays.asList(
@@ -57,8 +57,13 @@ public class CalendarViewModel extends AndroidViewModel {
         if (c == null) return;  // Return if no date
         Calendar copy = (Calendar) c.clone();
         String mode = viewMode.getValue();
+
         // Check if day, week or month
-        if (MODE_DAY.equals(mode)) { copy.add(Calendar.DAY_OF_MONTH, delta); }
+        if (MODE_DAY.equals(mode)) {
+            copy.add(Calendar.DAY_OF_MONTH, delta);
+            // Skip weekends
+            copy = avoidWeekend(copy, delta);
+        }
         else if (MODE_WEEK.equals(mode)) { copy.add(Calendar.WEEK_OF_YEAR, delta); }
         else { copy.add(Calendar.MONTH, delta); }
         currentDate.setValue(copy);
@@ -72,7 +77,13 @@ public class CalendarViewModel extends AndroidViewModel {
     /// Moves to future occurrences of view
     public void goToNext() { shiftDate(+1); }
     /// Moves back to today's occurrences of view
-    public void goToToday() { currentDate.setValue(Calendar.getInstance());}
+    public void goToToday() {
+        Calendar c = Calendar.getInstance();
+        c = avoidWeekend(c, -1);
+
+        currentDate.setValue(c);
+        reloadRange();
+    }
 
     // View mode
 
@@ -192,9 +203,12 @@ public class CalendarViewModel extends AndroidViewModel {
         calendarRepository.deleteStudySession(s);
     }
 
-    /// Updates the study session
-    /// @param s study session
-    public void updateStudySession(StudySessionEntity s) {
-        calendarRepository.updateStudySession(s);
+    /// Avoids weekends in date views
+    /// @return last calendar date before weekend or current date
+    private Calendar avoidWeekend(Calendar c, int delta) {
+        int dow = c.get(Calendar.DAY_OF_WEEK);
+        if (dow == Calendar.SATURDAY) c.add(Calendar.DAY_OF_MONTH, delta > 0 ? 2 : -1);
+        else if (dow == Calendar.SUNDAY) c.add(Calendar.DAY_OF_MONTH, delta > 0 ? 1: -2);
+        return c;
     }
 }
