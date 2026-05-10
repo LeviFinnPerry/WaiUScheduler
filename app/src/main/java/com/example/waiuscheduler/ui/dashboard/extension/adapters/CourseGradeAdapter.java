@@ -72,7 +72,7 @@ public class CourseGradeAdapter extends RecyclerView.Adapter<CourseGradeAdapter.
 
     /// Static class for the custom view holder
     /// @extends RecyclerView.ViewHolder
-    static class VH extends RecyclerView.ViewHolder {
+    public static class VH extends RecyclerView.ViewHolder {
         TextView textPaperId, textGrade;
         ProgressBar progressGrade;
         VH(View v) {

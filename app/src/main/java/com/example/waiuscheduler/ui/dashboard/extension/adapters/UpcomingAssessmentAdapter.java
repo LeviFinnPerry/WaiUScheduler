@@ -1,6 +1,5 @@
 package com.example.waiuscheduler.ui.dashboard.extension.adapters;
 
-import android.content.res.ColorStateList;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -70,12 +69,12 @@ public class UpcomingAssessmentAdapter extends RecyclerView.Adapter<UpcomingAsse
     private void setBadgeColor(VH holder, String type) {
         int badgeColour;
         switch (type) {
-            case "event": badgeColour = 0xFF3949AB; break;
-            case "assignment": badgeColour = 0xFFE65100; break;
-            case "exam": badgeColour = 0xFFC62828; break;
+            case "Report": badgeColour = 0xFF3949AB; break;
+            case "Assignment": badgeColour = 0xFFE65100; break;
+            case "Exam": badgeColour = 0xFFC62828; break;
             default: badgeColour = 0xFF757575; break;
         }
-        holder.textTypeBadge.setBackgroundTintList(ColorStateList.valueOf(badgeColour));
+        holder.textTypeBadge.setBackgroundColor(badgeColour);
     }
 
     /// If the assessment is due within two days
@@ -97,7 +96,7 @@ public class UpcomingAssessmentAdapter extends RecyclerView.Adapter<UpcomingAsse
 
     /// Static class for the custom view holder
     /// @extends RecyclerView.ViewHolder
-    static class VH extends RecyclerView.ViewHolder {
+    public static class VH extends RecyclerView.ViewHolder {
         TextView textTitle, textDate, textPaper, textTypeBadge, textUrgent;
         VH(View v) {
             super(v);

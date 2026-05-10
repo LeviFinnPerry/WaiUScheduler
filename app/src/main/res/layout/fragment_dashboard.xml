@@ -64,22 +64,24 @@
                 android:id="@+id/section_study_hours"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
+                android:orientation="vertical"
                 android:background="@drawable/card_background"
                 android:layout_marginBottom="8dp">
                 <include layout="@layout/dashboard_section_header"
                     android:id="@+id/header_study_hours"/>
+
                 <LinearLayout
                     android:id="@+id/content_study_hours"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:visibility="gone"
-                    android:padding="16dp">
+                    android:padding="16dp"
+                    android:visibility="gone">
+
                     <com.github.mikephil.charting.charts.BarChart
                         android:id="@+id/chart_study_hours"
                         android:layout_width="match_parent"
-                        android:layout_height="200dp"/>
+                        android:layout_height="200dp" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -87,23 +89,28 @@
                 android:id="@+id/section_course_grades"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
+                android:orientation="vertical"
                 android:background="@drawable/card_background"
                 android:layout_marginBottom="8dp">
-                <include layout="@layout/dashboard_section_header"
-                    android:id="@+id/header_course_grades"/>
+
+                <include
+                    android:id="@+id/header_course_grades"
+                    layout="@layout/dashboard_section_header"
+                    android:visibility="visible" />
+
                 <LinearLayout
                     android:id="@+id/content_course_grades"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:visibility="gone"
-                    android:padding="16dp">
+                    android:padding="16dp"
+                    android:visibility="gone">
+
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/recycleview_course_grades"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:nestedScrollingEnabled="false"/>
+                        android:nestedScrollingEnabled="false" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -111,23 +118,25 @@
                 android:id="@+id/section_upcoming_assessments"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
+                android:orientation="vertical"
                 android:background="@drawable/card_background"
                 android:layout_marginBottom="8dp">
                 <include layout="@layout/dashboard_section_header"
                     android:id="@+id/header_upcoming_assessments"/>
+
                 <LinearLayout
                     android:id="@+id/content_upcoming_assessments"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:visibility="gone"
-                    android:padding="16dp">
+                    android:padding="16dp"
+                    android:visibility="gone">
+
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/recycleview_upcoming_assessments"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:nestedScrollingEnabled="false"/>
+                        android:nestedScrollingEnabled="false" />
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>

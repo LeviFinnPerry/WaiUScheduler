@@ -184,7 +184,7 @@ public class DashboardFragment extends Fragment {
         for (int i = 0; i < rows.size(); i++) {
             entries.add(new BarEntry(i, (float) rows.get(i).hours));
             // Shorten paper id for label
-            labels.add(rows.get(i).paperId_fk.split("-")[0]);
+            labels.add(rows.get(i).paperId.split("-")[0]);
         }
 
         // Set up bar data
