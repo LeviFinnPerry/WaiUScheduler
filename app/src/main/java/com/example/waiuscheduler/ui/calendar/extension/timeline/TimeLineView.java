@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Locale;
 
 public abstract class TimeLineView {
+
     // Constant variables
     protected static final int START_HOUR = 8;
     protected static final int END_HOUR = 18;
@@ -133,9 +134,17 @@ public abstract class TimeLineView {
         container.addView(divider, p);
     }
 
+    protected void drawHour(int totalHours, int hourHeightPx, int gridTopPx, int labelWidthPx) {
+        for (int h = 0; h < totalHours; h++) {
+            int topPx = h * hourHeightPx + gridTopPx;
+            drawHourLabel(START_HOUR + h, topPx, labelWidthPx, hourHeightPx);
+            drawDivider(topPx, labelWidthPx);
+        }
+    }
+
     /// Draws the background strip for all day items
     /// @param bannerHeight Height to draw strip
-    private void drawBackgroundStrip(int bannerHeight) {
+    protected void drawBackgroundStrip(int bannerHeight) {
         View strip = new View(context);
         strip.setBackgroundColor(0xFFF0F0F0);
         RelativeLayout.LayoutParams stripParams = new RelativeLayout.LayoutParams(

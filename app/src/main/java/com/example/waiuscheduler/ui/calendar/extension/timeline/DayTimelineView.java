@@ -42,11 +42,7 @@ public class DayTimelineView extends TimeLineView {
 
 
         // Draw hour slot background and labels
-        for (int h = 0; h < totalHours; h++) {
-            int topPx = h * hourHeightPx + allDayHeightPx;
-            drawHourLabel(START_HOUR + h, topPx, labelWidthPx, hourHeightPx);
-            drawDivider(topPx, labelWidthPx);
-        }
+        drawHour(totalHours, hourHeightPx, allDayHeightPx, labelWidthPx);
 
         // Set total container height
         setContainerHeight(hourHeightPx * totalHours);

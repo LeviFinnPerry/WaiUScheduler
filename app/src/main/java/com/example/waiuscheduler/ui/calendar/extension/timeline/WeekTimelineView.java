@@ -70,60 +70,16 @@ public class WeekTimelineView extends TimeLineView {
         splitEvents(events, allDay, timed);
 
         // Day header row
-        for (int col = 0; col < 5; col++) {
-            Date dayDate = weekDays.get(col);
-            if (dayDate == null) continue;
-
-            Calendar dayCal = Calendar.getInstance();
-            dayCal.setTime(dayDate);
-
-            TextView header = new TextView(context);
-            header.setText(dayFmt.format(dayDate));
-            header.setTextSize(11);
-            header.setGravity(Gravity.CENTER);
-            header.setBackgroundColor(0xFFF5F5F5);
-
-            boolean isToday = isSameDay(dayCal, today);
-            header.setTextColor(isToday ? 0xFF1565C0 : 0xFF212121);
-            header.setTypeface(null, isToday ? Typeface.BOLD : Typeface.NORMAL);
-
-            RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(
-                    dayColumnWidth, headerHeightPx);
-            p.leftMargin = labelWidthPx + col * dayColumnWidth;
-            p.topMargin  = 0;
-            container.addView(header, p);
-        }
+        dayHeaderRow(weekDays, dayFmt, today, dayColumnWidth, headerHeightPx, labelWidthPx);
 
         // Per column all day banners
-        int maxAllDay = 0;
-        for (int c = 0; c < 5; c++) {
-            Date dueDate = weekDays.get(c);
-            if (dueDate == null) continue;
-            Calendar myCal = Calendar.getInstance();
-            myCal.setTime(dueDate);
-            int count = 0;
-            for (CalendarOccurrence occ: allDay) {
-                Calendar occCal = Calendar.getInstance();
-                occCal.setTime(occ.getStartDateTime());
-                if (isSameDay(occCal, myCal)) count++;
-            }
-            maxAllDay = Math.max(maxAllDay, count);
-        }
-
         int chipHeightPx = (int) (20 * density);
         int chipPaddingPx = (int) (4 * density);
-        int allDayRowHeightPx = maxAllDay == 0 ? 0
-                : maxAllDay * (chipHeightPx + chipPaddingPx) + chipPaddingPx * 2;
+        int allDayRowHeightPx = dayHeaderCol(weekDays, allDay, chipHeightPx, chipPaddingPx);
+
 
         // Background strip for all-day row
-        if (allDayRowHeightPx > 0) {
-            View strip = new View(context);
-            strip.setBackgroundColor(0xFFF0F0F0);
-            RelativeLayout.LayoutParams stripParams = new RelativeLayout.LayoutParams(
-                    RelativeLayout.LayoutParams.MATCH_PARENT, allDayRowHeightPx);
-            stripParams.topMargin = headerHeightPx;
-            container.addView(strip, stripParams);
-        }
+        drawBackgroundStrip(allDayRowHeightPx);
 
         // Draw assessment chips per column
         for (int col = 0; col < 5; col++) {
@@ -150,11 +106,7 @@ public class WeekTimelineView extends TimeLineView {
         int gridTopPx = headerHeightPx + allDayRowHeightPx;
 
         // Hour labels
-        for (int h = 0; h < totalHours; h++) {
-            int topPx = gridTopPx + h * hourHeightPx;
-            drawHourLabel(START_HOUR + h, topPx, labelWidthPx, hourHeightPx);
-            drawDivider(topPx, labelWidthPx);
-        }
+        drawHour(totalHours, hourHeightPx, gridTopPx, labelWidthPx);
 
         // Vertical divider between days
         for (int col = 1; col < 5; col++) {
@@ -233,5 +185,51 @@ public class WeekTimelineView extends TimeLineView {
 
             drawEventChip(occ, topPx, heightPx, chipLeft, chipWidth);
         }
+    }
+
+    private void dayHeaderRow(List<Date> weekDays, SimpleDateFormat dayFmt, Calendar today,
+                              int dayColumnWidth, int headerHeightPx, int labelWidthPx) {
+        for (int col = 0; col < 5; col++) {
+            Date dayDate = weekDays.get(col);
+            if (dayDate == null) continue;
+
+            Calendar dayCal = Calendar.getInstance();
+            dayCal.setTime(dayDate);
+
+            TextView header = new TextView(context);
+            header.setText(dayFmt.format(dayDate));
+            header.setTextSize(11);
+            header.setGravity(Gravity.CENTER);
+            header.setBackgroundColor(0xFFF5F5F5);
+
+            boolean isToday = isSameDay(dayCal, today);
+            header.setTextColor(isToday ? 0xFF1565C0 : 0xFF212121);
+            header.setTypeface(null, isToday ? Typeface.BOLD : Typeface.NORMAL);
+
+            RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(
+                    dayColumnWidth, headerHeightPx);
+            p.leftMargin = labelWidthPx + col * dayColumnWidth;
+            p.topMargin  = 0;
+            container.addView(header, p);
+        }
+    }
+
+    private int dayHeaderCol(List<Date> weekDays, List<CalendarOccurrence> allDay, int chipHeightPx, int chipPaddingPx) {
+        int maxAllDay = 0;
+        for (int c = 0; c < 5; c++) {
+            Date dueDate = weekDays.get(c);
+            if (dueDate == null) continue;
+            Calendar myCal = Calendar.getInstance();
+            myCal.setTime(dueDate);
+            int count = 0;
+            for (CalendarOccurrence occ: allDay) {
+                Calendar occCal = Calendar.getInstance();
+                occCal.setTime(occ.getStartDateTime());
+                if (isSameDay(occCal, myCal)) count++;
+            }
+            maxAllDay = Math.max(maxAllDay, count);
+        }
+        return maxAllDay == 0 ? 0: maxAllDay * (chipHeightPx + chipPaddingPx) + chipPaddingPx * 2;
+
     }
 }
