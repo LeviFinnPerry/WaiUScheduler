@@ -89,6 +89,12 @@ public class DatabaseController {
         db.assessmentDao().insert(assessmentEntity);
     }
 
+    /// Function to save the assessment table
+    /// @param assessmentEntity An assessment for a paper
+    public void updateAssessment(AssessmentEntity assessmentEntity) {
+        db.assessmentDao().update(assessmentEntity);
+    }
+
     /// Function to save the timetable pattern table
     /// @param timetablePatternEntity A timetable pattern occurance
     public void saveTimetablePattern(TimetablePatternEntity timetablePatternEntity) {

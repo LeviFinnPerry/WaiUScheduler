@@ -7,6 +7,7 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.waiuscheduler.database.tables.AssessmentEntity;
 import com.example.waiuscheduler.database.tables.StudySessionEntity;
 import com.example.waiuscheduler.ui.calendar.extension.CalendarOccurrence;
 import com.example.waiuscheduler.ui.calendar.extension.CalendarRepository;
@@ -201,6 +202,12 @@ public class CalendarViewModel extends AndroidViewModel {
     /// @param s Study session
     public void deleteStudySession(StudySessionEntity s) {
         calendarRepository.deleteStudySession(s);
+    }
+
+    /// Updates the grade in the assessment
+    /// @param assessment Assessment to update
+    public void updateGrade(AssessmentEntity assessment) {
+        calendarRepository.updateAssessmentGrade(assessment);
     }
 
     /// Avoids weekends in date views

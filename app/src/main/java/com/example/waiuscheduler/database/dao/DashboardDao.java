@@ -28,7 +28,7 @@ public interface DashboardDao {
     LiveData<Double> getAvgGrade();
 
     /// Grade per paper for course grades
-    @Query("SELECT paperId, AVG(grade) AS avgGrade, COUNT(*) AS total, " +
+    @Query("SELECT paperId, COALESCE(AVG(grade), 0) AS avgGrade, COUNT(*) AS total, " +
             "SUM(CASE WHEN grade IS NOT NULL THEN 1 ELSE 0 END) AS graded FROM assessment " +
             "GROUP BY paperId")
     LiveData<List<CourseGradeRow>> getGradesByPaper();

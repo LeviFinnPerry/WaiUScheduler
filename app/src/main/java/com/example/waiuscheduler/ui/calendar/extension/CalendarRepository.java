@@ -129,4 +129,10 @@ public class CalendarRepository {
     public void updateStudySession(StudySessionEntity s) {
         AppDatabase.databaseWriteExecutor.execute(() -> dbController.updateStudySession(s));
     }
+
+    /// Updates assessment grade
+    /// @param a Assessment
+    public void updateAssessmentGrade(AssessmentEntity a) {
+        AppDatabase.databaseWriteExecutor.execute(() -> dbController.updateAssessment(a));
+    }
 }

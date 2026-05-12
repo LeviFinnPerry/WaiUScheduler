@@ -121,6 +121,7 @@ public class CalendarEventDetail extends BottomSheetDialogFragment {
                 return;
             }
             assessment.setGrade(grade);
+            vm.updateGrade(assessment);
             Toast.makeText(requireContext(), "Grade saved: " + input, Toast.LENGTH_SHORT).show();
             dismiss();
         });
