@@ -21,6 +21,7 @@ import com.example.waiuscheduler.ui.calendar.CalendarViewModel;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
 
 public class CalendarEventDetail extends BottomSheetDialogFragment {
@@ -103,6 +104,15 @@ public class CalendarEventDetail extends BottomSheetDialogFragment {
             editGrade.setText(String.valueOf(assessment.getGrade()));
         }
 
+        // If assessment due date has already passed
+        boolean isFuture = assessment.getDueDate().after(new Date());
+        if (isFuture) {
+            editGrade.setEnabled(false);
+            editGrade.setHint(R.string.assessment_not_due);
+            view.findViewById(R.id.button_save_grade).setEnabled(false);
+            return;
+        }
+
         view.findViewById(R.id.button_save_grade).setOnClickListener(v -> {
             String input = editGrade.getText() != null ? editGrade.getText().toString().trim(): "";
             if (input.isEmpty()) {
@@ -136,6 +146,16 @@ public class CalendarEventDetail extends BottomSheetDialogFragment {
         RadioGroup radioGroup = view.findViewById(R.id.radiogroup_attendance);
         if (event.getAttended().equals(true)) radioGroup.check(R.id.radio_attended);
         else if (event.getAttended().equals(false)) radioGroup.check(R.id.radio_missed);
+
+        // Disables inputting event attendance for future events
+        boolean isFuture = occurrence.getStartDateTime().after(new Date());
+        if (isFuture) {
+            for (int i = 0; i < radioGroup.getChildCount(); i++) {
+                radioGroup.getChildAt(i).setEnabled(false);
+            }
+            view.findViewById(R.id.button_save_attendance).setEnabled(false);
+            return;
+        }
 
         view.findViewById(R.id.button_save_attendance).setOnClickListener(v -> {
             int checked = radioGroup.getCheckedRadioButtonId();

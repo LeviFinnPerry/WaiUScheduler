@@ -75,5 +75,6 @@
     <string name="upcoming_events">Upcoming Events</string>
     <string name="urgent">Urgent</string>
     <string name="enrolled_courses">Enrolled Courses</string>
+    <string name="assessment_not_due">Assessment not due yet</string>
 
 </resources>
