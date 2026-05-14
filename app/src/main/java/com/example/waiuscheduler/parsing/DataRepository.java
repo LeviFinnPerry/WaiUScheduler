@@ -11,11 +11,13 @@ import com.example.waiuscheduler.database.tables.EventEntity;
 import com.example.waiuscheduler.database.tables.PaperEntity;
 import com.example.waiuscheduler.database.tables.SemesterEntity;
 import com.example.waiuscheduler.database.tables.StaffEntity;
+import com.example.waiuscheduler.database.tables.StudySessionEntity;
 import com.example.waiuscheduler.database.tables.TimetablePatternEntity;
 
 import org.jsoup.nodes.Document;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Objects;
 
 import okhttp3.HttpUrl;
@@ -50,6 +52,8 @@ public class DataRepository {
                     DateConverter.stringToDate("06/11/2026"),
                     DateConverter.stringToDate("24/08/2026"),
                     DateConverter.stringToDate("07/09/2026")));
+
+
 
         });
     }
@@ -102,6 +106,19 @@ public class DataRepository {
                     for (EventEntity event : events) {
                         dbController.saveEvent(event); // Save event to database
                     }
+
+                    Date trialStart = DateConverter.toDateTime(DateConverter.stringToDate("12/05/2026"), DateConverter.stringToTime("08:00"));
+                    Date trialEnd = DateConverter.toDateTime(DateConverter.stringToDate("12/05/2026"), DateConverter.stringToTime("16:00"));
+
+                    // DEBUG:
+                    dbController.saveStudySession(new StudySessionEntity(
+                            trialStart,
+                            trialEnd,
+                            8.0,
+                            "",
+                            currentOutline.getPaper().getPaperId()
+                    ));
+
                     // Callback for successful pipeline
                     callback.OnComplete("Success");
                 } else {

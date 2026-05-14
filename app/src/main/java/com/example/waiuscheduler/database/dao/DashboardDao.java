@@ -15,11 +15,11 @@ public interface DashboardDao {
 
     // Study hours
     ///  Total study hours across all sessions
-    @Query("SELECT COALESCE(SUM(dateTimeEnd - dateTimeStart) / 3600000.0, 0) AS duration FROM study_session")
+    @Query("SELECT SUM(duration) FROM study_session")
     LiveData<Double> getTotalStudyHours();
 
     /// Study hours grouped by paper
-    @Query("SELECT paperId, SUM(dateTimeEnd - dateTimeStart) / 3600000.0 AS hours FROM study_session GROUP BY paperId ORDER BY hours DESC")
+    @Query("SELECT paperId, SUM(duration) AS hours FROM study_session GROUP BY paperId ORDER BY hours DESC")
     LiveData<List<StudyHourRow>> getStudyHoursByPaper();
 
     // Grades

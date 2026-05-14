@@ -79,9 +79,12 @@ public class DashboardFragment extends Fragment {
 
     /// Set on click listeners for each event
     private void setUpDropDownListeners() {
-        binding.headerStudyHours.getRoot().setOnClickListener(v -> toggleSection(binding.contentStudyHours, binding.headerStudyHours.sectionDropdown));
-        binding.headerCourseGrades.getRoot().setOnClickListener(v -> toggleSection(binding.contentCourseGrades, binding.headerCourseGrades.sectionDropdown));
-        binding.headerUpcomingAssessments.getRoot().setOnClickListener(v -> toggleSection(binding.contentUpcomingAssessments, binding.headerUpcomingAssessments.sectionDropdown));
+        binding.headerStudyHours.getRoot().setOnClickListener(v ->
+                toggleSection(binding.contentStudyHours, binding.headerStudyHours.sectionDropdown));
+        binding.headerCourseGrades.getRoot().setOnClickListener(v ->
+                toggleSection(binding.contentCourseGrades, binding.headerCourseGrades.sectionDropdown));
+        binding.headerUpcomingAssessments.getRoot().setOnClickListener(v ->
+                toggleSection(binding.contentUpcomingAssessments, binding.headerUpcomingAssessments.sectionDropdown));
     }
 
     /// Set up managers for the recycler views
@@ -94,6 +97,7 @@ public class DashboardFragment extends Fragment {
 
     /// Observe all the elements in the UI
     private void observeViewModel() {
+        // TODO: Handle null values
         // Total Study Hours
         viewModel.getTotalStudy().observe(getViewLifecycleOwner(), hours -> {
             binding.cardStudyHours.statLabel.setText(R.string.total_study_hours);

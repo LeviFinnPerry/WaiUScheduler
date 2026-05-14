@@ -99,13 +99,14 @@ public class TimerViewModel extends AndroidViewModel {
     /// @param notes Notes from user input
     /// @param paperId The foreign key for the paper id
     public void storeStudySession(String notes, String paperId) {
-        if (seconds <= 0) return;   // If there is no time
-        double duration = seconds / 3600.0;
+        if (seconds < 0) return;   // If there is no time
         new Thread(() -> {
             // Get the information from the study session
             long endTimeMillis = System.currentTimeMillis();
             Date startTime = new Date(startTimeMillis);
             Date endTime = new Date(endTimeMillis);
+            seconds = (endTimeMillis - startTimeMillis);
+            double duration = seconds / 360.0;
 
             // Create a study session
             StudySessionEntity currSession =

@@ -40,7 +40,6 @@ public class CalendarOccurrence {
     /// @param assessment Occurrence of an assessment
     /// @return Calendar object representing the assessment
     public static CalendarOccurrence from(AssessmentEntity assessment) {
-        // TODO: Separate start and end of day for assignment due dates
         return new CalendarOccurrence(
                 TYPE_ASSESSMENT,
                 assessment.getTitle(),
