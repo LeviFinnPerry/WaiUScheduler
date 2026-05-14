@@ -1,7 +1,6 @@
 package com.example.waiuscheduler.ui.dashboard;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -97,42 +96,38 @@ public class DashboardFragment extends Fragment {
 
     /// Observe all the elements in the UI
     private void observeViewModel() {
-        // TODO: Handle null values
         // Total Study Hours
         viewModel.getTotalStudy().observe(getViewLifecycleOwner(), hours -> {
             binding.cardStudyHours.statLabel.setText(R.string.total_study_hours);
             binding.cardStudyHours.statValue.setText(
-                    String.format(Locale.getDefault(), "%.1f", hours));
+                    hours != null ? String.format(Locale.getDefault(), "%.1f", hours) : "0.0");
         });
         // Grade average
         viewModel.getAvgGrade().observe(getViewLifecycleOwner(), grade -> {
             binding.cardAvgGrade.statLabel.setText(R.string.average_grade);
             binding.cardAvgGrade.statValue.setText(
-                    String.format(Locale.getDefault(), "%.1f%%", grade));
+                    grade != null ? String.format(Locale.getDefault(), "%.1f%%", grade) : "0.0%");
         });
         // Paper count
         viewModel.getTotalPaperCount().observe(getViewLifecycleOwner(), count -> {
             binding.cardCourses.statLabel.setText(R.string.enrolled_courses);
             binding.cardCourses.statValue.setText(
-                    String.valueOf(count));
+                    count != null ? String.valueOf(count) : "0");
         });
         // Upcoming events
         viewModel.getUpcomingEventCount().observe(getViewLifecycleOwner(), count -> {
             binding.cardEvents.statLabel.setText(R.string.upcoming_events);
-            binding.cardEvents.statValue.setText(String.valueOf(count));
+            binding.cardEvents.statValue.setText(
+                    count != null ? String.valueOf(count) : "0");
         });
         // Study hours by paper
         viewModel.getTotalStudyByPaper().observe(getViewLifecycleOwner(), this::setUpBarChart);
         // Grades by paper
-        viewModel.getGradesByPaper().observe(getViewLifecycleOwner(), rows -> {
-            Log.d("Dashboard", "Grades returned: " + rows.size());
-            binding.recycleviewCourseGrades.setAdapter(new CourseGradeAdapter(rows));
-        });
+        viewModel.getGradesByPaper().observe(getViewLifecycleOwner(), rows ->
+            binding.recycleviewCourseGrades.setAdapter(new CourseGradeAdapter(rows)));
         // Upcoming events
-        viewModel.getUpcomingAssessments().observe(getViewLifecycleOwner(), rows -> {
-            Log.d("Dashboard", "Assessments returned: " + rows.size());
-            binding.recycleviewUpcomingAssessments.setAdapter(new UpcomingAssessmentAdapter(rows));
-        });
+        viewModel.getUpcomingAssessments().observe(getViewLifecycleOwner(), rows ->
+            binding.recycleviewUpcomingAssessments.setAdapter(new UpcomingAssessmentAdapter(rows)));
     }
 
 
