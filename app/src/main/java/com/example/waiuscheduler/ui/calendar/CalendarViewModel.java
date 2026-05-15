@@ -198,6 +198,12 @@ public class CalendarViewModel extends AndroidViewModel {
         reloadRange();
     }
 
+    /// Updates the study session
+    /// @param s Study session
+    public void updateStudySession(StudySessionEntity s) {
+        calendarRepository.updateStudySession(s);
+    }
+
     /// Deletes the study session
     /// @param s Study session
     public void deleteStudySession(StudySessionEntity s) {
