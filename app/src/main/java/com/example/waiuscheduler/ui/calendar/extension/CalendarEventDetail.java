@@ -1,5 +1,7 @@
 package com.example.waiuscheduler.ui.calendar.extension;
 
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,6 +23,7 @@ import com.example.waiuscheduler.ui.calendar.CalendarViewModel;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -177,13 +180,13 @@ public class CalendarEventDetail extends BottomSheetDialogFragment {
     private void setupStudySection(View view) {
         view.findViewById(R.id.section_study).setVisibility(View.VISIBLE);
         StudySessionEntity studySession = (StudySessionEntity) occurrence.getSourceEntity();
+        TextView detailsView = view.findViewById(R.id.text_study_details);
 
-        SimpleDateFormat fmt = new SimpleDateFormat(
-                "EEE d MMM, h:mm a", Locale.getDefault());
-        String details = "Subject: " + studySession.getPaperId().split("-")[0] + "\n"
-                + "Start: "   + fmt.format(studySession.getDateTimeStart()) + "\n"
-                + "End: "     + fmt.format(studySession.getDateTimeEnd());
-        ((TextView) view.findViewById(R.id.text_study_details)).setText(details);
+        // Builds and displays section details
+        refreshStudyGrid(detailsView, studySession);
+
+        // Select details to edit times
+        setDetails(detailsView, studySession);
 
         view.findViewById(R.id.button_delete_study).setOnClickListener(v -> {
             if (vm != null) {
@@ -194,5 +197,100 @@ public class CalendarEventDetail extends BottomSheetDialogFragment {
         });
 
     }
+
+    /// Rebuilds study detail text
+    /// @param detailsView Textview to update
+    /// @param studySession Source entity
+    private void refreshStudyGrid(TextView detailsView, StudySessionEntity studySession) {
+        SimpleDateFormat fmt = new SimpleDateFormat(
+                "EEE d MMM, h:mm a", Locale.getDefault());
+        
+        String notes = studySession.getNotes();
+        String details = "Subject: " + studySession.getPaperId().split("-")[0] + "\n"
+                + "Start: "   + fmt.format(studySession.getDateTimeStart()) + "\n"
+                + "End: "     + fmt.format(studySession.getDateTimeEnd()) + "\n"
+                + (hasNotes(notes) ? "Notes: " + notes : "");
+        ((TextView) detailsView.findViewById(R.id.text_study_details)).setText(details);
+    }
+
+    /// Whether the study session has notes
+    /// @param notes notes taken
+    /// @return True if has notes else false
+    private boolean hasNotes(String notes) {
+        return notes != null && !notes.trim().isEmpty();
+    }
+
+    /// Opens a date then time picker to set the session start time
+    /// @param session Study session being edited
+    /// @param onSaved Runnable called for confirmed times
+    private void pickStartTime(StudySessionEntity session, Runnable onSaved) {
+        Calendar startCal = Calendar.getInstance();
+        startCal.setTime(session.getDateTimeStart());
+
+        Calendar endCal = Calendar.getInstance();
+        endCal.setTime(session.getDateTimeEnd());
+
+        // Pick start date
+        new DatePickerDialog(requireContext(), (dp, year, month, day) -> {
+            startCal.set(year, month, day);
+            // Pick start time
+            new TimePickerDialog(requireContext(), (tp, hour, minute) -> {
+                startCal.set(Calendar.HOUR_OF_DAY, hour);
+                startCal.set(Calendar.MINUTE, minute);
+
+                // Send to picking end time
+                pickEndTime(session, startCal, endCal, onSaved);
+
+            }, startCal.get(Calendar.HOUR_OF_DAY), startCal.get(Calendar.MINUTE), false).show();
+
+        }, startCal.get(Calendar.YEAR), startCal.get(Calendar.MONTH), startCal.get(Calendar.DAY_OF_MONTH)).show();
+    }
+
+    /// Opens a date then time picker to set the session end time
+    /// @param session Study session being edited
+    /// @param onSaved Runnable called for confirmed times
+    private void pickEndTime(StudySessionEntity session, Calendar startCal, Calendar endCal, Runnable onSaved) {
+        new DatePickerDialog(requireContext(), (dp, year, month, day) -> {
+            endCal.set(year, month, day);
+
+            new TimePickerDialog(requireContext(), (tp, hour, minute) -> {
+                endCal.set(Calendar.HOUR_OF_DAY, hour);
+                endCal.set(Calendar.MINUTE, minute);
+
+                setTimes(startCal, endCal, session, onSaved);
+            }, endCal.get(Calendar.HOUR_OF_DAY), endCal.get(Calendar.MINUTE), false).show();
+        }, endCal.get(Calendar.YEAR), endCal.get(Calendar.MONTH), endCal.get(Calendar.DAY_OF_MONTH)).show();
+    }
+
+    /// Sets the pickers to set the session times
+    /// @param startCal Start calendar time
+    /// @param endCal End calendar time
+    /// @param session Study session being edited
+    /// @param onSaved Runnable called for confirmed times
+    private void setTimes(Calendar startCal, Calendar endCal, StudySessionEntity session, Runnable onSaved) {
+        // End must be after start
+        if (!endCal.getTime().after(startCal.getTime())) {
+            Toast.makeText(requireContext(), "End time must be after start", Toast.LENGTH_SHORT).show();
+        } else {
+            // Set times to update session
+            session.setDateTimeStart(startCal.getTime());
+            session.setDateTimeEnd(endCal.getTime());
+            if (vm != null) vm.updateStudySession(session);
+            Toast.makeText(requireContext(), "Session time updated", Toast.LENGTH_SHORT).show();
+        }
+        onSaved.run();
+    }
+
+    /// Sets the on click listener for setting times
+    /// @param detailsView Text view to select
+    /// @param studySession Study session to edit
+    private void setDetails(TextView detailsView, StudySessionEntity studySession) {
+        detailsView.setClickable(true);
+        detailsView.setOnClickListener(v -> pickStartTime(studySession, () -> refreshStudyGrid(detailsView, studySession)));
+    }
+
+
+
+
 
 }
