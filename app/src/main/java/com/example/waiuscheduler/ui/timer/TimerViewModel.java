@@ -78,7 +78,8 @@ public class TimerViewModel extends AndroidViewModel {
     /// Starts the timer by logging the start time
     public void start() {
         if (!running && seconds == 0) {                 // If timer is not already running
-                startTimeMillis = System.currentTimeMillis();
+                this.startTimeMillis = System.currentTimeMillis();
+                this.seconds = 0.0;
         }
         running = true;     // Enable timer is running
     }
@@ -105,14 +106,15 @@ public class TimerViewModel extends AndroidViewModel {
             long endTimeMillis = System.currentTimeMillis();
             Date startTime = new Date(startTimeMillis);
             Date endTime = new Date(endTimeMillis);
-            seconds = (endTimeMillis - startTimeMillis);
-            double duration = seconds / 360.0;
+            seconds = (double) (endTimeMillis - startTimeMillis) / 1000.0;
+            double duration = seconds / 3600.0;
 
             // Create a study session
             StudySessionEntity currSession =
                     new StudySessionEntity(startTime, endTime, duration, notes, paperId);
 
             dbController.saveStudySession(currSession);
+            this.seconds = 0;
         }).start();
         reset();    // Reset UI after saving
     }
