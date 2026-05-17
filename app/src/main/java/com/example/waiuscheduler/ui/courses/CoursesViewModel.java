@@ -34,12 +34,6 @@ public class CoursesViewModel extends AndroidViewModel {
         this.papers = dbController.getAllPapers();
     }
 
-    /// Get status of the pipeline
-    /// @return Status message
-    public LiveData<String> getStatus() {
-        return status;
-    }
-
     /// Function to retrieve text from user and start course outline pipeline
     /// @param courseCode paper code
     /// @param occCode paper occurrence code
@@ -49,7 +43,6 @@ public class CoursesViewModel extends AndroidViewModel {
         String urlFormat =
                 "https://uow-func-net-currmngmt-offmngmt-aue-prod.azurewebsites.net/api/outline/view/" + courseCode + "-" + occCode + "%20%28" + loc + "%29";
         HttpUrl url = HttpUrl.parse(urlFormat);
-
         repository.startCourseOutlinePipeline(url, status::postValue);
 
     }

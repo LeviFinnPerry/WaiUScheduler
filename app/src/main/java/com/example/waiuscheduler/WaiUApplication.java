@@ -9,6 +9,6 @@ public class WaiUApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        new DataRepository(this);
+        new DataRepository(this);   // Initialises data repository
     }
 }

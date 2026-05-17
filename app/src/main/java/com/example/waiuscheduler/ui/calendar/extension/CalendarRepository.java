@@ -39,6 +39,9 @@ public class CalendarRepository {
     private List<EventEntity> latestEvents = Collections.emptyList();
     private List<StudySessionEntity> latestStudySessions = Collections.emptyList();
 
+    // Handling calendar items
+    private List<CalendarOccurrence> all;
+
 
     ///  Constructor for the repository
     /// If the constructor isn't initialised yet then it will initialise one
@@ -68,49 +71,74 @@ public class CalendarRepository {
         studySessionSource = dbController.getStudySessionsBetween(start, end);
 
         // Add each source to the list
+        addAssessmentSource();
+        addEventSource();
+        addSessionSource();
+    }
+
+    /// Adds assessments to calendar items
+    private void addAssessmentSource() {
         calendarItems.addSource(assessmentSource, list -> {
-            Log.d("CalRepo", "Assessments emitted: " + (list != null ? list.size() : "null"));
             latestAssessments = list != null ? list : Collections.emptyList();
             convertSources();
         });
+    }
+
+    /// Adds events to calendar items
+    private void addEventSource() {
         calendarItems.addSource(eventSource, list -> {
-            Log.d("CalRepo", "Events emitted: " + (list != null ? list.size() : "null"));
             latestEvents = list != null ? list : Collections.emptyList();
             convertSources();
         });
+    }
+
+    /// Adds study sessions to calendar items
+    private void addSessionSource() {
         calendarItems.addSource(
                 studySessionSource, list -> {
-            Log.d("CalRepo", "Study emitted: " + (list != null ? list.size() : "null"));
-            latestStudySessions = list != null ? list : Collections.emptyList();
-            convertSources();
-        });
+                    latestStudySessions = list != null ? list : Collections.emptyList();
+                    convertSources();
+                });
     }
 
     /// Converts each type to a calendar occurance
     public void convertSources() {
         if (mergeRunnable != null) mergeHandler.removeCallbacks(mergeRunnable);
         mergeRunnable = () -> {
-            List<CalendarOccurrence> all = new ArrayList<>();
-            // Convert all assessments
-            for (AssessmentEntity a : latestAssessments) {
-                all.add(CalendarOccurrence.from(a));
-            }
-            // Convert all events
-            for (EventEntity e : latestEvents) {
-                all.add(CalendarOccurrence.from(e));
-            }
-            // Convert all study sessions
-            for (StudySessionEntity s : latestStudySessions) {
-                all.add(CalendarOccurrence.from(s));
-            }
+            this.all = new ArrayList<>();
+            convertAssessments();
+            convertEvents();
+            convertSessions();
             // Sort all occurrences
             all.sort(Comparator.comparing(CalendarOccurrence::getStartDateTime));
             // Add to calendar items
             calendarItems.setValue(all);
-            Log.d("CAL_DEBUG", "convertSources fired, assessments=" + latestAssessments.size()
-                    + " events=" + latestEvents.size() + " study=" + latestStudySessions.size());
         };
         mergeHandler.postDelayed(mergeRunnable, 50);
+    }
+
+    /// Converts assessments to calendar occurrences
+    private void convertAssessments() {
+        // Convert all assessments
+        for (AssessmentEntity a : latestAssessments) {
+            all.add(CalendarOccurrence.from(a));
+        }
+    }
+
+    /// Converts events to calendar occurrences
+    private void convertEvents() {
+        // Convert all events
+        for (EventEntity e : latestEvents) {
+            all.add(CalendarOccurrence.from(e));
+        }
+    }
+
+    /// Converts study to calendar occurrences
+    private void convertSessions() {
+        // Convert all study sessions
+        for (StudySessionEntity s : latestStudySessions) {
+            all.add(CalendarOccurrence.from(s));
+        }
     }
 
     /// Returns all occurrences for the calendar

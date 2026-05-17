@@ -65,12 +65,24 @@ public class CalendarEventDetail extends BottomSheetDialogFragment {
             dismiss();
             return;
         }
+        setHeader(view);
+        setTime(view);
+        switchType(view);
+        view.findViewById(R.id.button_close_dialog).setOnClickListener(v -> dismiss());
+    }
 
+    /// Sets headers to view
+    /// @param view calendar view
+    private void setHeader(View view) {
         // Header
         ((TextView) view.findViewById(R.id.text_event_title)).setText(occurrence.getTitle());
         ((TextView) view.findViewById(R.id.text_event_type_badge)).setText(occurrence.getType());
         view.findViewById(R.id.view_colour_indicator).setBackgroundColor(occurrence.getColour());
+    }
 
+    /// Sets time to view
+    /// @param view calendar view
+    private void setTime(View view) {
         // Time
         SimpleDateFormat fmt = new SimpleDateFormat("EEE d MMM yyyy, h:mm a", Locale.getDefault());
         String timeText = fmt.format(occurrence.getStartDateTime());
@@ -78,7 +90,11 @@ public class CalendarEventDetail extends BottomSheetDialogFragment {
             timeText += " - " + fmt.format(occurrence.getEndDateTime());
         }
         ((TextView) view.findViewById(R.id.text_event_time)).setText(timeText);
+    }
 
+    /// Switches based on occurrence type
+    /// @param view calendar view
+    private void switchType(View view) {
         // Type specific sections
         switch (occurrence.getType()) {
             case CalendarOccurrence.TYPE_ASSESSMENT:
@@ -93,7 +109,6 @@ public class CalendarEventDetail extends BottomSheetDialogFragment {
                 setupStudySection(view);
                 break;
         }
-        view.findViewById(R.id.button_close_dialog).setOnClickListener(v -> dismiss());
     }
 
     /// Sets up assessments within the calendar
@@ -107,15 +122,30 @@ public class CalendarEventDetail extends BottomSheetDialogFragment {
             editGrade.setText(String.valueOf(assessment.getGrade()));
         }
 
+        disableFutureAssessments(assessment, view, editGrade);
+
+        setClickListener(view, editGrade, assessment);
+    }
+
+    /// Prevents input from user for event in the future
+    /// @param view calendar item view
+    /// @param assessment selected assessment
+    /// @param editGrade edit text section for grade
+    private void disableFutureAssessments(AssessmentEntity assessment, View view, EditText editGrade) {
         // If assessment due date has already passed
         boolean isFuture = assessment.getDueDate().after(new Date());
         if (isFuture) {
             editGrade.setEnabled(false);
             editGrade.setHint(R.string.assessment_not_due);
             view.findViewById(R.id.button_save_grade).setEnabled(false);
-            return;
         }
+    }
 
+    /// Sets click listener for events
+    /// @param view calendar item view
+    /// @param assessment selected assessment
+    /// @param editGrade edit text section for grade
+    private void setClickListener(View view, EditText editGrade, AssessmentEntity assessment) {
         view.findViewById(R.id.button_save_grade).setOnClickListener(v -> {
             String input = editGrade.getText() != null ? editGrade.getText().toString().trim(): "";
             if (input.isEmpty()) {
@@ -150,6 +180,15 @@ public class CalendarEventDetail extends BottomSheetDialogFragment {
         if (event.getAttended().equals(true)) radioGroup.check(R.id.radio_attended);
         else if (event.getAttended().equals(false)) radioGroup.check(R.id.radio_missed);
 
+        disableFutureEvents(radioGroup, view);
+
+        saveButtonListener(radioGroup, view, event);
+    }
+
+    /// Prevents input from user for event in the future
+    /// @param view calendar item view
+    /// @param radioGroup event attendance
+    private void disableFutureEvents(RadioGroup radioGroup, View view) {
         // Disables inputting event attendance for future events
         boolean isFuture = occurrence.getStartDateTime().after(new Date());
         if (isFuture) {
@@ -157,9 +196,14 @@ public class CalendarEventDetail extends BottomSheetDialogFragment {
                 radioGroup.getChildAt(i).setEnabled(false);
             }
             view.findViewById(R.id.button_save_attendance).setEnabled(false);
-            return;
         }
+    }
 
+    /// Click listener for toggling attendance
+    /// @param event selected event
+    /// @param view calendar item view
+    /// @param radioGroup event attendance
+    private void saveButtonListener(RadioGroup radioGroup, View view, EventEntity event) {
         view.findViewById(R.id.button_save_attendance).setOnClickListener(v -> {
             int checked = radioGroup.getCheckedRadioButtonId();
             boolean attendance;
@@ -188,6 +232,15 @@ public class CalendarEventDetail extends BottomSheetDialogFragment {
         // Select details to edit times
         setDetails(detailsView, studySession);
 
+        setStudyListener(detailsView, studySession);
+
+
+    }
+
+    /// Sets study session click listener
+    /// @param view study session item view
+    /// @param studySession study session selected
+    private void setStudyListener(View view, StudySessionEntity studySession) {
         view.findViewById(R.id.button_delete_study).setOnClickListener(v -> {
             if (vm != null) {
                 vm.deleteStudySession(studySession);
@@ -195,7 +248,6 @@ public class CalendarEventDetail extends BottomSheetDialogFragment {
             Toast.makeText(requireContext(), "Study session deleted", Toast.LENGTH_SHORT).show();
             dismiss();
         });
-
     }
 
     /// Rebuilds study detail text
@@ -288,9 +340,4 @@ public class CalendarEventDetail extends BottomSheetDialogFragment {
         detailsView.setClickable(true);
         detailsView.setOnClickListener(v -> pickStartTime(studySession, () -> refreshStudyGrid(detailsView, studySession)));
     }
-
-
-
-
-
 }

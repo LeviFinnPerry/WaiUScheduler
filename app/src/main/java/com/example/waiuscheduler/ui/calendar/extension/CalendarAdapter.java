@@ -33,6 +33,15 @@ public class CalendarAdapter extends BaseAdapter {
     private static final int COLOUR_STUDY = 0xFF3946AB;
     private static final int COLOUR_ASSESSMENT = 0xFFE65100;
 
+    // Calendar view items
+    private TextView dayNumber;
+    private TextView textOverflow;
+    private TextView chip1;
+    private TextView chip2;
+    private TextView chip3;
+    private Date date;
+
+
     /// Constructor for calendar adapter
     /// @param context Application context
     public CalendarAdapter(Context context) {
@@ -83,27 +92,45 @@ public class CalendarAdapter extends BaseAdapter {
                     .inflate(R.layout.calendar_cell, parent, false);
         }
 
-        TextView dayNumber = convertView.findViewById(R.id.text_day_number);
-        TextView textOverflow = convertView.findViewById(R.id.text_overflow);
-        TextView chip1 = convertView.findViewById(R.id.chip_event_1);
-        TextView chip2 = convertView.findViewById(R.id.chip_event_2);
-        TextView chip3 = convertView.findViewById(R.id.chip_event_3);
+        setCalendarItems(convertView, position);
 
-        Date date = days.get(position);
+        // Return to fragment
+        return convertView;
+    }
+
+
+    /// Sets events to textview items in calendar
+    /// @param convertView calendar view
+    /// @param position item position
+    private void setCalendarItems(View convertView, int position) {
+        this.dayNumber = convertView.findViewById(R.id.text_day_number);
+        this.textOverflow = convertView.findViewById(R.id.text_overflow);
+        this.chip1 = convertView.findViewById(R.id.chip_event_1);
+        this.chip2 = convertView.findViewById(R.id.chip_event_2);
+        this.chip3 = convertView.findViewById(R.id.chip_event_3);
+        this.date = days.get(position);
 
         // If no dates found in the calendar
-        if (date == null) {
-            // Pad cell
-            dayNumber.setText("");
-            textOverflow.setVisibility(View.GONE);
-            chip1.setVisibility(View.GONE);
-            chip2.setVisibility(View.GONE);
-            chip3.setVisibility(View.GONE);
-            convertView.setAlpha(0f);
-            convertView.setOnClickListener(null);   // Clear listener
-            return convertView;
-        }
+        if (date == null) setNullDate(convertView);
+        else setDate(convertView);
+    }
 
+    /// Sets dates without events in view
+    /// @param convertView calendar view
+    private void setNullDate(View convertView) {
+        // Pad cell
+        dayNumber.setText("");
+        textOverflow.setVisibility(View.GONE);
+        chip1.setVisibility(View.GONE);
+        chip2.setVisibility(View.GONE);
+        chip3.setVisibility(View.GONE);
+        convertView.setAlpha(0f);
+        convertView.setOnClickListener(null);   // Clear listener
+    }
+
+    /// Sets dates with events in view
+    /// @param convertView calendar view
+    private void setDate(View convertView) {
         convertView.setAlpha(1f);
         Calendar cellCal = Calendar.getInstance();
         cellCal.setTime(date);
@@ -116,6 +143,15 @@ public class CalendarAdapter extends BaseAdapter {
         convertView.setActivated(isToday);
         dayNumber.setTypeface(null, isToday ? Typeface.BOLD : Typeface.NORMAL);
 
+        // Set date observer
+        List<CalendarOccurrence> dayEvents = setFilters(cellCal);
+        setObserver(dayEvents, convertView);
+    }
+
+    /// Sets filters to calendar day
+    /// @param cellCal calendar day
+    /// @return events in day
+    private List<CalendarOccurrence> setFilters(Calendar cellCal) {
         // Filtered events
         List<CalendarOccurrence> dayEvents = new ArrayList<>();
         for (CalendarOccurrence occ: events) {
@@ -125,6 +161,18 @@ public class CalendarAdapter extends BaseAdapter {
             if (isSameDay(occCal, cellCal)) dayEvents.add(occ); // If occurrence matches view
         }
 
+        // Draw filter chips
+        drawChips(dayEvents);
+
+        // Set overflow text
+        setOverflow(dayEvents);
+
+        return dayEvents;
+    }
+
+    /// Draws filter chips for calendar days
+    /// @param dayEvents events in each day
+    private void drawChips(List<CalendarOccurrence> dayEvents) {
         // Draw up to 3 colour chips
         TextView[] chips = { chip1, chip2, chip3 };
         float density = context.getResources().getDisplayMetrics().density;
@@ -145,7 +193,12 @@ public class CalendarAdapter extends BaseAdapter {
                 chips[i].setVisibility(View.GONE);
             }
         }
+    }
 
+    /// Sets overflow text to calendar days
+    /// @param dayEvents events in each day
+    @SuppressLint("SetTextI18n")
+    private void setOverflow(List<CalendarOccurrence> dayEvents) {
         // Overflow label
         int overflow = dayEvents.size() - 3; // When more than 3 events in one day
         if (overflow > 0) {
@@ -154,7 +207,12 @@ public class CalendarAdapter extends BaseAdapter {
         } else {
             textOverflow.setVisibility(View.GONE);
         }
+    }
 
+    /// Sets click listeners to calendar days
+    /// @param dayEvents events in each day
+    /// @param convertView calendar view
+    private void setObserver(List<CalendarOccurrence> dayEvents, View convertView) {
         // Notify event listener
         final List<CalendarOccurrence> finalEvents = dayEvents;
         final Date finalDate = date;
@@ -163,9 +221,6 @@ public class CalendarAdapter extends BaseAdapter {
                 listener.onDayClick(finalDate, finalEvents);
             }
         });
-
-        // Return to fragment
-        return convertView;
     }
 
     /// Method to determine if two days are the same

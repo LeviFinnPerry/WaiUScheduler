@@ -70,14 +70,34 @@ public class PaperAdapter extends RecyclerView.Adapter<PaperAdapter.PaperViewHol
     @Override
     public void onBindViewHolder(@NonNull PaperViewHolder holder, int position) {
         PaperEntity paper = papers.get(position);
-        String title = paper.getPaperCode();
-        if (title.length() >= 25) {
-            title = title.substring(0,25);
-        }
-        holder.code.setText(paper.getPaperName());
-        holder.title.setText(title);
-        holder.occurrence.setText(paper.getSemesterCode_fk());
+        setPapers(holder, paper);
+        setPaperListener(holder, paper);
+    }
 
+    /// Sets paper information to holder
+    /// @param holder paper view holder
+    /// @param paper paper entity
+    private void setPapers(PaperViewHolder holder, PaperEntity paper) {
+        holder.code.setText(paper.getPaperName());
+        holder.title.setText(getPaperTitle(paper));
+        holder.occurrence.setText(paper.getSemesterCode_fk());
+    }
+
+    /// Splits paper foreign key to get title
+    /// @param paper paper entity
+    /// @return paper title
+    private String getPaperTitle(PaperEntity paper) {
+        String title = paper.getPaperCode().split("-")[0];
+        if (title.length() >= 25) {
+            return title.substring(0,25);
+        }
+        return title;
+    }
+
+    /// Sets paper holder to event listener
+    /// @param holder paper view holder
+    /// @param paper paper entity
+    private void setPaperListener(PaperViewHolder holder, PaperEntity paper) {
         holder.deleteBtn.setOnClickListener(v -> {
             if (deleteClickListener != null) {
                 new Thread(() -> deleteClickListener.onDelete(paper)).start();

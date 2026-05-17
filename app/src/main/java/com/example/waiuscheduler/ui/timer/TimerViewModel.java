@@ -91,8 +91,8 @@ public class TimerViewModel extends AndroidViewModel {
 
     /// Resets the timer
     public void reset() {
-        running = false;
-        seconds = 0;
+        this.running = false;
+        this.seconds = 0;
         updateTimeDisplay();
     }
 
@@ -103,20 +103,25 @@ public class TimerViewModel extends AndroidViewModel {
         if (seconds < 0) return;   // If there is no time
         new Thread(() -> {
             // Get the information from the study session
-            long endTimeMillis = System.currentTimeMillis();
-            Date startTime = new Date(startTimeMillis);
-            Date endTime = new Date(endTimeMillis);
-            seconds = (double) (endTimeMillis - startTimeMillis) / 1000.0;
-            double duration = seconds / 3600.0;
-
-            // Create a study session
-            StudySessionEntity currSession =
-                    new StudySessionEntity(startTime, endTime, duration, notes, paperId);
-
+            StudySessionEntity currSession = getCurrentSession(notes, paperId);
             dbController.saveStudySession(currSession);
-            this.seconds = 0;
         }).start();
         reset();    // Reset UI after saving
+    }
+
+    /// Gets current session information as a study session
+    /// @param notes notes taken
+    /// @param paperId paper studied
+    /// @return new study session entity
+    private StudySessionEntity getCurrentSession(String notes, String paperId) {
+        long endTimeMillis = System.currentTimeMillis();
+        Date startTime = new Date(startTimeMillis);
+        Date endTime = new Date(endTimeMillis);
+        seconds = (double) (endTimeMillis - startTimeMillis) / 1000.0;
+        double duration = seconds / 3600.0;
+
+        // Create a study session
+        return new StudySessionEntity(startTime, endTime, duration, notes, paperId);
     }
 
     /// Updates the UI time display

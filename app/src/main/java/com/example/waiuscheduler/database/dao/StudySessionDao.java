@@ -29,14 +29,12 @@ public interface StudySessionDao {
     @Update
     void update(StudySessionEntity session);
 
-    /// Select all study sessions
-    /// @return All study sessions in table
-    @Query("SELECT * FROM study_session")
-    LiveData<List<StudySessionEntity>> getAllSessions();
+
 
     /// Returns all study sessions within start and end date
     /// @param start Range start
     /// @param end Range end
+    /// @return list of study sessions
     @Query("SELECT * FROM study_session " +
             "WHERE dateTimeStart <= :end AND dateTimeEnd >= :start " +
             "ORDER BY dateTimeStart ASC")

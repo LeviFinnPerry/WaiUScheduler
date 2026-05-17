@@ -128,19 +128,38 @@ public class CalendarViewModel extends AndroidViewModel {
         Calendar end = (Calendar) c.clone();
 
         if (MODE_MONTH.equals(mode)) {
-            start.set(Calendar.DAY_OF_MONTH, 1);
-            end.set(Calendar.DAY_OF_MONTH, end.getActualMaximum(Calendar.DAY_OF_MONTH));
+            setMonth(start, end);
         } else if (MODE_WEEK.equals(mode)) {
-
-            start.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
-            end.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
+            setWeek(start, end);
+        } else {
+            setDay(start, end);
         }
 
-        // Set day
+        return new long[] {start.getTimeInMillis(), end.getTimeInMillis()};
+    }
+
+    /// Sets start and end day as same day
+    /// @param start start day
+    /// @param end end day
+    private void setDay(Calendar start, Calendar end) {
         setStartDay(start);
         setEndDay(end);
+    }
 
-        return new long[] {start.getTimeInMillis(), end.getTimeInMillis()};
+    /// Sets start and end day for week
+    /// @param start start day
+    /// @param end end day
+    private void setWeek(Calendar start, Calendar end) {
+        start.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
+        end.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
+    }
+
+    /// Sets start and end day for month
+    /// @param start start day
+    /// @param end end day
+    private void setMonth(Calendar start, Calendar end) {
+        start.set(Calendar.DAY_OF_MONTH, 1);
+        end.set(Calendar.DAY_OF_MONTH, end.getActualMaximum(Calendar.DAY_OF_MONTH));
     }
 
     /// Helping function to set to beginning of day

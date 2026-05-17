@@ -16,7 +16,7 @@ import java.util.List;
 public interface AssessmentDao {
     /// Insert assessment details
     /// @param assessment An assessment occurance
-    @Insert(onConflict = OnConflictStrategy.REPLACE) // Replace Information if duplicate
+    @Insert(onConflict = OnConflictStrategy.REPLACE) // Replace information if duplicate
     void insert(AssessmentEntity assessment);
 
     /// Delete assessment details
@@ -29,14 +29,11 @@ public interface AssessmentDao {
     @Update
     void update(AssessmentEntity assessment);
 
-    /// Select all assessments
-    /// @return All assessments in the table
-    @Query("SELECT * FROM assessment")
-    LiveData<List<AssessmentEntity>> getAllAssessments();
 
     /// Returns all assessments within start and end date
     /// @param start Range start
     /// @param end Range end
+    /// @return list of assessments
     @Query("SELECT * FROM assessment " +
             "WHERE dueDate >= :start AND dueDate <= :end " +
             "ORDER BY dueDate ASC")
