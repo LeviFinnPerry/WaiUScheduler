@@ -27,7 +27,21 @@ public class CourseOutlineScraper {
     /// @throws IOException When cannot reach the University Website
     public Document getCourseOutline(HttpUrl url) throws IOException {
         // As written on website for request headers
-        Request request = new Request.Builder()
+        Request request = getRequest(url);
+
+        // Try clean the json returned from the request
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful())
+                throw new IOException("Unexpected code" + response); // Error for unsuccessful calls
+            return parseResults(response); // Parse the result into json forms
+        }
+    }
+
+    /// Headers from Paper outline website
+    /// @param url Url of the paper outline
+    /// @return request headers formatted with url
+    private Request getRequest(HttpUrl url) {
+        return new Request.Builder()
                 .url(url)
                 .header("Accept", "application/json")
                 .header("Accept-Language", "en-US,en;q=0.9,es;q=0.8,ru;q=0.7")
@@ -47,37 +61,48 @@ public class CourseOutlineScraper {
                         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 OPR/127.0.0.0"
                 )
                 .build();
-
-        // Try clean the json returned from the request
-        try (Response response = client.newCall(request).execute()) {
-            if (!response.isSuccessful())
-                throw new IOException("Unexpected code" + response); // Error for unsuccessful calls
-
-            // Parse the result into json forms
-            if (response.body() != null) {
-                JsonElement parsed = JsonParser.parseString(response.body().string());
-
-                // Format the json element
-                Gson gson = new GsonBuilder().setPrettyPrinting().create();
-                String pretty = gson.toJson(parsed);
-
-                // Retrieve the html element from json file
-                JsonObject root = JsonParser.parseString(pretty).getAsJsonObject();
-                String escapedHtml = root.get("html").getAsString();
-
-                // Unescape the html
-                String html = escapedHtml
-                        .replace("\\r\\n", "\n")
-                        .replace("\\\"", "\"")
-                        .replace("\\u003c", "<")
-                        .replace("\\u003e", ">");
-
-
-                // Return the html as a document
-                return Jsoup.parse(html);
-            }
-            return null;
-        }
     }
+
+    /// Parses the response from json to a document
+    /// @param response response from paper outlines
+    /// @return document of paper outline
+    private Document parseResults(Response response) throws IOException {
+        if (response.body() != null) {
+            JsonElement parsed = JsonParser.parseString(response.body().string());
+            String html = retrieveHtml(parsed); // Retrieve the html element from json file
+            // Return the html as a document
+            return Jsoup.parse(html);
+        }
+        return null;
+    }
+
+    /// Retrieves html from string element
+    /// @param parsed Json Element
+    /// @return string of the html
+    private String retrieveHtml(JsonElement parsed) {
+        String pretty = formatJson(parsed); // Format the json element
+        JsonObject root = JsonParser.parseString(pretty).getAsJsonObject();
+        return  unescapeHtml(root.get("html").getAsString()); // Unescape the html
+    }
+
+    /// Formats json to string
+    /// @param parsed json element
+    /// @return string of json text
+    private String formatJson(JsonElement parsed) {
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        return gson.toJson(parsed);
+    }
+
+    /// Unencodes html in string
+    /// @param escapedHtml encoded html
+    /// @return cleaned string
+    private String unescapeHtml(String escapedHtml) {
+        return escapedHtml
+                .replace("\\r\\n", "\n")
+                .replace("\\\"", "\"")
+                .replace("\\u003c", "<")
+                .replace("\\u003e", ">");
+    }
+
 }
 

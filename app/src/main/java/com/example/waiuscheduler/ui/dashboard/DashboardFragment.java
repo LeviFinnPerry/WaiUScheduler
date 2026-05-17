@@ -96,38 +96,83 @@ public class DashboardFragment extends Fragment {
 
     /// Observe all the elements in the UI
     private void observeViewModel() {
+        setSummaryObservers();
+        setDropdownObservers();
+    }
+
+    /// Sets observers in dashboard summary
+    private void setSummaryObservers() {
+        setStudyObserver();
+        setGradeObserver();
+        setPaperObserver();
+        setEventsObserver();
+    }
+
+    /// Sets observers in the dashboard dropdown
+    private void setDropdownObservers() {
+        setStudyPaperObserver();
+        setGradePaperObserver();
+        setAssessmentObserver();
+    }
+
+    /// Study hours by paper observer
+    private void setStudyPaperObserver() {
+        // Study hours by paper
+        viewModel.getTotalStudyByPaper().observe(getViewLifecycleOwner(), this::setUpBarChart);
+    }
+
+    /// Grades by paper observer
+    private void setGradePaperObserver() {
+        // Grades by paper
+        viewModel.getGradesByPaper().observe(getViewLifecycleOwner(), rows ->
+                binding.recycleviewCourseGrades.setAdapter(new CourseGradeAdapter(rows)));
+    }
+
+    /// Upcoming assessment observer
+    private void setAssessmentObserver() {
+        // Upcoming events
+        viewModel.getUpcomingAssessments().observe(getViewLifecycleOwner(), rows ->
+                binding.recycleviewUpcomingAssessments.setAdapter(new UpcomingAssessmentAdapter(rows)));
+    }
+
+    /// Total study hours observer
+    private void setStudyObserver() {
         // Total Study Hours
         viewModel.getTotalStudy().observe(getViewLifecycleOwner(), hours -> {
             binding.cardStudyHours.statLabel.setText(R.string.total_study_hours);
             binding.cardStudyHours.statValue.setText(
                     hours != null ? String.format(Locale.getDefault(), "%.1f", hours) : "0.0");
         });
+    }
+
+    /// Average grade observer
+    private void setGradeObserver() {
         // Grade average
         viewModel.getAvgGrade().observe(getViewLifecycleOwner(), grade -> {
             binding.cardAvgGrade.statLabel.setText(R.string.average_grade);
             binding.cardAvgGrade.statValue.setText(
                     grade != null ? String.format(Locale.getDefault(), "%.1f%%", grade) : "0.0%");
         });
+    }
+
+    /// Get total enrolled papers
+    private void setPaperObserver() {
         // Paper count
         viewModel.getTotalPaperCount().observe(getViewLifecycleOwner(), count -> {
             binding.cardCourses.statLabel.setText(R.string.enrolled_courses);
             binding.cardCourses.statValue.setText(
                     count != null ? String.valueOf(count) : "0");
         });
+    }
+
+    /// Get number of upcoming events
+    private void setEventsObserver() {
         // Upcoming events
         viewModel.getUpcomingEventCount().observe(getViewLifecycleOwner(), count -> {
             binding.cardEvents.statLabel.setText(R.string.upcoming_events);
             binding.cardEvents.statValue.setText(
                     count != null ? String.valueOf(count) : "0");
         });
-        // Study hours by paper
-        viewModel.getTotalStudyByPaper().observe(getViewLifecycleOwner(), this::setUpBarChart);
-        // Grades by paper
-        viewModel.getGradesByPaper().observe(getViewLifecycleOwner(), rows ->
-            binding.recycleviewCourseGrades.setAdapter(new CourseGradeAdapter(rows)));
-        // Upcoming events
-        viewModel.getUpcomingAssessments().observe(getViewLifecycleOwner(), rows ->
-            binding.recycleviewUpcomingAssessments.setAdapter(new UpcomingAssessmentAdapter(rows)));
     }
 
 

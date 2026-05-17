@@ -31,11 +31,19 @@ public class DataCleaner {
     /// @param paper Paper outline document
     /// @return ScrapedData object that holds all paper details
     public ScrapedData clean(Document paper) {
-        results = new ScrapedData();
+        newResults(); // New Results instance
+        getInformation(paper);  // Process paper data into arraylists
+        setResults();   // Set results to table
+        return results;
+    }
 
-        // Process paper data into arraylists
-        getInformation(paper);
+    /// Initialises new results object
+    private void newResults() {
+        this.results = new ScrapedData();
+    }
 
+    /// Sets results to tables
+    private void setResults() {
         // Get the paper table object for the results
         results.setPaper(getPaperInformation());
 
@@ -47,8 +55,6 @@ public class DataCleaner {
 
         // Get the timetable pattern table object for the results
         results.setTimetablePatterns(getTimetablePatternInformation());
-
-        return results;
     }
 
     /// Function to retrieve outline information from the paper outline
@@ -56,13 +62,12 @@ public class DataCleaner {
     /// @param paper Paper outline document
     private void getInformation(Document paper) {
         ArrayList<String> labelNames = getLabelNames();
-
-        itemsData = new ArrayList<>();
-        staffData = new ArrayList<>();
+        // Empty arraylists
+        clearLists();
 
         // Retrieve main information from paper outline
         for (String name : labelNames) {
-            itemsData.add(retrieveItemData(name, paper));
+           itemsData.add(retrieveItemData(name, paper));
         }
 
         // Retrieves information about the staff
@@ -73,7 +78,14 @@ public class DataCleaner {
 
         // Retrieves information about the timetable pattern
         this.timetablePatternData = retrieveTimeTablePatternData(paper);
+    }
 
+    /// Initialises new arraylists
+    private void clearLists() {
+        this.itemsData = new ArrayList<>();
+        this.staffData = new ArrayList<>();
+        this.assessmentData = new ArrayList<>();
+        this.timetablePatternData = new ArrayList<>();
     }
 
     /// Function to generate the label names for the core paper information.

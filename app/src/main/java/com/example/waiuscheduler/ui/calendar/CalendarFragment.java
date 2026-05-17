@@ -3,7 +3,6 @@ package com.example.waiuscheduler.ui.calendar;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -67,33 +66,48 @@ public class CalendarFragment extends Fragment {
                               @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         viewModel = new ViewModelProvider(this).get(CalendarViewModel.class);
+        setUp();
+        observeViewModel();
+        viewModel.initialLoad();
+    }
 
+    /// Set up all aspects of calendar
+    private void setUp() {
+        setGridAdapter();
+        setDayTimelineView();
+        setWeekTimelineView();
+        setUpDayLabels();
+        setupNavButtons();
+        setupViewToggle();
+        setupFilterButtons();
+        setupAdapterClickListener();
+    }
+
+    /// Initialises new calendar adapter
+    private void setGridAdapter() {
         // Grid adapter
         adapter = new CalendarAdapter(requireContext());
         binding.gridViewCalendar.setAdapter(adapter);
+    }
 
+    /// Initialises new day timeline view
+    private void setDayTimelineView() {
         // Day timeline
         dayTimelineView = new DayTimelineView(
                 requireContext(),
                 binding.dayTimelineContainer,
                 this::openDetailDialog
         );
+    }
 
+    /// Initialises new week timeline view
+    private void setWeekTimelineView() {
         // Week timeline
         weekTimelineView = new WeekTimelineView(
                 requireContext(),
                 binding.weekTimelineContainer,
                 this::openDetailDialog
         );
-
-        // Set up methods
-        setUpDayLabels();
-        setupNavButtons();
-        setupViewToggle();
-        setupFilterButtons();
-        setupAdapterClickListener();
-        observeViewModel();
-        viewModel.initialLoad();
     }
 
     /// Destroys the view
@@ -185,7 +199,15 @@ public class CalendarFragment extends Fragment {
                 .toArray(String[]::new);
 
         final int[] selected = { 0 };
+        setAlertDialog(titles, selected, events);
 
+    }
+
+    /// Sets event picker dialog
+    /// @param titles title of events
+    /// @param selected selected events indexes
+    /// @param events event items
+    private void setAlertDialog(String[] titles, int[] selected, List<CalendarOccurrence> events) {
         new android.app.AlertDialog.Builder(requireContext())
                 .setTitle("Select event")
                 .setSingleChoiceItems(titles, 0, (dialog, which) -> selected[0] = which)
@@ -197,11 +219,21 @@ public class CalendarFragment extends Fragment {
 
     /// Watches the view model for any changes by user
     private void observeViewModel() {
+        observeCurrDate();
+        observeViewMode();
+        observeOccurrences();
+    }
+
+    /// Observes current date for view model
+    private void observeCurrDate() {
         viewModel.getCurrentDate().observe(getViewLifecycleOwner(), date -> {
             updateHeaderLabel(date);
             refreshGrid(viewModel.getOccurrences().getValue());
         });
+    }
 
+    /// Observes calendar mode for view model
+    private void observeViewMode() {
         viewModel.getViewMode().observe(getViewLifecycleOwner(), (Observer<? super String>) mode -> {
             ignoreToggle = true;
             // Sync radio buttons without triggering listeners
@@ -220,8 +252,10 @@ public class CalendarFragment extends Fragment {
 
             refreshGrid(viewModel.getOccurrences().getValue());
         });
+    }
 
-
+    /// Observes calendar occurrences for view model
+    private void observeOccurrences() {
         viewModel.getOccurrences().observe(getViewLifecycleOwner(), this::refreshGrid);
         viewModel.getFilters().observe(getViewLifecycleOwner(),f -> {
             if (filterButtonPressed) {
@@ -248,7 +282,6 @@ public class CalendarFragment extends Fragment {
     /// @param events Events for calendar grid
     private void refreshGrid(List<CalendarOccurrence> events) {
         Set<String> filters = viewModel.getFilters().getValue();
-        Log.d("CAL_DEBUG", "refreshGrid called, events=" + (events != null ? events.size() : "null"));
 
         if (refreshRunnable != null) refreshHandler.removeCallbacks(refreshRunnable);
         refreshRunnable = () -> performRefresh(events, filters);
@@ -259,7 +292,6 @@ public class CalendarFragment extends Fragment {
     /// @param events Events for calendar grid
     /// @param filters Selected filters on view
     private void performRefresh(List<CalendarOccurrence> events, Set<String> filters) {
-
         String mode = viewModel.getViewMode().getValue();
         Calendar current = viewModel.getCurrentDate().getValue();
         if (current == null || mode == null) return;
@@ -272,6 +304,17 @@ public class CalendarFragment extends Fragment {
         disappearView();
 
         // Handling of timeline for days
+        setMode(mode, current, safeEvents, safeFilters);
+
+        lastBuiltMode = mode;
+    }
+
+    /// Sets the calendar view based on the mode
+    /// @param mode calendar mode
+    /// @param current calendar
+    /// @param safeEvents events in view
+    /// @param safeFilters filters applied
+    private void setMode(String mode, Calendar current, List<CalendarOccurrence>  safeEvents, Set<String> safeFilters) {
         if (CalendarViewModel.MODE_DAY.equals(mode)) {
             buildDay(current, safeEvents, safeFilters);
         } else if (CalendarViewModel.MODE_WEEK.equals(mode)) {
@@ -279,9 +322,6 @@ public class CalendarFragment extends Fragment {
         } else {
             buildMonth(current, safeEvents, safeFilters);
         }
-
-        lastBuiltMode = mode;
-        Log.d("CAL_DEBUG", "performRefresh fired, mode=" + mode + " events=" + safeEvents.size());
     }
 
     /// Hides all calendar views
@@ -300,14 +340,8 @@ public class CalendarFragment extends Fragment {
         // Day view
         binding.scrollDayTimeline.setVisibility(View.VISIBLE);
 
-        // Apply filters
-        List<CalendarOccurrence> filtered = new ArrayList<>();
-        for (CalendarOccurrence occ : safeEvents) {
-            if (safeFilters.contains(occ.getType())) filtered.add(occ);
-        }
-
         // Set to calendar
-        final List<CalendarOccurrence> finalFiltered = filtered;
+        final List<CalendarOccurrence> finalFiltered = checkFilters(safeEvents, safeFilters);
         final Date finalDate = current.getTime();
 
         if (!CalendarViewModel.MODE_DAY.equals(lastBuiltMode)) {
@@ -318,7 +352,7 @@ public class CalendarFragment extends Fragment {
                 }
             });
         } else {
-            dayTimelineView.build(current.getTime(), filtered);
+            dayTimelineView.build(current.getTime(), finalFiltered);
         }
     }
 
@@ -330,14 +364,8 @@ public class CalendarFragment extends Fragment {
         // Week view
         binding.scrollWeekTimeline.setVisibility(View.VISIBLE);
 
-        // Check filters
-        List<CalendarOccurrence> filtered = new ArrayList<>();
-        for (CalendarOccurrence occ: safeEvents) {
-            if (safeFilters.contains(occ.getType())) filtered.add(occ);
-        }
-
         // Set to calendar
-        final List<CalendarOccurrence> finalFiltered = filtered;
+        final List<CalendarOccurrence> finalFiltered = checkFilters(safeEvents, safeFilters);
         final List<Date> weekDays = buildWeekDays(current);
 
         if (!CalendarViewModel.MODE_WEEK.equals(lastBuiltMode)) {
@@ -349,6 +377,18 @@ public class CalendarFragment extends Fragment {
         } else {
             weekTimelineView.build(weekDays, finalFiltered);
         }
+    }
+
+    /// Checks events against filters
+    /// @param safeEvents events in calendar view
+    /// @param safeFilters filters applied
+    private List<CalendarOccurrence> checkFilters(List<CalendarOccurrence> safeEvents, Set<String> safeFilters) {
+        // Check filters
+        List<CalendarOccurrence> filtered = new ArrayList<>();
+        for (CalendarOccurrence occ: safeEvents) {
+            if (safeFilters.contains(occ.getType())) filtered.add(occ);
+        }
+        return filtered;
     }
 
     /// Adds all calendar occurrences to the calendar month
@@ -391,17 +431,22 @@ public class CalendarFragment extends Fragment {
 
         // Offset from monday
         int dayOfWeek = first.get(Calendar.DAY_OF_WEEK);
-        int startOffset;
-
-        if (dayOfWeek == Calendar.SATURDAY || dayOfWeek == Calendar.SUNDAY) {
-            startOffset = 0;
-        } else {
-            startOffset = dayOfWeek - Calendar.MONDAY;
-        }
+        int startOffset = checkWeekend(dayOfWeek);
 
         // Prepend nulls
         for (int i = 0; i < startOffset; i++) days.add(null);
 
+        setMonth(first, days);
+
+        // Pad to multiple of 7
+        while (days.size() % 5 != 0) days.add(null);
+        return days;
+    }
+
+    /// Sets days to month avoiding weekends
+    /// @param first first day in view
+    /// @param days days in view
+    private void setMonth(Calendar first, List<Date> days) {
         int max = first.getActualMaximum(Calendar.DAY_OF_MONTH);
         Calendar day = (Calendar) first.clone();
         for (int d = 1; d <= max; d++) {
@@ -411,9 +456,17 @@ public class CalendarFragment extends Fragment {
                 days.add(day.getTime());
             }
         }
-        // Pad to multiple of 7
-        while (days.size() % 5 != 0) days.add(null);
-        return days;
+    }
+
+    /// Avoids weekends using offset
+    /// @param dayOfWeek day number
+    /// @return day number with offset
+    private int checkWeekend(int dayOfWeek) {
+        if (dayOfWeek == Calendar.SATURDAY || dayOfWeek == Calendar.SUNDAY) {
+            return 0;
+        } else {
+            return dayOfWeek - Calendar.MONDAY;
+        }
     }
 
     /// Builds a calendar week view

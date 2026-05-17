@@ -35,7 +35,6 @@ public class TimerFragment extends Fragment {
     ) {
         // Find each element of the UI for the timer
         timerViewModel = new ViewModelProvider(this).get(TimerViewModel.class);
-
         binding = FragmentTimerBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
@@ -47,21 +46,34 @@ public class TimerFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Observe papers from the database to fill the spinner
+        observePapers(); // Observe papers from the database to fill the spinner
+        selectPaper();   // Spinner selection
+        updateTimer();   // Update Timer and Button States
+        setListeners();  // Click Listeners
+    }
+
+    /// Sets observer for changes in enrolled papers
+    private void observePapers() {
         timerViewModel.getAllPapers().observe(getViewLifecycleOwner(), papers -> {
             List<String> paperNames = new ArrayList<>();
             paperNames.add("Select a paper...");
             for (PaperEntity paper : papers) {
                 paperNames.add(paper.getPaperId());   // Add selected papers
             }
-
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_dropdown_item, paperNames);
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            binding.paperSpinner.setAdapter(adapter);
-
+            setPapers(paperNames);
         });
+    }
 
-        // Spinner selection
+    /// Sets name of each paper into dropdown
+    /// @param paperNames list of paper names
+    private void setPapers(List<String> paperNames) {
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_dropdown_item, paperNames);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        binding.paperSpinner.setAdapter(adapter);
+    }
+
+    /// Listener for selecting paper from drop down
+    private void selectPaper() {
         binding.paperSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -71,17 +83,37 @@ public class TimerFragment extends Fragment {
             @Override
             public void onNothingSelected(AdapterView<?> parent) {}
         });
+    }
 
-        // Update Timer and Button States
+    /// Updates the time display
+    private void updateTimer() {
         timerViewModel.getTimeDisplay().observe(getViewLifecycleOwner(), time -> binding.timeView.setText(time));
+    }
 
-        // Click Listeners
+    /// Sets listeners for each button
+    private void setListeners() {
+        setStartButton();
+        setResetButton();
+        setStopButton();
+    }
+
+    /// Sets click listener for start button
+    private void setStartButton() {
         binding.startButton.setOnClickListener(v -> {
+            // Paper must be selected
             if (binding.paperSpinner.getSelectedItemPosition() != 0) {
                 timerViewModel.start();
             }
         });
+    }
+
+    /// Sets click listener for reset button
+    private void setResetButton() {
         binding.resetButton.setOnClickListener(v -> timerViewModel.reset());
+    }
+
+    /// Sets click listener for stop button
+    private void setStopButton() {
         binding.stopButton.setOnClickListener(v -> { timerViewModel.stop();
             // Get information from user
             String notes = binding.editTextSessionNotes.getText().toString();
@@ -89,7 +121,6 @@ public class TimerFragment extends Fragment {
             timerViewModel.storeStudySession(notes, paperId);
             binding.editTextSessionNotes.setText("");
         });
-
     }
 
     /// Destroys view when no longer needed

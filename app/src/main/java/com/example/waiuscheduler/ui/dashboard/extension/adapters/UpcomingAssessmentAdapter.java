@@ -54,9 +54,16 @@ public class UpcomingAssessmentAdapter extends RecyclerView.Adapter<UpcomingAsse
 
         // Set badge colour based on type
         setBadgeColor(holder, type);
+        // Set urgency based on date
+        setUrgency(holder, row.dueDate);
+    }
 
+    /// Sets visibility based on urgency
+    /// @param holder View holder
+    /// @param dueDate assessment due date
+    private void setUrgency(VH holder, Date dueDate) {
         // Determine if urgent
-        if (ifUrgent(row.dueDate)) {
+        if (ifUrgent(dueDate)) {
             holder.textUrgent.setVisibility(View.VISIBLE);
         } else {
             holder.textUrgent.setVisibility(View.GONE);

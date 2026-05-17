@@ -29,15 +29,10 @@ public interface EventDao {
     @Update
     void update(EventEntity event);
 
-    /// Select all events
-    /// @return All events in the table
-    @Query("SELECT * FROM event")
-    LiveData<List<EventEntity>> getAllEvents();
-
-
     /// Returns all events within start and end date
     /// @param start Range start
     /// @param end Range end
+    /// @return list of events
     @Query("SELECT * FROM event " +
             "WHERE dateTimeStart <= :end AND dateTimeEnd >= :start " +
             "ORDER BY dateTimeStart ASC")

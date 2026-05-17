@@ -34,7 +34,7 @@ public class CoursesFragment extends Fragment {
     // Staff Adapter
     private StaffAdapter staffAdapter;
 
-    /// Initialises fragment view
+    /// Initialises fragment and view model
     /// @param inflater Layout inflater
     /// @param container View Group of the fragment
     /// @param savedInstanceState Bundle for the instance
@@ -44,9 +44,7 @@ public class CoursesFragment extends Fragment {
             ViewGroup container, Bundle savedInstanceState
     ) {
         coursesViewModel = new ViewModelProvider(requireActivity()).get(CoursesViewModel.class);
-
         binding = FragmentCoursesBinding.inflate(inflater, container, false);
-
         return binding.getRoot();
     }
 
@@ -56,23 +54,34 @@ public class CoursesFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        setPaperAdapter(view);
+        setStaffAdapter(view);
+        setClickListener();
+    }
 
+    /// Set click listener for retrieving a paper outline
+    private void setClickListener() {
+        binding.buttonSearchPaper.setOnClickListener(v -> {
+            try {
 
-        // RecyclerView for paper information
-        RecyclerView paperRecycler = view.findViewById(R.id.paper_recycler);
-        paperRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
-        paperAdapter = new PaperAdapter(paper -> coursesViewModel.deletePaper(paper));
-        paperRecycler.setAdapter(paperAdapter);
+                // Get the information for the course outline
+                String paperCode = String.valueOf(binding.editTextPaperCode.getText()).trim();
+                String occCode = String.valueOf(binding.editTextOccCode.getText()).trim();
 
-        // Observe the papers from the view model
-        coursesViewModel.getAllPapers().observe(
-                getViewLifecycleOwner(), papers -> {
-                    if (papers != null) {
-                        paperAdapter.submitPapers(new ArrayList<>(papers));
-                    }
-                }
-        );
+                // Find the selected location
+                int locationId = binding.radioGroupLocation.getCheckedRadioButtonId();
+                String location = getLocation(locationId);
 
+                coursesViewModel.processCourseOutline(paperCode, occCode, location); // Trigger the pipeline via the button
+            } catch (Exception e) {
+                Log.e("User Add Paper", "Error in getting paper information");
+            }
+        });
+    }
+
+    /// Initialises new staff adapter sets to recycler view and sets observer
+    /// @param view staff recycler
+    private void setStaffAdapter(View view) {
         // RecyclerView for staff information
         RecyclerView staffRecycler = view.findViewById(R.id.staff_recycler);
         staffRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -87,32 +96,25 @@ public class CoursesFragment extends Fragment {
                     }
                 }
         );
+    }
 
+    /// Initialises new paper adapter sets to recycler view and sets observer
+    /// @param view paper recycler
+    private void setPaperAdapter(View view) {
+        // RecyclerView for paper information
+        RecyclerView paperRecycler = view.findViewById(R.id.paper_recycler);
+        paperRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
+        paperAdapter = new PaperAdapter(paper -> coursesViewModel.deletePaper(paper));
+        paperRecycler.setAdapter(paperAdapter);
 
-        // Trigger the pipeline via the button
-        binding.buttonSearchPaper.setOnClickListener(v -> {
-            try {
-
-                // Get the information for the course outline
-                String paperCode = String.valueOf(binding.editTextPaperCode.getText()).trim();
-                String occCode = String.valueOf(binding.editTextOccCode.getText()).trim();
-
-                // Find the selected location
-                int locationId = binding.radioGroupLocation.getCheckedRadioButtonId();
-                String location = getLocation(locationId);
-
-                coursesViewModel.processCourseOutline(paperCode, occCode, location);
-            } catch (Exception e) {
-                Log.e("User Add Paper", "Error in getting paper information");
-            }
-        });
-
-        // Observe the pipeline status
-        coursesViewModel.getStatus().observe(getViewLifecycleOwner(), statusMessage -> {
-            //if (statusMessage != null) {
-                //Toast.makeText(getContext(), statusMessage, Toast.LENGTH_LONG).show();
-            //}
-        });
+        // Observe the papers from the view model
+        coursesViewModel.getAllPapers().observe(
+                getViewLifecycleOwner(), papers -> {
+                    if (papers != null) {
+                        paperAdapter.submitPapers(new ArrayList<>(papers));
+                    }
+                }
+        );
     }
 
     /// Destroys the view

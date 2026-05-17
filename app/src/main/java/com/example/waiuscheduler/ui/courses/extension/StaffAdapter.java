@@ -67,10 +67,7 @@ public class StaffAdapter extends RecyclerView.Adapter<StaffAdapter.StaffViewHol
     @Override
     public void onBindViewHolder(@NonNull StaffViewHolder holder, int position) {
         StaffEntity staff = staffMembers.get(position);
-        String code_fk = staff.getPaperId();
-        String code = code_fk.split("-")[0];
-
-        holder.paperCode.setText(code);
+        holder.paperCode.setText(staff.getPaperId().split("-")[0]);
         holder.staffName.setText(staff.getName());
         holder.staffEmail.setText(staff.getEmail());
         holder.staffRole.setText(staff.getPosition());
