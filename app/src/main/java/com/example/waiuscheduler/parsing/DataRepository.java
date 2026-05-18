@@ -8,7 +8,6 @@ import com.example.waiuscheduler.database.DatabaseController;
 import com.example.waiuscheduler.database.DateConverter;
 import com.example.waiuscheduler.database.tables.AssessmentEntity;
 import com.example.waiuscheduler.database.tables.EventEntity;
-import com.example.waiuscheduler.database.tables.PaperEntity;
 import com.example.waiuscheduler.database.tables.SemesterEntity;
 import com.example.waiuscheduler.database.tables.StaffEntity;
 import com.example.waiuscheduler.database.tables.TimetablePatternEntity;
@@ -37,43 +36,9 @@ public class DataRepository {
         preInitialiseSemesters();
     }
 
-    /// Full pipeline to scrape course outlines and save it into tables
-    /// @param url URL address of paper outline
-    /// @param callback Callback for pipeline
-    public void startCourseOutlinePipeline(HttpUrl url, RepositoryCallback callback) {
-        AppDatabase.databaseWriteExecutor.execute(() -> {
-            try {
-                // Get the document with course outline scraper
-                Document paperOutline = scraper.getCourseOutline(url);
-                if (paperOutline.childNodeSize() > 2) {
-                    cleanCurrentOutline(paperOutline);
-                    writeToDatabase(); // Write information to database
-                    callback.OnComplete("Success"); // Callback for successful pipeline
-                } else {
-                    callback.OnComplete("There is no paper outline for this paper");
-                }
-            } catch (Exception e) {
-                Log.e("Pipeline failure:", Objects.requireNonNull(e.getMessage()));
-                if (e.getMessage().contains("code=400")) {
-                    callback.OnComplete("Paper Outline does not exist, make sure the information is correct");
-                }
-            }
-        });
-    }
-
-    /// Callback for pipeline
-    public interface RepositoryCallback {
-        void OnComplete(String result);
-    }
-
-    /// Get the database controller
-    /// @return Database controller
-    public static DatabaseController getDbController() {
-        return dbController;
-    }
-
-    /// Pre initialising the semester table to this years dates
-    private void preInitialiseSemesters() {
+    /// Pre-initialises semester dates for this year
+    private void preInitialiseSemesters()  {
+        // Pre initialising the semester table to this years dates
         AppDatabase.databaseWriteExecutor.execute(() -> {
             // A Semester
             dbController.saveSemester(new SemesterEntity("26A",
@@ -90,65 +55,104 @@ public class DataRepository {
         });
     }
 
-    /// Individually writes information to database
-    private void writeToDatabase() {
-        // Write the data to the database
-        savePaper();
-        saveStaff();
-        saveAssessments();
-        saveTimetablePattern();
-        saveEvents();
+    /// Full pipeline to scrape course outlines and save it into tables
+    /// @param url URL address of paper outline
+    /// @param callback Callback for pipeline
+    public void startCourseOutlinePipeline(HttpUrl url, RepositoryCallback callback) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            try {
+                // Get the document with course outline scraper
+                Document paperOutline = scraper.getCourseOutline(url);
+                if (paperOutline.childNodeSize() > 2) {
+                    currentOutline = cleaner.clean(paperOutline); // Clean the data
+
+                    writeToDb(); // Write the data to the database
+
+                    // Callback for successful pipeline
+                    callback.OnComplete("Success");
+                } else {
+                    callback.OnComplete("There is no paper outline for this paper");
+                }
+            } catch (Exception e) {
+                Log.e("Pipeline failure:", Objects.requireNonNull(e.getMessage()));
+                if (e.getMessage().contains("code=400")) {
+                    callback.OnComplete("Paper Outline does not exist, make sure the information is correct");
+                }
+            }
+        });
     }
 
-    /// Sets the current outline
-    private void cleanCurrentOutline(Document paperOutline) {
-        this.currentOutline = cleaner.clean(paperOutline);
+    /// Writes all entities to the database
+    private void writeToDb() {
+        savePaper(); // Add the paper information to database
+        saveStaff(); // Add the staff members to the database
+        saveAssessment(); // Add the assessments to the database
+        saveTimetable(); // Add the timetable pattern to the database
+        saveEvents(); // Add the events to the database
     }
 
-    /// Add the paper information to database
+    /// Saves paper information from the outline to database
     private void savePaper() {
-        PaperEntity paper = currentOutline.getPaper();
-        dbController.savePaper(paper);
+        dbController.savePaper(currentOutline.getPaper());
     }
 
-    /// Add the staff members to the database
+    /// Saves staff information from the outline to database
     private void saveStaff() {
-        ArrayList<StaffEntity> staffMembers = currentOutline.getStaffs();
-        // Set the paperId as foreign key
-        for (StaffEntity staff : staffMembers) {
+        for (StaffEntity staff : currentOutline.getStaffs()) {
             dbController.saveStaff(staff);      // Save each staff member to database
         }
     }
 
-    /// Add the assessments to the database
-    private void saveAssessments() {
-        ArrayList<AssessmentEntity> assessments = currentOutline.getAssessments();
-        for (AssessmentEntity assessment : assessments) {
+    /// Saves assessment information from the outline to database
+    private void saveAssessment() {
+        for (AssessmentEntity assessment : currentOutline.getAssessments()) {
             dbController.saveAssessment(assessment);    // Save each assessment to database
         }
     }
 
-    /// Add the timetable pattern to the database
-    private void saveTimetablePattern() {
-        ArrayList<TimetablePatternEntity> timetablePatterns =
-                currentOutline.getTimetablePatterns();
-        for (TimetablePatternEntity timetablePattern : timetablePatterns) {
+    /// Saves timetable information from the outline to database
+    private void saveTimetable() {
+        for (TimetablePatternEntity timetablePattern : currentOutline.getTimetablePatterns()) {
             dbController.saveTimetablePattern(timetablePattern);    // Save timetable to database
         }
     }
 
-    /// Add the events to the database
+    /// Saves event information from the outline to database
     private void saveEvents() {
-        currentOutline.setEvents(cleaner.createEventData(getCurrentSemester()));
-        ArrayList<EventEntity> events = currentOutline.getEvents();
-        for (EventEntity event : events) {
-            dbController.saveEvent(event); // Save event to database
+        SemesterEntity semester = resolveSemester(currentOutline.getSemesterCode());
+        if (semester == null) {
+            eventError();
+        } else {
+            ArrayList<EventEntity> events = cleaner.createEventData(semester);
+            currentOutline.setEvents(events);
+            for (EventEntity event : events) {
+                dbController.saveEvent(event); // Save event to database
+            }
         }
     }
 
-    /// Returns current semester
-    /// @return semester entity
-    private SemesterEntity getCurrentSemester() {
-        return dbController.getSemester(cleaner.semester_fk);
+    /// Logs error for semester code not found
+    private void eventError() {
+        Log.e("Data Repository", "Semester not found for code: " + currentOutline.getSemesterCode());
     }
+
+    /// Callback for pipeline
+    public interface RepositoryCallback {
+        /// @param result String to echo
+        void OnComplete(String result);
+    }
+
+    /// Get the database controller
+    /// @return Database controller
+    public static DatabaseController getDbController() {
+        return dbController;
+    }
+
+    /// Get the semester for the paper outline
+    /// @param semesterCode semester to resolve
+    /// @return semester matching code
+    private SemesterEntity resolveSemester(String semesterCode) {
+        return dbController.getSemester(semesterCode);
+    }
+
 }

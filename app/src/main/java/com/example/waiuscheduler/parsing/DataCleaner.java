@@ -10,74 +10,52 @@ import com.example.waiuscheduler.database.tables.TimetablePatternEntity;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
-/// Cleans HTML information from the paper outline
+/// Cleans HTML information from the paper outline.
+/// Parsing (raw text extraction) and entity construction are kept separate:
+/// extract* methods return plain strings/arrays; build* methods turn those into entities.
 public class DataCleaner {
     private ArrayList<String> itemsData;
     private ArrayList<String> staffData;
     private ArrayList<String> assessmentData;
     private ArrayList<String> timetablePatternData;
-    public String semester_fk;
     private ScrapedData results;
-
     private String paperId_fk;
 
-    /// Main method to clean HTML document.
+    /// Main method to clean an HTML document.
     /// @param paper Paper outline document
     /// @return ScrapedData object that holds all paper details
     public ScrapedData clean(Document paper) {
-        newResults(); // New Results instance
-        getInformation(paper);  // Process paper data into arraylists
-        setResults();   // Set results to table
+        newResults();
+        extractInformation(paper);
+        buildResults();
         return results;
     }
 
-    /// Initialises new results object
+    /// Initialises a new results object
     private void newResults() {
         this.results = new ScrapedData();
     }
 
-    /// Sets results to tables
-    private void setResults() {
-        // Get the paper table object for the results
-        results.setPaper(getPaperInformation());
+    // ─────────────────────────────────────────────────────────────
+    // Extraction — raw text only, no entity construction
+    // ─────────────────────────────────────────────────────────────
 
-        // Get the staff table object for the results
-        results.setStaffs(getStaffInformation());
-
-        // Get the assessment table object for the results
-        results.setAssessments(getAssessmentInformation());
-
-        // Get the timetable pattern table object for the results
-        results.setTimetablePatterns(getTimetablePatternInformation());
-    }
-
-    /// Function to retrieve outline information from the paper outline
-    /// for the paper header and each of the tables in the html
+    /// Extracts all raw text arrays from the HTML document
     /// @param paper Paper outline document
-    private void getInformation(Document paper) {
-        ArrayList<String> labelNames = getLabelNames();
-        // Empty arraylists
+    private void extractInformation(Document paper) {
         clearLists();
-
-        // Retrieve main information from paper outline
-        for (String name : labelNames) {
-           itemsData.add(retrieveItemData(name, paper));
+        for (String name : getLabelNames()) {
+            itemsData.add(extractItemData(name, paper));
         }
-
-        // Retrieves information about the staff
-        this.staffData = retrieveStaffTableData(paper);
-
-        // Retrieves information about the assessments
-        this.assessmentData = retrieveAssessmentTableData(paper);
-
-        // Retrieves information about the timetable pattern
-        this.timetablePatternData = retrieveTimeTablePatternData(paper);
+        this.staffData = extractStaffTableData(paper);
+        this.assessmentData = extractAssessmentTableData(paper);
+        this.timetablePatternData = extractTimetablePatternData(paper);
     }
 
     /// Initialises new arraylists
@@ -88,10 +66,9 @@ public class DataCleaner {
         this.timetablePatternData = new ArrayList<>();
     }
 
-    /// Function to generate the label names for the core paper information.
+    /// Returns the ordered label names used to pull core paper fields
     /// @return arraylist of html labels in the paper outline
     private ArrayList<String> getLabelNames() {
-        // Labels of each element
         ArrayList<String> labelNames = new ArrayList<>();
         labelNames.add("Paper Title");
         labelNames.add("Paper Occurrence Code");
@@ -99,46 +76,36 @@ public class DataCleaner {
         labelNames.add("When taught");
         labelNames.add("Start Week");
         labelNames.add("End Week");
-
         return labelNames;
     }
 
-    /// Helping function to retrieve information from the span elements
-    /// @param itemName HTML label from the outline
-    /// @return Text from the element if exists
-    private String retrieveItemData(String itemName, Document paper) {
+    /// Extracts a single span value following a matching label element
+    /// @param itemName HTML label text from the outline
+    /// @param paper    Document to search
+    /// @return Text content of the sibling span, or null
+    private String extractItemData(String itemName, Document paper) {
         String query = "label:contains(" + itemName + ")";
-        Element label = paper.select(query).first();    // Find the label
+        Element label = paper.select(query).first();
         if (label != null) {
-            Element span = label.nextElementSibling();  // Find the span
-            if (span != null) {
-                return span.text();                     // Return the item
-            }
+            Element span = label.nextElementSibling();
+            if (span != null) return span.text();
         }
-        return null;    // Else return null
+        return null;
     }
 
-    /// Helping function to retrieve information from staff tables
+    /// Extracts raw cell text from the staff table
     /// @param paper Paper outline document
-    /// @return Staff table as an arraylist
-    private ArrayList<String> retrieveStaffTableData(Document paper) {
+    /// @return Flat list of staff cell strings
+    private ArrayList<String> extractStaffTableData(Document paper) {
         ArrayList<String> tableData = new ArrayList<>();
-        String query = "table.staff";        // Find the staff table
-        Element table = paper.select(query).first();
-        // Find the rows in the table
-        if (table != null) {       // Make sure there is a table
-            Elements rows = table.select("tr");
-            // Get the columns from the rows
-            for (Element row : rows) {
-                Elements cols = row.select("td");
-                // Process each cell in the row
-                for (Element col : cols) {
+        Element table = paper.select("table.staff").first();
+        if (table != null) {
+            for (Element row : table.select("tr")) {
+                for (Element col : row.select("td")) {
                     String cellData = col.text();
-                    // Check if there is more than one person listed
                     if (cellData.matches(".*@.*@.*")) {
                         splitMultipleStaff(cellData, tableData);
                     } else if (cellData.contains("-")) {
-                        // Check if there contains a "-" as it seperates name and email
                         splitStaffInformation(cellData, tableData);
                     } else {
                         tableData.add(cellData);
@@ -149,38 +116,30 @@ public class DataCleaner {
         return tableData;
     }
 
-    /// Helping function to retrieve information from assessment table
+    /// Extracts raw cell text from the assessments table (title, date, weight triples)
     /// @param paper Paper outline document
-    /// @return Arraylist of assessment information
-    private ArrayList<String> retrieveAssessmentTableData(Document paper) {
+    /// @return Flat list of assessment cell strings
+    private ArrayList<String> extractAssessmentTableData(Document paper) {
         ArrayList<String> tableData = new ArrayList<>();
-        ArrayList<String> colTexts;
-        String query = "table.assessments";
-        Element table = paper.select(query).first();
+        Element table = paper.select("table.assessments").first();
         if (table != null) {
-            Elements rows = table.select("tr");
-            for (Element row : rows) {
-                colTexts = checkAssignment(row);
-                if (colTexts != null) {
-                    tableData.addAll(colTexts);
-                }
+            for (Element row : table.select("tr")) {
+                ArrayList<String> cols = extractAssessmentRow(row);
+                if (cols != null) tableData.addAll(cols);
             }
         }
         return tableData;
     }
 
-    /// Helping function to retrieve information from timetable pattern
+    /// Extracts raw cell text from the timetable pattern table
     /// @param paper Paper outline document
-    /// @return Arraylist of timetable pattern information.
-    private ArrayList<String> retrieveTimeTablePatternData(Document paper) {
+    /// @return Flat list of timetable cell strings
+    private ArrayList<String> extractTimetablePatternData(Document paper) {
         ArrayList<String> tableData = new ArrayList<>();
-        String query = "table.timetable";
-        Element table = paper.select(query).first();
+        Element table = paper.select("table.timetable").first();
         if (table != null) {
-            Elements rows = table.select("tr");
-            for (Element row : rows) {
-                Elements cols = row.select("td");
-                for (Element col : cols) {
+            for (Element row : table.select("tr")) {
+                for (Element col : row.select("td")) {
                     tableData.add(col.text());
                 }
             }
@@ -188,215 +147,209 @@ public class DataCleaner {
         return tableData;
     }
 
-    /// Function that creates event data for the event table
-    /// @param semester Semester the events occur within
-    /// @return Arraylist of events created based on the semester and timetable table
-    public ArrayList<EventEntity> createEventData(SemesterEntity semester) {
-        ArrayList<TimetablePatternEntity> timetablePattern = results.getTimetablePatterns();
-        ArrayList<EventEntity> eventEntities = new ArrayList<>();
+    // ─────────────────────────────────────────────────────────────
+    // Construction — entity building only, no HTML touching
+    // ─────────────────────────────────────────────────────────────
 
-        Date startDate = semester.getStartDate();
-        Date endDate = semester.getEndDate();
-        Date breakStartDate = semester.getBreakStartDate();
-        Date breakEndDate = semester.getBreakEndDate();
-
-        for (TimetablePatternEntity timetable: timetablePattern) {
-            String type = timetable.getType();
-            int dow = timetable.getDayOfWeek();
-            Date startTime = timetable.getStartTime();
-            Date endTime = timetable.getEndTime();
-
-            // Method to create events
-            eventEntities.addAll(createEvents(startDate,  endDate, breakStartDate, breakEndDate,
-                    type, dow, startTime, endTime));
-        }
-        return eventEntities;
+    /// Builds all entities from the extracted raw data and populates results
+    private void buildResults() {
+        results.setPaper(buildPaperEntity());
+        results.setStaffs(buildStaffEntities(extractStaffPairs()));
+        results.setAssessments(buildAssessmentEntities());
+        results.setTimetablePatterns(buildTimetablePatternEntities());
     }
 
-    /// Function that creates events based on a timetable pattern occurrence
-    /// @param semStart Start date of the semester
-    /// @param semEnd End date of the semester
-    /// @param breakSemStart Start date of the semester break
-    /// @param breakSemEnd End date of the semester break
-    /// @param type Type of timetable pattern event
-    /// @param dow Numeric day of the week the event occurs
-    /// @param startTime Start time of the event
-    /// @param endTime End time of the event
-    /// @return Arraylist of EventEntity Objects
-    private ArrayList<EventEntity> createEvents(Date semStart, Date semEnd, Date breakSemStart, Date breakSemEnd,
-                                                String type, int dow, Date startTime, Date endTime) {
-        ArrayList<EventEntity> events = new ArrayList<>();
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(semStart);
-
-        while (cal.getTime().before(semEnd)  || cal.getTime().equals(semEnd)) {
-            Date current = cal.getTime();
-
-            // Check if it is the right day of the week
-            int calDay = cal.get(Calendar.DAY_OF_WEEK);
-            if (calDay == dow) {
-                // Check if it not during the break
-                if (current.before(breakSemStart) || current.after(breakSemEnd)) {
-                    Date startDateTime = convertToDateTime(current, startTime);
-                    Date endDateTime = convertToDateTime(current, endTime);
-
-                    events.add(new EventEntity(startDateTime, endDateTime, false, type));
-                }
-            }
-            // Move to the next day
-            cal.add(Calendar.DATE, 1);
-        }
-        return events;
-
-    }
-
-    /// Helping function to determine whether a row in the assignment table
-    /// is an actual assignment.
-    /// @param row HTML element of the assignment
-    /// @return Arraylist of assignment information
-    private ArrayList<String> checkAssignment(Element row) {
-        ArrayList<String> rowElements = new ArrayList<>();
-        ArrayList<String> finalRow = new ArrayList<>();
-        Elements cols = row.select("td");
-        for (Element col: cols) {
-            String colText = col.text();
-            if (!colText.isEmpty()) {
-                rowElements.add(colText);
-            }
-        }
-        if (rowElements.size() > 3) {
-            for (int i = 0; i < 3; i++) {
-                finalRow.add(rowElements.get(i));
-            }
-            return finalRow;
-        } else { return null; }
-
-    }
-
-    /// Function to retrieve the information from the paper arraylist
-    /// @return new paper entity
-    private PaperEntity getPaperInformation() {
-        String paperId = itemsData.get(1);
-        String paperName = itemsData.get(0);
-        String paperCode = itemsData.get(1).split("-")[0];
-        int points = Integer.parseInt(itemsData.get(2));
-        String semesterCode_fk = "26" + itemsData.get(3);
+    /// Parses the core paper fields and constructs a PaperEntity.
+    /// Also sets paperId_fk and writes semesterCode into results so downstream
+    /// code does not need to reach into DataCleaner internals.
+    /// @return new PaperEntity
+    private PaperEntity buildPaperEntity() {
+        String paperId       = itemsData.get(1);
+        String paperName     = itemsData.get(0);
+        String paperCode     = paperId.split("-")[0];
+        int    points        = Integer.parseInt(itemsData.get(2));
+        String semesterCode  = "26" + itemsData.get(3);
 
         this.paperId_fk = paperId;
-        this.semester_fk = semesterCode_fk;
+        results.setSemesterCode(semesterCode);
 
-        return new PaperEntity(paperId, paperName, paperCode, points, semesterCode_fk);
+        return new PaperEntity(paperId, paperName, paperCode, points, semesterCode);
     }
 
-    /// Function to retrieve the information from the staff arraylist
-    /// @return new Staff entity
-    private ArrayList<StaffEntity> getStaffInformation() {
-        ArrayList<StaffEntity> staffList = new ArrayList<>();
+    /// Extracts (name, email, position) triples from the flat staff list.
+    /// Pure extraction — no entity construction.
+    /// @return list of String arrays: [, email, position]
+    private List<String[]> extractStaffPairs() {
+        List<String[]> pairs = new ArrayList<>();
         String position = "";
-
         for (int i = 0; i < staffData.size(); i++) {
             String item = staffData.get(i);
-            // If the item contains an email
             if (item.contains("@")) {
                 String name = (i > 0) ? staffData.get(i - 1) : "Unknown";
-                // Use the paperId we generated above as the foreign key
-                staffList.add(new StaffEntity(name, item, position, paperId_fk));
-            }
-            // If it's a role/position header
-            else if (i + 1 < staffData.size() && !staffData.get(i + 1).contains("@")) {
+                pairs.add(new String[]{ name, item, position });
+            } else if (i + 1 < staffData.size() && !staffData.get(i + 1).contains("@")) {
                 position = item;
             }
+        }
+        return pairs;
+    }
+
+    /// Constructs StaffEntity objects from pre-extracted (name, email, position) triples.
+    /// @param pairs Output of extractStaffPairs()
+    /// @return Arraylist of StaffEntity
+    private ArrayList<StaffEntity> buildStaffEntities(List<String[]> pairs) {
+        ArrayList<StaffEntity> staffList = new ArrayList<>();
+        for (String[] pair : pairs) {
+            staffList.add(new StaffEntity(pair[0], pair[1], pair[2], paperId_fk));
         }
         return staffList;
     }
 
-    /// Function to retrieve the information from the assessment arraylist
-    /// @return new assessment entity
-    private ArrayList<AssessmentEntity> getAssessmentInformation() {
+    /// Constructs AssessmentEntity objects from the flat assessmentData list.
+    /// @return Arraylist of AssessmentEntity
+    private ArrayList<AssessmentEntity> buildAssessmentEntities() {
         ArrayList<AssessmentEntity> assessmentList = new ArrayList<>();
-
-        for (int i = 0; i < assessmentData.size(); i+=3) {
-            String title = assessmentData.get(i);
-            Date dueDate = convertToDate(assessmentData.get(i + 1));
-            Double weight = Double.valueOf(assessmentData.get(i + 2));
+        for (int i = 0; i + 2 < assessmentData.size(); i += 3) {
+            String title         = assessmentData.get(i);
+            Date   dueDate       = DateConverter.stringAbvToDate(assessmentData.get(i + 1));
+            Double weight        = Double.valueOf(assessmentData.get(i + 2));
             String assessmentType = findAssessmentType(title);
-
-            // Add the assessment table
             assessmentList.add(new AssessmentEntity(title, dueDate, weight, assessmentType, 0.0, paperId_fk));
         }
-
         return assessmentList;
     }
 
-
-    /// Helping function to determine the type of assessment based on the title
-    /// @param title name of the assessment
-    /// @return type of assessment
-    private String findAssessmentType(String title) {
-        ArrayList<String> assessmentTypes = setAssessmentTypes();
-        // Compare the title to the assessment types
-        for (String assessmentType: assessmentTypes) {
-            if (title.contains(assessmentType)) {
-                return assessmentType;
-            }
-        }
-        return "Assessment";    // Default assessment type
-    }
-
-    /// Sets arraylist of assessment types to check
-    /// @return Arraylist of all the assessment types
-    private ArrayList<String> setAssessmentTypes() {
-        ArrayList<String> assessmentTypes = new ArrayList<>();
-        assessmentTypes.add("Assessment");
-        assessmentTypes.add("Quiz");
-        assessmentTypes.add("Test");
-        assessmentTypes.add("Report");
-        assessmentTypes.add("Presentation");
-        assessmentTypes.add("Exam");
-
-        return assessmentTypes;
-    }
-
-    /// Function to retrieve the timetable pattern information based on the timetable
-    /// arraylist.
-    /// @return Arraylist of timetable patterns
-    private ArrayList<TimetablePatternEntity> getTimetablePatternInformation() {
-        ArrayList<TimetablePatternEntity> timetablePatternList = new ArrayList<>();
-        // Iterate through arraylist in groups of 5
-        for (int i = 0; i < timetablePatternData.size(); i+=5) {
-            String type = timetablePatternData.get(i);
-            int dayOfWeek = convertDOW(timetablePatternData.get(i + 1));
+    /// Constructs TimetablePatternEntity objects from the flat timetablePatternData list.
+    /// @return Arraylist of TimetablePatternEntity
+    private ArrayList<TimetablePatternEntity> buildTimetablePatternEntities() {
+        ArrayList<TimetablePatternEntity> list = new ArrayList<>();
+        for (int i = 0; i + 4 < timetablePatternData.size(); i += 5) {
+            String type            = timetablePatternData.get(i);
+            int    dayOfWeek       = convertDOW(timetablePatternData.get(i + 1));
             String startTimeString = timetablePatternData.get(i + 2);
-            String endTimeString = timetablePatternData.get(i + 3);
-            String location = timetablePatternData.get(i + 4);
-            Double duration = getDuration(startTimeString, endTimeString);
-
-            // Convert the times to date objects
-            Date startTime = convertToTime(startTimeString);
-            Date endTime = convertToTime(endTimeString);
-
-            // Add to the timetable pattern table
-            timetablePatternList.add(new TimetablePatternEntity(type, dayOfWeek, startTime, endTime, location, duration, paperId_fk));
+            String endTimeString   = timetablePatternData.get(i + 3);
+            String location        = timetablePatternData.get(i + 4);
+            Double duration        = getDuration(startTimeString, endTimeString);
+            Date   startTime       = DateConverter.stringToTime(startTimeString);
+            Date   endTime         = DateConverter.stringToTime(endTimeString);
+            list.add(new TimetablePatternEntity(type, dayOfWeek, startTime, endTime, location, duration, paperId_fk));
         }
-        return timetablePatternList;
+        return list;
     }
 
-    /// Convert the day of week into int representation
-    /// @param dayOfWeek Three letter representation of weekday
-    /// @return Numeric representation for day of the week
-    private int convertDOW(String dayOfWeek) {
-        ArrayList<String> days = setDays();
-        for (String day: days) {
-            if (day.matches(dayOfWeek)) {
-                return days.indexOf(day) + 2;
+    // ─────────────────────────────────────────────────────────────
+    // Event generation (depends on semester, called by DataRepository)
+    // ─────────────────────────────────────────────────────────────
+
+    /// Creates event occurrences from the timetable patterns within a semester window.
+    /// @param semester Semester the events occur within
+    /// @return Arraylist of EventEntity
+    public ArrayList<EventEntity> createEventData(SemesterEntity semester) {
+        ArrayList<TimetablePatternEntity> timetablePattern = results.getTimetablePatterns();
+        ArrayList<EventEntity> eventEntities = new ArrayList<>();
+
+        Date startDate      = semester.getStartDate();
+        Date endDate        = semester.getEndDate();
+        Date breakStartDate = semester.getBreakStartDate();
+        Date breakEndDate   = semester.getBreakEndDate();
+
+        for (TimetablePatternEntity timetable : timetablePattern) {
+            eventEntities.addAll(createEvents(
+                    startDate, endDate, breakStartDate, breakEndDate,
+                    timetable.getType(), timetable.getDayOfWeek(),
+                    timetable.getStartTime(), timetable.getEndTime()));
+        }
+        return eventEntities;
+    }
+
+    /// Generates individual EventEntity occurrences for one timetable pattern.
+    /// @param semStart     Start date of the semester
+    /// @param semEnd       End date of the semester
+    /// @param breakSemStart Start date of the semester break
+    /// @param breakSemEnd   End date of the semester break
+    /// @param type         Type of timetable pattern event
+    /// @param dow          Numeric day of the week the event occurs
+    /// @param startTime    Start time of the event
+    /// @param endTime      End time of the event
+    /// @return Arraylist of EventEntity objects
+    private ArrayList<EventEntity> createEvents(
+            Date semStart, Date semEnd, Date breakSemStart, Date breakSemEnd,
+            String type, int dow, Date startTime, Date endTime) {
+
+        ArrayList<EventEntity> events = new ArrayList<>();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(semStart);
+
+        while (!cal.getTime().after(semEnd)) {
+            Date current = cal.getTime();
+            if (cal.get(Calendar.DAY_OF_WEEK) == dow) {
+                if (current.before(breakSemStart) || current.after(breakSemEnd)) {
+                    Date startDateTime = DateConverter.toDateTime(current, startTime);
+                    Date endDateTime   = DateConverter.toDateTime(current, endTime);
+                    events.add(new EventEntity(startDateTime, endDateTime, false, type));
+                }
             }
+            cal.add(Calendar.DATE, 1);
+        }
+        return events;
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // Helpers
+    // ─────────────────────────────────────────────────────────────
+
+    /// Validates and extracts the first three non-empty columns from an assessment row.
+    /// @param row HTML row element
+    /// @return Three-element list [, date, weight] or null if not a valid assessment row
+    private ArrayList<String> extractAssessmentRow(Element row) {
+        ArrayList<String> cells = new ArrayList<>();
+        for (Element col : row.select("td")) {
+            String text = col.text();
+            if (!text.isEmpty()) cells.add(text);
+        }
+        if (cells.size() < 3) return null;
+        ArrayList<String> result = new ArrayList<>();
+        for (int i = 0; i < 3; i++) result.add(cells.get(i));
+        return result;
+    }
+
+    /// Resolves assessment type from title keywords
+    /// @param title name of the assessment
+    /// @return matching type string, or "Assessment" as default
+    private String findAssessmentType(String title) {
+        for (String type : buildAssessmentTypes()) {
+            if (title.contains(type)) return type;
+        }
+        return "Assessment";
+    }
+
+    /// Returns the ordered list of assessment type keywords to check
+    /// @return Arraylist of type strings
+    private ArrayList<String> buildAssessmentTypes() {
+        ArrayList<String> types = new ArrayList<>();
+        types.add("Assessment");
+        types.add("Quiz");
+        types.add("Test");
+        types.add("Report");
+        types.add("Presentation");
+        types.add("Exam");
+        return types;
+    }
+
+    /// Converts a three-letter day abbreviation to a Calendar.DAY_OF_WEEK int
+    /// @param dayOfWeek Three-letter day string eg. "Mon"
+    /// @return Calendar day constant (2 = Monday … 6 = Friday), or 0 if unrecognised
+    private int convertDOW(String dayOfWeek) {
+        ArrayList<String> days = buildDayList();
+        for (String day : days) {
+            if (day.equals(dayOfWeek)) return days.indexOf(day) + 2;
         }
         return 0;
     }
 
-    /// Helping function to add days of week
-    /// @return arraylist of the three letter days of the week
-    private ArrayList<String> setDays() {
+    /// Returns ordered weekday abbreviations Mon–Fri
+    /// @return arraylist of three-letter day strings
+    private ArrayList<String> buildDayList() {
         ArrayList<String> days = new ArrayList<>();
         days.add("Mon");
         days.add("Tue");
@@ -406,61 +359,33 @@ public class DataCleaner {
         return days;
     }
 
-    /// Calculates duration based on the start and end time
-    /// @param startTime Text start time
-    /// @param endTime Text end time
+    /// Calculates whole-hour duration from start and end time strings
+    /// @param startTime Text start time eg. "09:00"
+    /// @param endTime   Text end time eg. "11:00"
     /// @return Duration as a double
     private Double getDuration(String startTime, String endTime) {
         Double start = Double.valueOf(startTime.split(":")[0]);
-        Double end = Double.valueOf(endTime.split(":")[0]);
-
+        Double end   = Double.valueOf(endTime.split(":")[0]);
         return end - start;
     }
 
-    /// Handles multiple staff member information by separating name and email for each staff member
-    /// @param cellData Text from a cell in the staff table
-    /// @param tableData Arraylist of all current staff members
+    /// Splits a cell containing multiple staff entries (identified by two @ symbols)
+    /// @param cellData Text from a multi-person cell
+    /// @param tableData Accumulator list
     private void splitMultipleStaff(String cellData, ArrayList<String> tableData) {
-        String[] multipleStaff = cellData.split(" ");
-        for (int i = 0; i < multipleStaff.length; i+=4) {
-            String staffName = multipleStaff[i] + " " + multipleStaff[i+1];
-            String staffEmail = multipleStaff[i + 3];
-
-            // Add to arraylist
-            tableData.add(staffName);
-            tableData.add(staffEmail);
+        String[] parts = cellData.split(" ");
+        for (int i = 0; i + 3 < parts.length; i += 4) {
+            tableData.add(parts[i] + " " + parts[i + 1]);
+            tableData.add(parts[i + 3]);
         }
     }
 
-    /// Splits the name and email of a staff member from a single string
-    /// @param cellData Text from a cell in the staff table
-    /// @param tableData Arraylist of all current staff members
+    /// Splits a "Name - email" cell into two separate strings
+    /// @param cellData Text from a hyphen-delimited cell
+    /// @param tableData Accumulator list
     private void splitStaffInformation(String cellData, ArrayList<String> tableData) {
-        String[] splitCell = cellData.split("-");
-        // Add to arraylist
-        tableData.add(splitCell[0].trim());
-        tableData.add(splitCell[1].trim());
-    }
-
-    /// Converts a dateString into a date
-    /// @param dateString Text format of a date with a text month
-    /// @return Date object
-    private Date convertToDate(String dateString) {
-        return DateConverter.stringAbvToDate(dateString);
-    }
-
-    /// Converts a timeString into a time
-    /// @param timeString Text format of a time
-    /// @return Date object for time
-    private Date convertToTime(String timeString) {
-        return DateConverter.stringToTime(timeString);
-    }
-
-    /// Combines date and time into a datetime
-    /// @param date Date object
-    /// @param time Date object for time
-    /// @return Combined date and time
-    private Date convertToDateTime(Date date, Date time) {
-        return DateConverter.toDateTime(date, time);
+        String[] parts = cellData.split("-");
+        tableData.add(parts[0].trim());
+        tableData.add(parts[1].trim());
     }
 }

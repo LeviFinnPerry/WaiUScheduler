@@ -65,25 +65,25 @@ public class CalendarEventDetail extends BottomSheetDialogFragment {
             dismiss();
             return;
         }
-        setHeader(view);
-        setTime(view);
-        switchType(view);
+
+        bindHeader(view);
+        bindTime(view);
+        bindTypeSection(view);
+
         view.findViewById(R.id.button_close_dialog).setOnClickListener(v -> dismiss());
     }
 
-    /// Sets headers to view
-    /// @param view calendar view
-    private void setHeader(View view) {
-        // Header
+    ///  Populates time, type and colour from the occurrence
+    /// @param view main view
+    private void bindHeader(View view) {
         ((TextView) view.findViewById(R.id.text_event_title)).setText(occurrence.getTitle());
         ((TextView) view.findViewById(R.id.text_event_type_badge)).setText(occurrence.getType());
         view.findViewById(R.id.view_colour_indicator).setBackgroundColor(occurrence.getColour());
     }
 
-    /// Sets time to view
-    /// @param view calendar view
-    private void setTime(View view) {
-        // Time
+    ///  Populates time label for the occurrence
+    /// @param view main view
+    private void bindTime(View view) {
         SimpleDateFormat fmt = new SimpleDateFormat("EEE d MMM yyyy, h:mm a", Locale.getDefault());
         String timeText = fmt.format(occurrence.getStartDateTime());
         if (!occurrence.getStartDateTime().equals(occurrence.getEndDateTime())) {
@@ -92,10 +92,8 @@ public class CalendarEventDetail extends BottomSheetDialogFragment {
         ((TextView) view.findViewById(R.id.text_event_time)).setText(timeText);
     }
 
-    /// Switches based on occurrence type
-    /// @param view calendar view
-    private void switchType(View view) {
-        // Type specific sections
+    /// Routes to the correct type section
+    private void bindTypeSection(View view) {
         switch (occurrence.getType()) {
             case CalendarOccurrence.TYPE_ASSESSMENT:
                 setupAssessmentSection(view);
@@ -118,48 +116,46 @@ public class CalendarEventDetail extends BottomSheetDialogFragment {
         AssessmentEntity assessment = (AssessmentEntity) occurrence.getSourceEntity();
         EditText editGrade = view.findViewById(R.id.edit_grade);
 
+        populateExistingGrade(editGrade, assessment);
+        applyFutureAssessmentGating(view, editGrade, assessment);
+        bindSaveGradeButton(view, editGrade, assessment);
+    }
+
+    /// Pre fills the grade field if a grade has been recorded
+    /// @param editGrade grade input field
+    /// @param assessment source entity
+    private void populateExistingGrade(EditText editGrade, AssessmentEntity assessment) {
         if(assessment.getGrade() != null ) {
             editGrade.setText(String.valueOf(assessment.getGrade()));
         }
-
-        disableFutureAssessments(assessment, view, editGrade);
-
-        setClickListener(view, editGrade, assessment);
     }
 
-    /// Prevents input from user for event in the future
-    /// @param view calendar item view
-    /// @param assessment selected assessment
-    /// @param editGrade edit text section for grade
-    private void disableFutureAssessments(AssessmentEntity assessment, View view, EditText editGrade) {
-        // If assessment due date has already passed
-        boolean isFuture = assessment.getDueDate().after(new Date());
-        if (isFuture) {
+    /// Disables grade entry and the save button if the assessment hasn't been due
+    /// @param view root dialog view
+    /// @param editGrade grade input field
+    /// @param assessment source entity
+    private void applyFutureAssessmentGating(View view, EditText editGrade, AssessmentEntity assessment) {
+        if (isFutureDate(assessment.getDueDate())) {
             editGrade.setEnabled(false);
             editGrade.setHint(R.string.assessment_not_due);
             view.findViewById(R.id.button_save_grade).setEnabled(false);
         }
     }
 
-    /// Sets click listener for events
-    /// @param view calendar item view
-    /// @param assessment selected assessment
-    /// @param editGrade edit text section for grade
-    private void setClickListener(View view, EditText editGrade, AssessmentEntity assessment) {
+    /// Connects to save button for grade
+    /// @param view root dialog view
+    /// @param editGrade grade input field
+    /// @param assessment source entity
+    private void bindSaveGradeButton(View view, EditText editGrade, AssessmentEntity assessment) {
         view.findViewById(R.id.button_save_grade).setOnClickListener(v -> {
-            String input = editGrade.getText() != null ? editGrade.getText().toString().trim(): "";
+            String input = trimmedText(editGrade);
             if (input.isEmpty()) {
                 Toast.makeText(requireContext(), "Please enter a grade", Toast.LENGTH_SHORT).show();
                 return;
             }
-            double grade;
-            try {
-                grade = Double.parseDouble(input);
-            } catch (NumberFormatException e) {
-                Log.e("Number Format", "Invalid Grade Value");
-                return;
-            }
-            if (grade < 0 || grade > 100) {
+            double grade = parseGrade(input);
+            if (Double.isNaN(grade)) return;
+            if (!isValidGrade(grade)) {
                 Toast.makeText(requireContext(), "Grade out of bounds", Toast.LENGTH_SHORT).show();
                 return;
             }
@@ -170,28 +166,50 @@ public class CalendarEventDetail extends BottomSheetDialogFragment {
         });
     }
 
+    /// Parses a grade string into a double
+    /// @param input grade string
+    /// @return grade double
+    private double parseGrade(String input) {
+        try {
+            return Double.parseDouble(input);
+        } catch (NumberFormatException e) {
+            Log.e("Number Format", "Invalid grade value");
+            return Double.NaN;
+        }
+    }
+
+    /// If the grade is between 0 and 100
+    /// @param grade grade inputted
+    /// @return true if in range else false
+    private boolean isValidGrade(double grade) {
+        return grade >=0 && grade <= 100;
+    }
+
     /// Sets up the events within the calendar
     /// @param view Calendar view
     private void setupEventSection(View view) {
         view.findViewById(R.id.section_event).setVisibility(View.VISIBLE);
         EventEntity event = (EventEntity) occurrence.getSourceEntity();
-
         RadioGroup radioGroup = view.findViewById(R.id.radiogroup_attendance);
-        if (event.getAttended().equals(true)) radioGroup.check(R.id.radio_attended);
-        else if (event.getAttended().equals(false)) radioGroup.check(R.id.radio_missed);
 
-        disableFutureEvents(radioGroup, view);
-
-        saveButtonListener(radioGroup, view, event);
+        populateAttendanceSection(radioGroup, event);
+        applyFutureEventGating(view, radioGroup);
+        bindSaveAttendanceButtons(view, radioGroup, event);
     }
 
-    /// Prevents input from user for event in the future
-    /// @param view calendar item view
-    /// @param radioGroup event attendance
-    private void disableFutureEvents(RadioGroup radioGroup, View view) {
-        // Disables inputting event attendance for future events
-        boolean isFuture = occurrence.getStartDateTime().after(new Date());
-        if (isFuture) {
+    /// Preselects correct radio button on the attendance
+    /// @param radioGroup attendance radio group
+    /// @param event source entity
+    private void populateAttendanceSection(RadioGroup radioGroup, EventEntity event) {
+        if (event.getAttended().equals(true)) radioGroup.check(R.id.radio_attended);
+        else if (event.getAttended().equals(false)) radioGroup.check(R.id.radio_missed);
+    }
+
+    /// Prevents attendance being marked on future events
+    /// @param radioGroup attendance radio group
+    /// @param view root dialog view
+    private void applyFutureEventGating(View view, RadioGroup radioGroup) {
+        if (isFutureDate(occurrence.getStartDateTime())) {
             for (int i = 0; i < radioGroup.getChildCount(); i++) {
                 radioGroup.getChildAt(i).setEnabled(false);
             }
@@ -199,75 +217,91 @@ public class CalendarEventDetail extends BottomSheetDialogFragment {
         }
     }
 
-    /// Click listener for toggling attendance
-    /// @param event selected event
-    /// @param view calendar item view
-    /// @param radioGroup event attendance
-    private void saveButtonListener(RadioGroup radioGroup, View view, EventEntity event) {
+    /// Connects to save button for attendance
+    /// @param view root dialog view
+    /// @param radioGroup attendance radio group
+    /// @param event source entity
+    private void bindSaveAttendanceButtons(View view, RadioGroup radioGroup, EventEntity event) {
         view.findViewById(R.id.button_save_attendance).setOnClickListener(v -> {
-            int checked = radioGroup.getCheckedRadioButtonId();
-            boolean attendance;
-            if (checked == R.id.radio_attended) attendance = true;
-            else if (checked == R.id.radio_missed) attendance = false;
+
+            Boolean attendance = resolveAttendance(radioGroup);
+            if (attendance != null) {
+                event.setAttended(attendance);
+                Toast.makeText(requireContext(), "Attendance saved", Toast.LENGTH_SHORT).show();
+            }
             else {
                 Toast.makeText(requireContext(), "Please select attendance", Toast.LENGTH_SHORT)
                         .show();
-                return;
-            }
-            event.setAttended(attendance);
-            Toast.makeText(requireContext(), "Attendance saved", Toast.LENGTH_SHORT).show();
+                }
         });
     }
 
-    /// Sets up the study sessions within the calendar
-    /// @param view Calendar view
-    private void setupStudySection(View view) {
-        view.findViewById(R.id.section_study).setVisibility(View.VISIBLE);
-        StudySessionEntity studySession = (StudySessionEntity) occurrence.getSourceEntity();
-        TextView detailsView = view.findViewById(R.id.text_study_details);
-
-        // Builds and displays section details
-        refreshStudyGrid(detailsView, studySession);
-
-        // Select details to edit times
-        setDetails(detailsView, studySession);
-
-        setStudyListener(detailsView, studySession);
-
-
+    /// Maps the checked radio button to an attendance boolean
+    /// @param radioGroup Attendance radio group
+    /// @return true if attended else false
+    @Nullable
+    private Boolean resolveAttendance(RadioGroup radioGroup) {
+        int checked = radioGroup.getCheckedRadioButtonId();
+        if (checked == R.id.radio_attended) return true;
+        else if (checked == R.id.radio_missed) return false;
+        return null;
     }
 
-    /// Sets study session click listener
-    /// @param view study session item view
-    /// @param studySession study session selected
-    private void setStudyListener(View view, StudySessionEntity studySession) {
+    /// Shows the study section, renders details, and wires edit/delete interactions
+    /// @param view Root dialog view
+    private void setupStudySection(View view) {
+        view.findViewById(R.id.section_study).setVisibility(View.VISIBLE);
+        StudySessionEntity session = (StudySessionEntity) occurrence.getSourceEntity();
+        TextView detailsView = view.findViewById(R.id.text_study_details);
+        renderStudyDetails(detailsView, session);
+        bindStudyEditListener(detailsView, session);
+        bindStudyDeleteButton(view, session);
+    }
+
+    /// Formats and displays study session details in the text view.
+    /// Separated from setup so it can be called again after an edit.
+    /// @param detailsView TextView to populate
+    /// @param session     Source entity
+    private void renderStudyDetails(TextView detailsView, StudySessionEntity session) {
+        detailsView.setText(formatStudyDetails(session));
+    }
+
+    /// Pure formatting function — returns the multi-line detail string for a study session.
+    /// No view access; independently testable.
+    /// @param session Source entity
+    /// @return Formatted detail string
+    private String formatStudyDetails(StudySessionEntity session) {
+        SimpleDateFormat fmt = new SimpleDateFormat("EEE d MMM, h:mm a", Locale.getDefault());
+        String notes = session.getNotes();
+        return "Subject: " + session.getPaperId().split("-")[0] + "\n"
+                + "Start: "   + fmt.format(session.getDateTimeStart()) + "\n"
+                + "End: "     + fmt.format(session.getDateTimeEnd()) + "\n"
+                + (hasNotes(notes) ? "Notes: " + notes : "");
+    }
+
+    /// Makes the details view clickable to trigger time editing
+    /// @param detailsView Clickable text view
+    /// @param session     Session being edited
+    private void bindStudyEditListener(TextView detailsView, StudySessionEntity session) {
+        detailsView.setClickable(true);
+        detailsView.setOnClickListener(v ->
+                pickStartTime(session, () -> renderStudyDetails(detailsView, session)));
+    }
+
+    /// Wires the delete button to study session
+    /// @param view    Root dialog view
+    /// @param session Session to delete
+    private void bindStudyDeleteButton(View view, StudySessionEntity session) {
         view.findViewById(R.id.button_delete_study).setOnClickListener(v -> {
-            if (vm != null) {
-                vm.deleteStudySession(studySession);
-            }
+            if (vm != null) vm.deleteStudySession(session);
             Toast.makeText(requireContext(), "Study session deleted", Toast.LENGTH_SHORT).show();
             dismiss();
         });
     }
 
-    /// Rebuilds study detail text
-    /// @param detailsView Textview to update
-    /// @param studySession Source entity
-    private void refreshStudyGrid(TextView detailsView, StudySessionEntity studySession) {
-        SimpleDateFormat fmt = new SimpleDateFormat(
-                "EEE d MMM, h:mm a", Locale.getDefault());
-        
-        String notes = studySession.getNotes();
-        String details = "Subject: " + studySession.getPaperId().split("-")[0] + "\n"
-                + "Start: "   + fmt.format(studySession.getDateTimeStart()) + "\n"
-                + "End: "     + fmt.format(studySession.getDateTimeEnd()) + "\n"
-                + (hasNotes(notes) ? "Notes: " + notes : "");
-        ((TextView) detailsView.findViewById(R.id.text_study_details)).setText(details);
-    }
-
-    /// Whether the study session has notes
-    /// @param notes notes taken
-    /// @return True if has notes else false
+    /// Returns true when a notes string has content
+    /// @param notes Notes string
+    /// @return true if notes is present
     private boolean hasNotes(String notes) {
         return notes != null && !notes.trim().isEmpty();
     }
@@ -276,8 +310,7 @@ public class CalendarEventDetail extends BottomSheetDialogFragment {
     /// @param session Study session being edited
     /// @param onSaved Runnable called for confirmed times
     private void pickStartTime(StudySessionEntity session, Runnable onSaved) {
-        Calendar startCal = Calendar.getInstance();
-        startCal.setTime(session.getDateTimeStart());
+        Calendar startCal = calendarFromDate(session.getDateTimeStart());
 
         Calendar endCal = Calendar.getInstance();
         endCal.setTime(session.getDateTimeEnd());
@@ -309,7 +342,7 @@ public class CalendarEventDetail extends BottomSheetDialogFragment {
                 endCal.set(Calendar.HOUR_OF_DAY, hour);
                 endCal.set(Calendar.MINUTE, minute);
 
-                setTimes(startCal, endCal, session, onSaved);
+                applySessionTimes(startCal, endCal, session, onSaved);
             }, endCal.get(Calendar.HOUR_OF_DAY), endCal.get(Calendar.MINUTE), false).show();
         }, endCal.get(Calendar.YEAR), endCal.get(Calendar.MONTH), endCal.get(Calendar.DAY_OF_MONTH)).show();
     }
@@ -319,7 +352,7 @@ public class CalendarEventDetail extends BottomSheetDialogFragment {
     /// @param endCal End calendar time
     /// @param session Study session being edited
     /// @param onSaved Runnable called for confirmed times
-    private void setTimes(Calendar startCal, Calendar endCal, StudySessionEntity session, Runnable onSaved) {
+    private void applySessionTimes(Calendar startCal, Calendar endCal, StudySessionEntity session, Runnable onSaved) {
         // End must be after start
         if (!endCal.getTime().after(startCal.getTime())) {
             Toast.makeText(requireContext(), "End time must be after start", Toast.LENGTH_SHORT).show();
@@ -333,11 +366,27 @@ public class CalendarEventDetail extends BottomSheetDialogFragment {
         onSaved.run();
     }
 
-    /// Sets the on click listener for setting times
-    /// @param detailsView Text view to select
-    /// @param studySession Study session to edit
-    private void setDetails(TextView detailsView, StudySessionEntity studySession) {
-        detailsView.setClickable(true);
-        detailsView.setOnClickListener(v -> pickStartTime(studySession, () -> refreshStudyGrid(detailsView, studySession)));
+
+    /// Returns true when the given date is in the future relative to now
+    /// @param date Date to test
+    /// @return true if date is after the current instant
+    private boolean isFutureDate(Date date) {
+        return date.after(new Date());
+    }
+
+    /// Constructs a Calendar set to the given Date
+    /// @param date Source date
+    /// @return Initialised Calendar
+    private Calendar calendarFromDate(Date date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        return cal;
+    }
+
+    /// Returns the trimmed text from an EditText, or an empty string if null
+    /// @param editText Source field
+    /// @return Trimmed string
+    private String trimmedText(EditText editText) {
+        return editText.getText() != null ? editText.getText().toString().trim() : "";
     }
 }

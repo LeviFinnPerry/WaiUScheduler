@@ -45,19 +45,24 @@
                 android:id="@+id/stats_row2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="16dp">
-                <include layout="@layout/dashboard_stat_card"
+                android:layout_marginBottom="8dp"
+                android:baselineAligned="false"
+                android:orientation="horizontal">
+
+                <include
                     android:id="@+id/card_courses"
-                    android:layout_height="wrap_content"
+                    layout="@layout/dashboard_stat_card"
                     android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="8dp"/>
-                <include layout="@layout/dashboard_stat_card"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1" />
+
+                <include
                     android:id="@+id/card_events"
-                    android:layout_height="wrap_content"
+                    layout="@layout/dashboard_stat_card"
                     android:layout_width="0dp"
-                    android:layout_weight="1"/>
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
             </LinearLayout>
 
             <LinearLayout

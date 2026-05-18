@@ -10,6 +10,8 @@ import java.util.ArrayList;
 /// Scraped data object to temporarily store information from the paper outline
 public class ScrapedData {
     private PaperEntity paper;
+    private String semesterCode;
+
     // Arraylists to save multiple of each table type
     private ArrayList<StaffEntity> staff;
     private ArrayList<AssessmentEntity> assessment;
@@ -35,6 +37,14 @@ public class ScrapedData {
     public void setPaper(PaperEntity paper) {
         this.paper = paper;
     }
+
+    /// Gets the semester code for the paper
+    /// @return semester code
+    public String getSemesterCode() {return semesterCode;}
+
+    /// Sets the semester code for the paper
+    /// @param semesterCode semester code e.g. 26A
+    public void setSemesterCode(String semesterCode) {this.semesterCode = semesterCode;}
 
     /// Get all staff
     /// @return All staff in the table

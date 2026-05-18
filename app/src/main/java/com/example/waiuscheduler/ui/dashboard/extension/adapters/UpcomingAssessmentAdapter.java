@@ -76,10 +76,10 @@ public class UpcomingAssessmentAdapter extends RecyclerView.Adapter<UpcomingAsse
     private void setBadgeColor(VH holder, String type) {
         int badgeColour;
         switch (type) {
-            case "Report": badgeColour = 0xFF3949AB; break;
-            case "Assignment": badgeColour = 0xFFE65100; break;
-            case "Exam": badgeColour = 0xFFC62828; break;
-            default: badgeColour = 0xFF757575; break;
+            case "Report": badgeColour = 0xFFBB7E8C; break;
+            case "Assessment": badgeColour = 0xFF997095; break;
+            case "Test": badgeColour = 0xFF87B3C0; break;
+            default: badgeColour = 0xFFA08794; break;
         }
         holder.textTypeBadge.setBackgroundColor(badgeColour);
     }
