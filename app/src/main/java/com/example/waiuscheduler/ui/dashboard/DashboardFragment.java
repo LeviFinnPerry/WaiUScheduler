@@ -198,7 +198,7 @@ public class DashboardFragment extends Fragment {
     private BarData setBarData(List<BarEntry> entries) {
         // Dataset
         BarDataSet dataSet = new BarDataSet(entries, "");
-        dataSet.setColor(0xFF3949AB);
+        dataSet.setColor(0xFF997095);
         dataSet.setDrawValues(true);
         dataSet.setValueTextSize(10f);
 
