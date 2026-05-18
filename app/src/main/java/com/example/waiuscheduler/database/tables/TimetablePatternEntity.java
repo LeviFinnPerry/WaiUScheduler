@@ -20,6 +20,7 @@ import java.util.Date;
 )
 public class TimetablePatternEntity {
     @PrimaryKey @NonNull
+    private String timetableId;     // Name for event
     private String type;            // Type of timetable event (eg. lecture)
     private final int dayOfWeek;       // Day of week event occurs on
     private final Date startTime;       // Start time
@@ -40,6 +41,7 @@ public class TimetablePatternEntity {
             @NonNull String type, int dayOfWeek, Date startTime,
             Date endTime, String location, Double duration, String paperId
     ) {
+        this.timetableId  = type + " " + paperId.split("-")[0];
         this.type = type;
         this.dayOfWeek = dayOfWeek;
         this.startTime = startTime;
@@ -47,6 +49,19 @@ public class TimetablePatternEntity {
         this.location = location;
         this.duration = duration;
         this.paperId = paperId;
+    }
+
+    /// Get the id of timetable pattern occurrence
+    /// @return The type of timetable occurrence
+    @NonNull
+    public String getTimetableId() {
+        return timetableId;
+    }
+
+    /// Set the id of timetable pattern occurrence
+    /// @param type The type of timetable occurrence
+    public void setTimetableId(@NonNull String type) {
+        this.timetableId = type;
     }
 
     /// Get the type of timetable pattern occurrence

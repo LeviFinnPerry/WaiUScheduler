@@ -12,7 +12,7 @@ import java.util.Date;
 @Entity(tableName = "event",
         foreignKeys = @ForeignKey(
                 entity = TimetablePatternEntity.class,   // Class of foreign key
-                parentColumns = "type",          // Foreign key variable
+                parentColumns = "timetableId",          // Foreign key variable
                 childColumns = "timetableId_fk",        // Foreign key name
                 onDelete = ForeignKey.CASCADE           // Dependency on timetable
         ),

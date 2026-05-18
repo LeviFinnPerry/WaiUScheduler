@@ -42,10 +42,6 @@ public class DataCleaner {
         this.results = new ScrapedData();
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // Extraction — raw text only, no entity construction
-    // ─────────────────────────────────────────────────────────────
-
     /// Extracts all raw text arrays from the HTML document
     /// @param paper Paper outline document
     private void extractInformation(Document paper) {
@@ -147,10 +143,6 @@ public class DataCleaner {
         return tableData;
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // Construction — entity building only, no HTML touching
-    // ─────────────────────────────────────────────────────────────
-
     /// Builds all entities from the extracted raw data and populates results
     private void buildResults() {
         results.setPaper(buildPaperEntity());
@@ -237,10 +229,6 @@ public class DataCleaner {
         return list;
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // Event generation (depends on semester, called by DataRepository)
-    // ─────────────────────────────────────────────────────────────
-
     /// Creates event occurrences from the timetable patterns within a semester window.
     /// @param semester Semester the events occur within
     /// @return Arraylist of EventEntity
@@ -254,9 +242,10 @@ public class DataCleaner {
         Date breakEndDate   = semester.getBreakEndDate();
 
         for (TimetablePatternEntity timetable : timetablePattern) {
+            String timetableId = timetable.getTimetableId();
             eventEntities.addAll(createEvents(
                     startDate, endDate, breakStartDate, breakEndDate,
-                    timetable.getType(), timetable.getDayOfWeek(),
+                    timetableId, timetable.getDayOfWeek(),
                     timetable.getStartTime(), timetable.getEndTime()));
         }
         return eventEntities;
@@ -267,14 +256,14 @@ public class DataCleaner {
     /// @param semEnd       End date of the semester
     /// @param breakSemStart Start date of the semester break
     /// @param breakSemEnd   End date of the semester break
-    /// @param type         Type of timetable pattern event
+    /// @param timetableId   Type of timetable pattern event
     /// @param dow          Numeric day of the week the event occurs
     /// @param startTime    Start time of the event
     /// @param endTime      End time of the event
     /// @return Arraylist of EventEntity objects
     private ArrayList<EventEntity> createEvents(
             Date semStart, Date semEnd, Date breakSemStart, Date breakSemEnd,
-            String type, int dow, Date startTime, Date endTime) {
+            String timetableId, int dow, Date startTime, Date endTime) {
 
         ArrayList<EventEntity> events = new ArrayList<>();
         Calendar cal = Calendar.getInstance();
@@ -286,17 +275,13 @@ public class DataCleaner {
                 if (current.before(breakSemStart) || current.after(breakSemEnd)) {
                     Date startDateTime = DateConverter.toDateTime(current, startTime);
                     Date endDateTime   = DateConverter.toDateTime(current, endTime);
-                    events.add(new EventEntity(startDateTime, endDateTime, false, type));
+                    events.add(new EventEntity(startDateTime, endDateTime, false, timetableId));
                 }
             }
             cal.add(Calendar.DATE, 1);
         }
         return events;
     }
-
-    // ─────────────────────────────────────────────────────────────
-    // Helpers
-    // ─────────────────────────────────────────────────────────────
 
     /// Validates and extracts the first three non-empty columns from an assessment row.
     /// @param row HTML row element
