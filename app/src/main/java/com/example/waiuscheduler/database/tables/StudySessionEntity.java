@@ -22,8 +22,8 @@ public class StudySessionEntity {
     private int sessionId;
     private Date dateTimeStart;           // Start time of study session
     private Date dateTimeEnd;             // End time of study session
-    private Double duration;                // Duration of study session
-    private String notes;                   // Notes from session
+    private final Double duration;                // Duration of study session
+    private final String notes;                   // Notes from session
     private String paperId;          // Foreign key referencing paper
 
     /// Constructor for the study session table
@@ -84,22 +84,10 @@ public class StudySessionEntity {
         return duration;
     }
 
-    /// Set the duration of the study session
-    /// @param duration Length of study session in minutes
-    public void setDuration(Double duration) {
-        this.duration = duration;
-    }
-
     /// Get study session notes
     /// @return Additional notes from the user
     public String getNotes() {
         return notes;
-    }
-
-    /// Set study session notes
-    /// @param notes Additional notes from the user
-    public void setNotes(String notes) {
-        this.notes = notes;
     }
 
     /// Get paper id assigned for the session

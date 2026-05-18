@@ -21,8 +21,8 @@ import java.util.Date;
 public class EventEntity {
     @PrimaryKey(autoGenerate = true)
     private int eventId;     // Unique identifier for the event
-    private Date dateTimeStart;   // Start time
-    private Date dateTimeEnd;     // End time
+    private final Date dateTimeStart;   // Start time
+    private final Date dateTimeEnd;     // End time
     private Boolean attended;       // Monitor attendance of each event
     private String timetableId_fk;     // Foreign key references the timetable table
 
@@ -58,22 +58,10 @@ public class EventEntity {
         return dateTimeStart;
     }
 
-    /// Set when the event starts
-    /// @param dateTimeStart The date and time of the event start
-    public void setDateTimeStart(Date dateTimeStart) {
-        this.dateTimeStart = dateTimeStart;
-    }
-
     /// Get when the event ends
     /// @return The date and time of the event end
     public Date getDateTimeEnd() {
         return dateTimeEnd;
-    }
-
-    /// Set when the event ends
-    /// @param dateTimeEnd The date and time of the event end
-    public void setDateTimeEnd(Date dateTimeEnd) {
-        this.dateTimeEnd = dateTimeEnd;
     }
 
     /// Get if the event was attended

@@ -21,11 +21,11 @@ import java.util.Date;
 public class TimetablePatternEntity {
     @PrimaryKey @NonNull
     private String type;            // Type of timetable event (eg. lecture)
-    private int dayOfWeek;       // Day of week event occurs on
-    private Date startTime;       // Start time
-    private Date endTime;         // End time
-    private String location;        // Location for event
-    private Double duration;        // Total duration in hours
+    private final int dayOfWeek;       // Day of week event occurs on
+    private final Date startTime;       // Start time
+    private final Date endTime;         // End time
+    private final String location;        // Location for event
+    private final Double duration;        // Total duration in hours
     private String paperId;     // Foreign key references event table
 
     /// Constructor for the timetable table
@@ -68,22 +68,10 @@ public class TimetablePatternEntity {
         return dayOfWeek;
     }
 
-    /// Set the day of the week for the timetable pattern
-    /// @param dayOfWeek Numeric representation for the day of the week
-    public void setDayOfWeek(int dayOfWeek) {
-        this.dayOfWeek = dayOfWeek;
-    }
-
     /// Get the occurrence start time
     /// @return Time the timetable pattern starts
     public Date getStartTime() {
         return startTime;
-    }
-
-    /// Set the occurrence start time
-    /// @param startTime Time the timetable pattern starts
-    public void setStartTime(Date startTime) {
-        this.startTime = startTime;
     }
 
     /// Get the occurrence end time
@@ -92,22 +80,11 @@ public class TimetablePatternEntity {
         return endTime;
     }
 
-    /// Set the occurrence start time
-    /// @param endTime Time the timetable pattern ends
-    public void setEndTime(Date endTime) {
-        this.endTime = endTime;
-    }
 
     /// Get the location of the timetable pattern
     /// @return Building the occurrence is in
     public String getLocation() {
         return location;
-    }
-
-    /// Set the location of the timetable pattern
-    /// @param location Building the occurrence is in
-    public void setLocation(String location) {
-        this.location = location;
     }
 
     /// Get the duration of the timetable pattern
@@ -116,11 +93,6 @@ public class TimetablePatternEntity {
         return duration;
     }
 
-    /// Set the duration of the timetable pattern
-    /// @param duration Length of occurrence in hours
-    public void setDuration(Double duration) {
-        this.duration = duration;
-    }
 
     /// Get the paper id that corresponds to the timetable occurrence
     /// @return Foreign key paper id the timetable pattern is from

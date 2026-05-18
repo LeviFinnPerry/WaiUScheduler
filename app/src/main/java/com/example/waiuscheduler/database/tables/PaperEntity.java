@@ -19,9 +19,9 @@ import androidx.room.PrimaryKey;
 public class PaperEntity {
     @PrimaryKey @NonNull                 // Unique Id for the paper
     private String paperId;
-    private String paperCode;           // Paper code eg. COMPX576
-    private String paperName;           // Paper name eg. Programming Project
-    private int points;                 // Paper points
+    private final String paperCode;           // Paper code eg. COMPX576
+    private final String paperName;           // Paper name eg. Programming Project
+    private final int points;                 // Paper points
     private String semesterCode_fk;    // Foreign key referencing semester
 
     /// Constructor for the paper table
@@ -58,34 +58,16 @@ public class PaperEntity {
         return paperCode;
     }
 
-    /// Set the paper code
-    /// @param paperCode The code for the paper
-    public void setPaperCode(String paperCode) {
-        this.paperCode = paperCode;
-    }
-
     /// Get the paper name
     /// @return The paper name
     public String getPaperName() {
         return paperName;
     }
 
-    /// Set the paper name
-    /// @param paperName The name for the paper
-    public void setPaperName(String paperName) {
-        this.paperName = paperName;
-    }
-
     /// Get the paper points
     /// @return The amount of points the paper is worth
     public int getPoints() {
         return points;
-    }
-
-    /// Set the paper points
-    /// @param points The points for the paper
-    public void setPoints(int points) {
-        this.points = points;
     }
 
     /// Get the semester code foreign key
