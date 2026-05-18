@@ -23,6 +23,9 @@ import com.example.waiuscheduler.ui.calendar.CalendarViewModel;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -360,10 +363,23 @@ public class CalendarEventDetail extends BottomSheetDialogFragment {
             // Set times to update session
             session.setDateTimeStart(startCal.getTime());
             session.setDateTimeEnd(endCal.getTime());
+            session.setDuration(getDurationFromTimes(startCal, endCal));
             if (vm != null) vm.updateStudySession(session);
             Toast.makeText(requireContext(), "Session time updated", Toast.LENGTH_SHORT).show();
         }
         onSaved.run();
+    }
+
+    /// Gets the total duration is hours between the start and end
+    /// @param start start time
+    /// @param end end time
+    /// @return duration
+    private Double getDurationFromTimes(Calendar start, Calendar end) {
+        LocalTime startTime = start.toInstant().atZone(ZoneId.systemDefault()).toLocalTime();
+        LocalTime endTime = end.toInstant().atZone(ZoneId.systemDefault()).toLocalTime();
+
+        long totalMinutes = Duration.between(startTime, endTime).toMinutes();
+        return totalMinutes / 60.0;
     }
 
 

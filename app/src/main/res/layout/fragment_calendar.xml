@@ -114,7 +114,7 @@
             android:layout_width="wrap_content"
             android:layout_height="36dp"
             android:layout_marginEnd="8dp"
-            android:backgroundTint="#1565C0"
+            android:backgroundTint="@color/option_3"
             android:text="@string/filter_study"
             android:textSize="12sp" />
 
@@ -124,7 +124,7 @@
             android:layout_width="wrap_content"
             android:layout_height="36dp"
             android:layout_marginEnd="8dp"
-            android:backgroundTint="#2E7D32"
+            android:backgroundTint="@color/option_2"
             android:text="@string/filter_lecture"
             android:textSize="12sp" />
 
@@ -133,7 +133,7 @@
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="36dp"
-            android:backgroundTint="#D32F2F"
+            android:backgroundTint="@color/option_1"
             android:text="@string/filter_assignment"
             android:textSize="12sp" />
 

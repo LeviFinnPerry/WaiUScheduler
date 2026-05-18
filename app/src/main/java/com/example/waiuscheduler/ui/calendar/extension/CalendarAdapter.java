@@ -29,9 +29,9 @@ public class CalendarAdapter extends BaseAdapter {
     private final Calendar today = Calendar.getInstance();
 
     // Colours
-    private static final int COLOUR_EVENT = 0xFF007968;
-    private static final int COLOUR_STUDY = 0xFF3946AB;
-    private static final int COLOUR_ASSESSMENT = 0xFFE65100;
+    private static final int COLOUR_EVENT = 0xFFBB7E8C;
+    private static final int COLOUR_STUDY = 0xFF87B3C0;
+    private static final int COLOUR_ASSESSMENT = 0xFF997095;
 
     /// Constructor for calendar adapter
     /// @param context Application context
