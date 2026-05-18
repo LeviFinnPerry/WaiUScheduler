@@ -8,16 +8,13 @@ import com.example.waiuscheduler.database.DatabaseController;
 import com.example.waiuscheduler.database.DateConverter;
 import com.example.waiuscheduler.database.tables.AssessmentEntity;
 import com.example.waiuscheduler.database.tables.EventEntity;
-import com.example.waiuscheduler.database.tables.PaperEntity;
 import com.example.waiuscheduler.database.tables.SemesterEntity;
 import com.example.waiuscheduler.database.tables.StaffEntity;
-import com.example.waiuscheduler.database.tables.StudySessionEntity;
 import com.example.waiuscheduler.database.tables.TimetablePatternEntity;
 
 import org.jsoup.nodes.Document;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Objects;
 
 import okhttp3.HttpUrl;
@@ -36,8 +33,11 @@ public class DataRepository {
         this.cleaner = new DataCleaner();
         AppDatabase db = AppDatabase.getInstance(context);
         dbController = new DatabaseController(db);
+        preInitialiseSemesters();
+    }
 
-
+    /// Pre-initialises semester dates for this year
+    private void preInitialiseSemesters()  {
         // Pre initialising the semester table to this years dates
         AppDatabase.databaseWriteExecutor.execute(() -> {
             // A Semester
@@ -52,9 +52,6 @@ public class DataRepository {
                     DateConverter.stringToDate("06/11/2026"),
                     DateConverter.stringToDate("24/08/2026"),
                     DateConverter.stringToDate("07/09/2026")));
-
-
-
         });
     }
 
@@ -66,58 +63,10 @@ public class DataRepository {
             try {
                 // Get the document with course outline scraper
                 Document paperOutline = scraper.getCourseOutline(url);
-
                 if (paperOutline.childNodeSize() > 2) {
-                    // Clean the data
-                    currentOutline = cleaner.clean(paperOutline);
+                    currentOutline = cleaner.clean(paperOutline); // Clean the data
 
-                    // Write the data to the database
-
-                    // Add the paper information to database
-                    PaperEntity paper = currentOutline.getPaper();
-                    dbController.savePaper(paper);
-
-                    // Add the staff members to the database
-                    ArrayList<StaffEntity> staffMembers = currentOutline.getStaffs();
-                    // Set the paperId as foreign key
-                    for (StaffEntity staff : staffMembers) {
-                        dbController.saveStaff(staff);      // Save each staff member to database
-                    }
-
-                    // Add the assessments to the database
-                    ArrayList<AssessmentEntity> assessments = currentOutline.getAssessments();
-                    for (AssessmentEntity assessment : assessments) {
-                        dbController.saveAssessment(assessment);    // Save each assessment to database
-                    }
-
-                    // Add the events to the database
-                    ArrayList<TimetablePatternEntity> timetablePatterns =
-                            currentOutline.getTimetablePatterns();
-                    for (TimetablePatternEntity timetablePattern : timetablePatterns) {
-                        dbController.saveTimetablePattern(timetablePattern);    // Save timetable to database
-                    }
-
-                    // Get the current semester for the paper
-                    SemesterEntity semesterEntity =
-                            dbController.getSemester(currentOutline.getSemesterCode());
-
-                    currentOutline.setEvents(cleaner.createEventData(semesterEntity));
-                    ArrayList<EventEntity> events = currentOutline.getEvents();
-                    for (EventEntity event : events) {
-                        dbController.saveEvent(event); // Save event to database
-                    }
-
-                    Date trialStart = DateConverter.toDateTime(DateConverter.stringToDate("12/05/2026"), DateConverter.stringToTime("08:00"));
-                    Date trialEnd = DateConverter.toDateTime(DateConverter.stringToDate("12/05/2026"), DateConverter.stringToTime("16:00"));
-
-                    // DEBUG:
-                    dbController.saveStudySession(new StudySessionEntity(
-                            trialStart,
-                            trialEnd,
-                            8.0,
-                            "",
-                            currentOutline.getPaper().getPaperId()
-                    ));
+                    writeToDb(); // Write the data to the database
 
                     // Callback for successful pipeline
                     callback.OnComplete("Success");
@@ -133,8 +82,63 @@ public class DataRepository {
         });
     }
 
+    /// Writes all entities to the database
+    private void writeToDb() {
+        savePaper(); // Add the paper information to database
+        saveStaff(); // Add the staff members to the database
+        saveAssessment(); // Add the assessments to the database
+        saveTimetable(); // Add the timetable pattern to the database
+        saveEvents(); // Add the events to the database
+    }
+
+    /// Saves paper information from the outline to database
+    private void savePaper() {
+        dbController.savePaper(currentOutline.getPaper());
+    }
+
+    /// Saves staff information from the outline to database
+    private void saveStaff() {
+        for (StaffEntity staff : currentOutline.getStaffs()) {
+            dbController.saveStaff(staff);      // Save each staff member to database
+        }
+    }
+
+    /// Saves assessment information from the outline to database
+    private void saveAssessment() {
+        for (AssessmentEntity assessment : currentOutline.getAssessments()) {
+            dbController.saveAssessment(assessment);    // Save each assessment to database
+        }
+    }
+
+    /// Saves timetable information from the outline to database
+    private void saveTimetable() {
+        for (TimetablePatternEntity timetablePattern : currentOutline.getTimetablePatterns()) {
+            dbController.saveTimetablePattern(timetablePattern);    // Save timetable to database
+        }
+    }
+
+    /// Saves event information from the outline to database
+    private void saveEvents() {
+        SemesterEntity semester = resolveSemester(currentOutline.getSemesterCode());
+        if (semester == null) {
+            eventError();
+        } else {
+            ArrayList<EventEntity> events = cleaner.createEventData(semester);
+            currentOutline.setEvents(events);
+            for (EventEntity event : events) {
+                dbController.saveEvent(event); // Save event to database
+            }
+        }
+    }
+
+    /// Logs error for semester code not found
+    private void eventError() {
+        Log.e("Data Repository", "Semester not found for code: " + currentOutline.getSemesterCode());
+    }
+
     /// Callback for pipeline
     public interface RepositoryCallback {
+        /// @param result String to echo
         void OnComplete(String result);
     }
 
@@ -142,6 +146,13 @@ public class DataRepository {
     /// @return Database controller
     public static DatabaseController getDbController() {
         return dbController;
+    }
+
+    /// Get the semester for the paper outline
+    /// @param semesterCode semester to resolve
+    /// @return semester matching code
+    private SemesterEntity resolveSemester(String semesterCode) {
+        return dbController.getSemester(semesterCode);
     }
 
 }
