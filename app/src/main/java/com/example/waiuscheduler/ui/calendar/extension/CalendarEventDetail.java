@@ -311,7 +311,9 @@ public class CalendarEventDetail extends BottomSheetDialogFragment {
     /// @param onSaved Runnable called for confirmed times
     private void pickStartTime(StudySessionEntity session, Runnable onSaved) {
         Calendar startCal = calendarFromDate(session.getDateTimeStart());
-        Calendar endCal = calendarFromDate(session.getDateTimeEnd());
+
+        Calendar endCal = Calendar.getInstance();
+        endCal.setTime(session.getDateTimeEnd());
 
         // Pick start date
         new DatePickerDialog(requireContext(), (dp, year, month, day) -> {
