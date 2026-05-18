@@ -31,9 +31,9 @@ public abstract class TimeLineView {
     protected int cachedHourHeightPx = 0;
 
     // Colours
-    protected static final int COLOUR_EVENT = 0xFF007968;
-    protected static final int COLOUR_STUDY = 0xFF3946AB;
-    protected static final int COLOUR_ASSESSMENT = 0xFFE65100;
+    protected static final int COLOUR_EVENT = 0xFFBB7E8C;
+    protected static final int COLOUR_STUDY = 0xFF87B3C0;
+    protected static final int COLOUR_ASSESSMENT = 0xFF997095;
 
     /// Base constructor
     /// @param context Application context

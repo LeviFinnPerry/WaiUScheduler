@@ -19,10 +19,10 @@ import androidx.room.PrimaryKey;
 public class PaperEntity {
     @PrimaryKey @NonNull                 // Unique Id for the paper
     private String paperId;
-    private String paperCode;           // Paper code eg. COMPX576
-    private String paperName;           // Paper name eg. Programming Project
-    private int points;                 // Paper points
-    private String semesterCode_fk;    // Foreign key referencing semester
+    private final String paperCode;           // Paper code eg. COMPX576
+    private final String paperName;           // Paper name eg. Programming Project
+    private final int points;                 // Paper points
+    private final String semesterCode_fk;    // Foreign key referencing semester
 
     /// Constructor for the paper table
     /// @param paperId Id of the paper
@@ -58,22 +58,10 @@ public class PaperEntity {
         return paperCode;
     }
 
-    /// Set the paper code
-    /// @param paperCode The code for the paper
-    public void setPaperCode(String paperCode) {
-        this.paperCode = paperCode;
-    }
-
     /// Get the paper name
     /// @return The paper name
     public String getPaperName() {
         return paperName;
-    }
-
-    /// Set the paper name
-    /// @param paperName The name for the paper
-    public void setPaperName(String paperName) {
-        this.paperName = paperName;
     }
 
     /// Get the paper points
@@ -82,21 +70,10 @@ public class PaperEntity {
         return points;
     }
 
-    /// Set the paper points
-    /// @param points The points for the paper
-    public void setPoints(int points) {
-        this.points = points;
-    }
-
     /// Get the semester code foreign key
     /// @return Foreign key of the semester occurrence code
     public String getSemesterCode_fk() {
         return semesterCode_fk;
     }
 
-    /// Set the semester code foreign key
-    /// @param semesterCode_fk The semester occurrence code
-    public void setSemesterCode_fk(String semesterCode_fk) {
-        this.semesterCode_fk = semesterCode_fk;
-    }
 }
