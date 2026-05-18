@@ -99,7 +99,7 @@ public class DataRepository {
 
                     // Get the current semester for the paper
                     SemesterEntity semesterEntity =
-                            dbController.getSemester(cleaner.semester_fk);
+                            dbController.getSemester(currentOutline.getSemesterCode());
 
                     currentOutline.setEvents(cleaner.createEventData(semesterEntity));
                     ArrayList<EventEntity> events = currentOutline.getEvents();
