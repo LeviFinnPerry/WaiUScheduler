@@ -13,6 +13,7 @@ import com.example.waiuscheduler.R;
 import com.example.waiuscheduler.database.tables.StaffEntity;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class StaffAdapter extends RecyclerView.Adapter<StaffAdapter.StaffViewHolder> {
     private final ArrayList<StaffEntity> staffMembers;
@@ -27,12 +28,26 @@ public class StaffAdapter extends RecyclerView.Adapter<StaffAdapter.StaffViewHol
     @SuppressLint("NotifyDataSetChanged")
     public void submitStaff(ArrayList<StaffEntity> newStaff) {
         staffMembers.clear();
-        for (StaffEntity staff : newStaff) {
-            if (staff.getPosition().matches("Convenor")) {
-                staffMembers.add(staff);
-            }
-        }
+        staffMembers.addAll(filterConvenors(newStaff));
         notifyDataSetChanged();
+    }
+
+    /// Finds staff that are convenors of the paper
+    /// @param staff list of staff entities
+    /// @return list of staff who are convenors
+    private List<StaffEntity> filterConvenors(List<StaffEntity> staff) {
+        List<StaffEntity> result = new ArrayList<>();
+        for (StaffEntity s: staff) {
+            if (isConvenor(s)) result.add(s);
+        }
+        return result;
+    }
+
+    /// Determines whether staff member is a convenor
+    /// @param staff staff member
+    /// @return true if convenor else false
+    private boolean isConvenor(StaffEntity staff) {
+        return "Convenor".equalsIgnoreCase(staff.getPosition());
     }
 
     /// View Holder class to manage the items in the recycler view
@@ -67,10 +82,7 @@ public class StaffAdapter extends RecyclerView.Adapter<StaffAdapter.StaffViewHol
     @Override
     public void onBindViewHolder(@NonNull StaffViewHolder holder, int position) {
         StaffEntity staff = staffMembers.get(position);
-        String code_fk = staff.getPaperId();
-        String code = code_fk.split("-")[0];
-
-        holder.paperCode.setText(code);
+        holder.paperCode.setText(staff.getPaperId().split("-")[0]);
         holder.staffName.setText(staff.getName());
         holder.staffEmail.setText(staff.getEmail());
         holder.staffRole.setText(staff.getPosition());
